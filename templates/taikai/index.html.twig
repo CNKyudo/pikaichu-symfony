@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'taikai.list'|trans }} · {{ app_name }}{% endblock %}
+
+{% block body %}
+<div class="level">
+    <div class="level-left"><h1 class="title">{{ 'taikai.list'|trans }}</h1></div>
+    <div class="level-right">
+        <a class="button is-primary" href="{{ path('app_taikai_new') }}">{{ 'action.add'|trans }}</a>
+    </div>
+</div>
+
+<table class="table is-fullwidth is-striped is-hoverable">
+    <thead>
+    <tr>
+        <th>{{ 'taikai.shortname'|trans }}</th>
+        <th>{{ 'taikai.name'|trans }}</th>
+        <th>{{ 'taikai.dates'|trans }}</th>
+        <th>{{ 'taikai.state'|trans }}</th>
+        <th>{{ 'taikai.form'|trans }}</th>
+        <th class="has-text-right">{{ 'taikai.participants'|trans }}</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for taikai in pagination %}
+        <tr>
+            <td><a href="{{ path('app_taikai_show', {id: taikai.id}) }}">{{ taikai.shortname }}</a></td>
+            <td>{{ taikai.name }}</td>
+            <td>
+                {{ taikai.startDate ? taikai.startDate|date('d/m/y') : '' }}
+                – {{ taikai.endDate ? taikai.endDate|date('d/m/y') : '' }}
+            </td>
+            <td><span class="tag is-info">{{ taikai.currentState.label|trans }}</span></td>
+            <td><span class="tag is-dark">{{ taikai.form ? taikai.form.label|trans : '' }}</span></td>
+            <td class="has-text-right">{{ taikai.participants|length }}</td>
+        </tr>
+    {% else %}
+        <tr><td colspan="6" class="has-text-centered has-text-grey">{{ 'taikai.empty'|trans }}</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<div class="is-flex is-justify-content-center">{{ knp_pagination_render(pagination) }}</div>
+{% endblock %}

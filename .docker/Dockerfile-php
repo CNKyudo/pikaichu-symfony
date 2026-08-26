@@ -1,0 +1,45 @@
+FROM php:8.4-fpm-bookworm
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        git \
+        zlib1g-dev \
+        libxml2-dev \
+        libpng-dev \
+        libzip-dev \
+        libpq-dev \
+        libicu-dev \
+        vim curl debconf subversion apt-transport-https apt-utils \
+        build-essential locales acl mailutils wget nodejs zip unzip \
+        gnupg \
+        sudo \
+        ssh \
+    && docker-php-ext-install \
+        pdo \
+        pdo_pgsql \
+        soap \
+        zip \
+        opcache \
+        gd \
+        intl \
+    && pecl install apcu \
+    && docker-php-ext-enable apcu \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+COPY build/php/opcache.ini /usr/local/etc/php/conf.d/
+COPY build/php/custom.ini /usr/local/etc/php/conf.d/
+RUN curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer
+
+RUN wget --no-check-certificate https://phar.phpunit.de/phpunit-10.5.3.phar && \
+    mv phpunit*.phar phpunit.phar && \
+    chmod +x phpunit.phar && \
+    mv phpunit.phar /usr/local/bin/phpunit
+
+RUN usermod -u 1000 www-data
+RUN usermod -a -G www-data root
+RUN mkdir -p /var/www
+RUN chown -R www-data:www-data /var/www
+RUN mkdir -p /var/www/.composer
+RUN chown -R www-data:www-data /var/www/.composer
+
+RUN git config --system --add safe.directory /var/www/project
+
+WORKDIR /var/www/project/

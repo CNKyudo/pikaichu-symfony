@@ -1,0 +1,68 @@
+services:
+###> doctrine/doctrine-bundle ###
+  database:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - database_data:/var/lib/postgresql/data:rw
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d app"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - symfony
+###< doctrine/doctrine-bundle ###
+
+  adminer:
+    image: adminer
+    environment:
+      ADMINER_DEFAULT_DB_DRIVER: pgsql
+      ADMINER_DEFAULT_DB_HOST: database
+      ADMINER_DEFAULT_SERVER: database
+      ADMINER_DEFAULT_DB_NAME: app
+      ADMINER_DESIGN: lucas-sandery
+    ports:
+      - "8080:8080"
+    networks:
+      - symfony
+
+  php-nginx:
+    build:
+      context: ./.docker
+      dockerfile: Dockerfile-php-nginx
+    volumes:
+      - ./:/var/www/project/
+    ports:
+      - "8000:80"
+    depends_on:
+      - php-fpm
+    networks:
+      - symfony
+
+  php-fpm:
+    build:
+      context: ./.docker
+      dockerfile: Dockerfile-php
+    environment:
+      - DATABASE_URL=pgsql://app:password@database:5432/app?serverVersion=16&charset=utf8
+    volumes:
+      - ./:/var/www/project/
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - symfony
+
+networks:
+  symfony:
+
+volumes:
+###> doctrine/doctrine-bundle ###
+  database_data:
+###< doctrine/doctrine-bundle ###

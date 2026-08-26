@@ -1,0 +1,17 @@
+parameters:
+    app.default_locale: 'fr'
+    app.supported_locales: ['fr', 'en']
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/DTO/'
+            - '../src/Exception/'
+            - '../src/Kernel.php'

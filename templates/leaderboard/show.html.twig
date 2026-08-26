@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'leaderboard.title'|trans }} · {{ taikai.shortname }}{% endblock %}
+
+{% block body %}
+<h1 class="title">{{ 'leaderboard.title'|trans }} — {{ taikai.shortname }}</h1>
+
+<div class="buttons mb-4">
+    <a class="button" href="{{ path('app_taikai_show', {id: taikai.id}) }}">{{ 'marking.back_to_taikai'|trans }}</a>
+    <a class="button is-light" href="{{ path('app_leaderboard_public', {taikaiId: taikai.id}) }}">
+        {{ 'leaderboard.public_view'|trans }}
+    </a>
+</div>
+
+{{ include('leaderboard/_content.html.twig') }}
+{% endblock %}

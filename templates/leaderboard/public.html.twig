@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ taikai.shortname }} · {{ 'leaderboard.title'|trans }}{% endblock %}
+
+{# Vue destinée à la projection en salle : rafraîchissement automatique. #}
+{% block stylesheets %}
+    <meta http-equiv="refresh" content="30">
+{% endblock %}
+
+{% block body %}
+<h1 class="title has-text-centered">{{ taikai.name }}</h1>
+<h2 class="subtitle has-text-centered">{{ 'leaderboard.title'|trans }}</h2>
+
+{{ include('leaderboard/_content.html.twig') }}
+{% endblock %}

@@ -1,0 +1,6 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ 'taikai.new'|trans }} · {{ app_name }}{% endblock %}
+{% block body %}
+    <h1 class="title">{{ 'taikai.new'|trans }}</h1>
+    {{ include('taikai/_form.html.twig') }}
+{% endblock %}

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="{{ app.request.locale|default('fr') }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{{ app_name }}{% endblock %}</title>
+
+    {# Bulma, comme l'application Rails d'origine, pour ne pas dérouter les utilisateurs. #}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
+    <style>
+        /* Le mode sombre automatique de Bulma 1.x rend l'application illisible :
+           on force le thème clair, comme sur l'application Rails. */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bulma-scheme-brightness: light;
+                --bulma-scheme-main-l: 100%;
+                --bulma-scheme-main-bis-l: 98%;
+                --bulma-scheme-main-ter-l: 96%;
+                --bulma-background-l: 96%;
+                --bulma-border-weak-l: 93%;
+                --bulma-border-l: 86%;
+                --bulma-text-weak-l: 48%;
+                --bulma-text-strong-l: 21%;
+                --bulma-text-title-l: 14%;
+            }
+        }
+    </style>
+    {% block stylesheets %}{% endblock %}
+</head>
+<body>
+<nav class="navbar is-light" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <a class="navbar-item has-text-weight-bold" href="{{ path('app_taikai_index') }}">{{ app_name }}</a>
+        </div>
+        <div class="navbar-menu is-active">
+            <div class="navbar-start">
+                <a class="navbar-item" href="{{ path('app_taikai_index') }}">{{ 'nav.taikais'|trans }}</a>
+            </div>
+            <div class="navbar-end">
+                {% if app.user %}
+                    <div class="navbar-item">{{ app.user.displayName }}</div>
+                    <div class="navbar-item">
+                        <form method="post" action="{{ path('app_logout') }}">
+                            <button class="button is-small is-light" type="submit">{{ 'nav.logout'|trans }}</button>
+                        </form>
+                    </div>
+                {% else %}
+                    <a class="navbar-item" href="{{ path('app_login') }}">{{ 'nav.login'|trans }}</a>
+                    <a class="navbar-item" href="{{ path('app_register') }}">{{ 'nav.register'|trans }}</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>
+
+<section class="section">
+    <div class="container">
+        {% for type, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="notification is-{{ type == 'error' ? 'danger' : type }}">{{ message|trans }}</div>
+            {% endfor %}
+        {% endfor %}
+
+        {% block body %}{% endblock %}
+    </div>
+</section>
+
+{% block javascripts %}{% endblock %}
+</body>
+</html>

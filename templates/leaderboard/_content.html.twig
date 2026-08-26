@@ -1,0 +1,34 @@
+{% if teams|length %}
+    <h2 class="subtitle">{{ 'leaderboard.by_team'|trans }}</h2>
+    {{ include('leaderboard/_table.html.twig', {groups: teams}) }}
+{% endif %}
+
+{% if individual|length %}
+    <h2 class="subtitle mt-5">{{ 'leaderboard.individual'|trans }}</h2>
+    {{ include('leaderboard/_table.html.twig', {groups: individual}) }}
+{% endif %}
+
+{% if podium|length %}
+    <h2 class="subtitle">{{ 'leaderboard.final_standings'|trans }}</h2>
+    <table class="table is-fullwidth is-striped is-narrow">
+        <tbody>
+        {% for entry in podium %}
+            <tr>
+                <td class="has-text-weight-bold">{{ loop.index }}</td>
+                <td>{{ entry.team.shortname }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
+{% if by_dojo|length %}
+    <h2 class="subtitle mt-6">{{ 'leaderboard.by_host_club'|trans }}</h2>
+    {% for participatingDojo in taikai.participatingDojos %}
+        {% set groups = by_dojo[participatingDojo.id]|default([]) %}
+        {% if groups|length %}
+            <h3 class="is-size-5 mt-4">{{ participatingDojo.displayName }}</h3>
+            {{ include('leaderboard/_table.html.twig', {groups: groups}) }}
+        {% endif %}
+    {% endfor %}
+{% endif %}

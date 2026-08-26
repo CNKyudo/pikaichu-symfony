@@ -1,0 +1,162 @@
+nav:
+    taikais: Taikai
+    login: Sign in
+    logout: Sign out
+    register: Sign up
+
+action:
+    save: Save
+    back: Back
+    add: Add
+    edit: Edit
+    delete: Delete
+
+user:
+    email_address: Email
+    firstname: First name
+    lastname: Last name
+    password: Password
+    password_confirmation: Confirm password
+    password.blank: A password is required.
+    password.mismatch: The two passwords do not match.
+    password.too_short: The password must be at least {{ limit }} characters long.
+    email_address.already_used: This email address is already in use.
+
+registration:
+    success: Your account has been created, you can now sign in.
+
+dojo:
+    shortname: Short name
+    name: Full name
+    city: City
+    country_code: Country
+    shortname.already_used: This short name is already used by another dojo.
+
+kyudojin:
+    license_id.already_used: This license number is already registered.
+
+taikai:
+    list: Taikai list
+    new: Add a Taikai
+    edit: Edit Taikai
+    overview: Overview of
+    details: Details
+    empty: No taikai registered yet.
+    created: The taikai has been created.
+    updated: The taikai has been updated.
+    deleted: The taikai has been deleted.
+    shortname: Short name
+    shortname.help: Explicit acronym, without spaces, including the dojo or territorial commission name.
+    shortname.already_used: This short name is already used by another taikai.
+    shortname.invalid_format: The short name may only contain letters, digits and hyphens.
+    name: Full name
+    description: Description
+    start_date: Start date
+    end_date: End date
+    dates: Dates
+    scoring: Scoring
+    form: Form
+    state: Stage
+    category: Category
+    total_num_arrows: Total number of arrows
+    total_num_arrows.help: Only the first 12 arrows count towards the French championship.
+    total_num_arrows.invalid_for_kinteki: In kinteki the total number of arrows must be 8, 12 or 20.
+    total_num_arrows.must_be_four_for_matches: A matches tournament is shot over 4 arrows.
+    num_targets: Targets / shooters
+    tachi_size: Tachi size
+    distributed: Remote
+    distributed.help: Tick to allow several host dojos in different locations.
+    distributed.num_participating_dojos: An on-site taikai can only have one host dojo.
+    participants: Participants
+    host_clubs: Host dojos
+    no_host_club: No host dojo registered.
+    staff: Staff
+    no_staff: No staff member registered.
+    history: History
+    marking_sheet: Marking sheet
+    results: Results table
+
+    form.individual: Individual
+    form.team: Teams
+    form.2in1: 2 in 1
+    form.matches: Matches
+
+    scoring.kinteki: Kinteki
+    scoring.enteki: Enteki
+
+    state.new: Preparation
+    state.registration: Registration
+    state.marking: Marking
+    state.tie_break: Tie-Break
+    state.done: Done
+
+    transition:
+        next: Next stage
+        previous: Previous stage
+        success: The stage has been changed.
+        confirm_forward: Are you sure you want to move to the next stage?
+        confirm_backward: Are you sure you want to go back to the previous stage? You may lose the data of the current stage!
+        not_allowed: This stage change is not allowed.
+        unknown_state: Unknown stage.
+        invalid_token: Invalid security token, please try again.
+        missing_required_staff: >-
+            Cannot move to the "Marking" stage. The staff must include at least
+            a Chairman, a Shajo Referee and a Target Referee.
+        draw_not_done: 'Cannot move to the "Marking" stage: the draw has not been done for every host dojo.'
+        results_not_finalized: 'Cannot move to the "Tie-Break" stage: some marks are not validated yet.'
+
+draw:
+    label: Draw
+    done: Done
+    pending: Pending
+    no_taikai: This host dojo is not attached to any taikai.
+    unteamed_participants: Every participant must be assigned to a team before the draw.
+    success: The draw has been completed.
+    confirm: Are you sure you want to run the draw?
+    no_change_if_taikai_is_marking: The draw is only possible during the "Registration" stage.
+
+marking:
+    title: Marking sheet
+    back_to_taikai: Back to Taikai
+    all_rounds: All rounds
+    round: Round
+    order: No.
+    name: Name
+    input: Input
+    score: Score
+    complete: Marking complete
+    validate_round: Validate round
+    no_participant: No participant.
+    unknown_status: Unknown mark.
+    invalid_token: Invalid security token, please try again.
+    status.hit: Hit
+    status.miss: Miss
+    status.unknown: Uncertain
+
+leaderboard:
+    title: Results table
+    rank: Rank
+    name: Name
+    hits: Hits
+    points: Points
+    individual: Individual results
+    by_team: Team results
+    by_host_club: Ranking per dojo
+    final_standings: Final standings
+    public_view: Public results
+    empty: No result yet.
+
+score:
+    team_xor_participant: A score belongs to a participant or to a team, not both.
+
+result:
+    value.invalid_for_enteki: In enteki each arrow must carry a value among 0, 3, 5, 7, 9 or 10.
+
+staff:
+    user.required_for_role: This role must be attached to a user account.
+    participating_dojo.required_for_role: This role must be attached to a host dojo.
+    at_least_one_admin: The taikai must keep at least one administrator.
+
+match:
+    no_taikai: This match is not attached to any taikai.
+    defined_results_for_target_match: Marks have already been entered on the next match, the winner can no longer be changed.

@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'nav.login'|trans }} · {{ app_name }}{% endblock %}
+
+{% block body %}
+<div class="columns is-centered">
+    <div class="column is-one-third">
+        <div class="card">
+            <header class="card-header"><p class="card-header-title">{{ 'nav.login'|trans }}</p></header>
+            <div class="card-content">
+                {% if error %}
+                    <div class="notification is-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                {% endif %}
+
+                <form method="post">
+                    <div class="field">
+                        <label class="label" for="email_address">{{ 'user.email_address'|trans }}</label>
+                        <div class="control">
+                            <input class="input" type="email" id="email_address" name="email_address"
+                                   value="{{ last_username }}" required autofocus>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label" for="password">{{ 'user.password'|trans }}</label>
+                        <div class="control">
+                            <input class="input" type="password" id="password" name="password" required>
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                    <div class="field">
+                        <button class="button is-primary is-fullwidth" type="submit">{{ 'nav.login'|trans }}</button>
+                    </div>
+                </form>
+
+                <p class="mt-4"><a href="{{ path('app_register') }}">{{ 'nav.register'|trans }}</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

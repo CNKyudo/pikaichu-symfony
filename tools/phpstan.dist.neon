@@ -1,0 +1,40 @@
+parameters:
+    level: 7
+    paths:
+        - ../src
+        - ../tests
+    symfony:
+        containerXmlPath: ../var/cache/dev/App_KernelDevDebugContainer.xml
+    doctrine:
+        objectManagerLoader: ../tests/object-manager.php
+    excludePaths:
+        - ../src/Kernel.php
+        # Amorçage PHPUnit, pas du code applicatif.
+        - ../tests/bootstrap.php
+
+    ignoreErrors:
+        # Les propriétés d'entité sont déclarées nullables pour permettre
+        # l'instanciation avant hydratation, alors que la colonne est NOT NULL.
+        # C'est l'idiome Doctrine habituel : la contrainte est portée par la base
+        # et par les contraintes de validation, pas par le type PHP.
+        -
+            identifier: doctrine.columnType
+            message: '#type mapping mismatch: property can contain .* but database expects#'
+            path: ../src/Entity
+        -
+            identifier: doctrine.associationType
+            path: ../src/Entity
+
+        # Les identifiants sont des BIGSERIAL, que Doctrine restitue en `string`.
+        # Sur PHP 64 bits les identifiants restent très en deçà de PHP_INT_MAX,
+        # on les manipule donc en `int`, comme le faisait l'application Rails.
+        -
+            identifier: doctrine.columnType
+            message: '#\$id type mapping mismatch: database can contain string but property expects int\|null#'
+            path: ../src/Entity
+
+includes:
+    - ../vendor/phpstan/phpstan-symfony/extension.neon
+    - ../vendor/phpstan/phpstan-symfony/rules.neon
+    - ../vendor/phpstan/phpstan-doctrine/extension.neon
+    - ../vendor/phpstan/phpstan-doctrine/rules.neon

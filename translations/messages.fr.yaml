@@ -1,0 +1,162 @@
+nav:
+    taikais: Taikai
+    login: Connexion
+    logout: Déconnexion
+    register: Inscription
+
+action:
+    save: Sauvegarder
+    back: Retour
+    add: Ajouter
+    edit: Modifier
+    delete: Supprimer
+
+user:
+    email_address: Email
+    firstname: Prénom
+    lastname: Nom
+    password: Mot de passe
+    password_confirmation: Confirmation du mot de passe
+    password.blank: Le mot de passe est obligatoire.
+    password.mismatch: Les deux mots de passe ne correspondent pas.
+    password.too_short: Le mot de passe doit faire au moins {{ limit }} caractères.
+    email_address.already_used: Cette adresse email est déjà utilisée.
+
+registration:
+    success: Votre compte a bien été créé, vous pouvez vous connecter.
+
+dojo:
+    shortname: Nom court
+    name: Nom entier
+    city: Ville
+    country_code: Pays
+    shortname.already_used: Ce nom court est déjà utilisé par un autre club.
+
+kyudojin:
+    license_id.already_used: Ce numéro de licence est déjà enregistré.
+
+taikai:
+    list: Liste des Taikai
+    new: Ajouter un Taikai
+    edit: Modifier le Taikai
+    overview: Vue d'ensemble de
+    details: Informations
+    empty: Aucun taikai enregistré.
+    created: Le taikai a bien été créé.
+    updated: Le taikai a bien été modifié.
+    deleted: Le taikai a bien été supprimé.
+    shortname: Nom court
+    shortname.help: Sigle explicite, sans espace, comprenant le nom du club ou de la commission territoriale.
+    shortname.already_used: Ce nom court est déjà utilisé par un autre taikai.
+    shortname.invalid_format: Le nom court ne peut contenir que des lettres, des chiffres et des tirets.
+    name: Nom entier
+    description: Description
+    start_date: Date de début
+    end_date: Date de fin
+    dates: Dates
+    scoring: Type de score
+    form: Forme
+    state: Étape
+    category: Catégorie
+    total_num_arrows: Nb total de flèches
+    total_num_arrows.help: Seules les 12 premières flèches sont homologuées pour le championnat de France.
+    total_num_arrows.invalid_for_kinteki: En kinteki, le nombre total de flèches doit être 8, 12 ou 20.
+    total_num_arrows.must_be_four_for_matches: Un tournoi à matchs se tire en 4 flèches.
+    num_targets: Nb de cibles/tireurs
+    tachi_size: Taille des tachi
+    distributed: À distance
+    distributed.help: Cochez pour autoriser plusieurs clubs hôtes situés dans des lieux différents.
+    distributed.num_participating_dojos: Un taikai sur place ne peut avoir qu'un seul club hôte.
+    participants: Participants
+    host_clubs: Clubs hôtes
+    no_host_club: Aucun club hôte enregistré.
+    staff: Staff
+    no_staff: Aucun membre du staff enregistré.
+    history: Historique
+    marking_sheet: Feuille de marque
+    results: Tableau des résultats
+
+    form.individual: Individuel
+    form.team: En équipes
+    form.2in1: 2 en 1
+    form.matches: Matchs
+
+    scoring.kinteki: Kinteki
+    scoring.enteki: Enteki
+
+    state.new: Préparation
+    state.registration: Enregistrement
+    state.marking: Marquage
+    state.tie_break: Tie-Break
+    state.done: Terminé
+
+    transition:
+        next: Étape suivante
+        previous: Étape précédente
+        success: L'étape a bien été changée.
+        confirm_forward: Êtes-vous certain.e de vouloir avancer à l'état suivant ?
+        confirm_backward: Êtes-vous certain.e de vouloir revenir à l'état précédent ? Vous risquez de perdre les données de l'état courant !
+        not_allowed: Ce changement d'étape n'est pas autorisé.
+        unknown_state: Étape inconnue.
+        invalid_token: Jeton de sécurité invalide, veuillez réessayer.
+        missing_required_staff: >-
+            Impossible de passer à l'étape « Marquage ». Le staff doit disposer au minimum
+            d'un Directeur de tournoi, d'un Juge de Shajo et d'un Juge de Cible.
+        draw_not_done: "Impossible de passer à l'étape « Marquage » : le tirage au sort n'a pas été effectué pour tous les clubs hôtes."
+        results_not_finalized: "Impossible de passer à l'étape « Tie-Break » : toutes les marques ne sont pas validées."
+
+draw:
+    label: Tirage au sort
+    done: Effectué
+    pending: À faire
+    no_taikai: Ce club hôte n'est rattaché à aucun taikai.
+    unteamed_participants: Tous les participants doivent être affectés à une équipe avant le tirage au sort.
+    success: Le tirage au sort a bien été effectué.
+    confirm: Êtes-vous certain.e de vouloir effectuer le tirage au sort ?
+    no_change_if_taikai_is_marking: Le tirage au sort n'est possible qu'à l'étape « Enregistrement ».
+
+marking:
+    title: Feuille de marque
+    back_to_taikai: Retour au Taikai
+    all_rounds: Toutes les séries
+    round: Série
+    order: Nb
+    name: Nom
+    input: Saisie
+    score: Score
+    complete: Saisie terminée
+    validate_round: Validation de la série
+    no_participant: Aucun participant.
+    unknown_status: Marque inconnue.
+    invalid_token: Jeton de sécurité invalide, veuillez réessayer.
+    status.hit: Touché
+    status.miss: Manqué
+    status.unknown: Incertain
+
+leaderboard:
+    title: Tableau des résultats
+    rank: Rang
+    name: Nom
+    hits: Touchés
+    points: Points
+    individual: Résultats individuels
+    by_team: Résultats en équipe
+    by_host_club: Classement par club
+    final_standings: Classement final
+    public_view: Résultats publics
+    empty: Aucun résultat pour le moment.
+
+score:
+    team_xor_participant: Un score porte sur un participant ou sur une équipe, pas les deux.
+
+result:
+    value.invalid_for_enteki: En enteki, chaque flèche doit porter une valeur parmi 0, 3, 5, 7, 9 ou 10.
+
+staff:
+    user.required_for_role: Ce rôle doit être rattaché à un compte utilisateur.
+    participating_dojo.required_for_role: Ce rôle doit être rattaché à un club hôte.
+    at_least_one_admin: Le taikai doit conserver au moins un administrateur.
+
+match:
+    no_taikai: Ce match n'est rattaché à aucun taikai.
+    defined_results_for_target_match: Des marques ont déjà été saisies sur le match suivant, le vainqueur ne peut plus être modifié.
