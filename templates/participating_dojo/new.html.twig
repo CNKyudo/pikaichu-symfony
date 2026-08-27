@@ -1,0 +1,6 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ 'participating_dojo.new'|trans }} · {{ app_name }}{% endblock %}
+{% block body %}
+    <h1 class="title">{{ 'participating_dojo.new'|trans }} — {{ taikai.shortname }}</h1>
+    {{ include('participating_dojo/_form.html.twig') }}
+{% endblock %}

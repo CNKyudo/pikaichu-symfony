@@ -1,6 +1,10 @@
 framework:
     validation:
         email_validation_mode: html5
+        # Les messages de contrainte du projet vivent dans `messages.*.yaml` comme
+        # le reste des traductions ; sans cela Symfony les cherche dans le domaine
+        # `validators` et affiche la clé brute à l'utilisateur.
+        translation_domain: messages
         auto_mapping:
             App\Entity\: []
 

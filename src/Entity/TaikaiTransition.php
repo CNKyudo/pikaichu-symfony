@@ -16,6 +16,14 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: TaikaiTransitionRepository::class)]
 #[ORM\Table(name: 'taikai_transitions')]
 #[ORM\UniqueConstraint(name: 'index_taikai_transitions_parent_sort', columns: ['taikai_id', 'sort_key'])]
+// Index unique partiel : une seule transition `most_recent` par taikai. Déclaré ici
+// pour que `doctrine:schema:validate` le reconnaisse, DBAL 4 introspectant la clause
+// `WHERE` des index PostgreSQL.
+#[ORM\UniqueConstraint(
+    name: 'index_taikai_transitions_parent_most_recent',
+    columns: ['taikai_id', 'most_recent'],
+    options: ['where' => 'most_recent'],
+)]
 #[ORM\HasLifecycleCallbacks]
 class TaikaiTransition
 {

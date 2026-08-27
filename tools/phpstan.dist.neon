@@ -25,14 +25,6 @@ parameters:
             identifier: doctrine.associationType
             path: ../src/Entity
 
-        # Les identifiants sont des BIGSERIAL, que Doctrine restitue en `string`.
-        # Sur PHP 64 bits les identifiants restent très en deçà de PHP_INT_MAX,
-        # on les manipule donc en `int`, comme le faisait l'application Rails.
-        -
-            identifier: doctrine.columnType
-            message: '#\$id type mapping mismatch: database can contain string but property expects int\|null#'
-            path: ../src/Entity
-
 includes:
     - ../vendor/phpstan/phpstan-symfony/extension.neon
     - ../vendor/phpstan/phpstan-symfony/rules.neon

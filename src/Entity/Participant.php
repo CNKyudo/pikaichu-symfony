@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\UniqueConstraint;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -20,6 +21,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[UniqueConstraint(name: 'by_participants_participating_dojo_kyudojin', columns: ['participating_dojo_id', 'kyudojin_id'])]
 #[UniqueConstraint(name: 'teams_by_team_index_in_team', columns: ['team_id', 'index_in_team'])]
 #[ORM\HasLifecycleCallbacks]
+// `allow_blank` côté Rails : plusieurs participants sans licencié ni ordre de
+// passage coexistent, PostgreSQL traitant les NULL comme distincts.
+#[UniqueEntity(fields: ['participatingDojo', 'kyudojin'], message: 'participant.kyudojin.already_registered', errorPath: 'kyudojin', ignoreNull: true)]
+#[UniqueEntity(fields: ['participatingDojo', 'index'], message: 'participant.index.already_used', errorPath: 'index', ignoreNull: true)]
 class Participant implements \Stringable
 {
     use TimestampableTrait;

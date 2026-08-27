@@ -6,6 +6,7 @@ namespace App\Repository;
 
 use App\Entity\Dojo;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -16,5 +17,12 @@ class DojoRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Dojo::class);
+    }
+
+    /** Requête de la liste des clubs, triée par nom court comme côté Rails. */
+    public function createListQueryBuilder(): QueryBuilder
+    {
+        return $this->createQueryBuilder('d')
+            ->orderBy('d.shortname', 'ASC');
     }
 }

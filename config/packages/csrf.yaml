@@ -1,6 +1,6 @@
 # Protection CSRF classique, adossée à la session.
 #
-# La recette Symfony 7.4 active par défaut le mode « stateless », qui repose sur
+# La recette Symfony active par défaut le mode « stateless », qui repose sur
 # un cookie double-submit renseigné par JavaScript. L'application rend ses pages
 # côté serveur sans JS obligatoire : on conserve donc le mode session, où le jeton
 # est directement présent dans le HTML.

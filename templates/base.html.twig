@@ -36,6 +36,7 @@
         <div class="navbar-menu is-active">
             <div class="navbar-start">
                 <a class="navbar-item" href="{{ path('app_taikai_index') }}">{{ 'nav.taikais'|trans }}</a>
+                <a class="navbar-item" href="{{ path('app_dojo_index') }}">{{ 'nav.dojos'|trans }}</a>
             </div>
             <div class="navbar-end">
                 {% if app.user %}
@@ -58,7 +59,10 @@
     <div class="container">
         {% for type, messages in app.flashes %}
             {% for message in messages %}
-                <div class="notification is-{{ type == 'error' ? 'danger' : type }}">{{ message|trans }}</div>
+                {# Un message peut être une simple clé, ou une paire clé/paramètres. #}
+                <div class="notification is-{{ type == 'error' ? 'danger' : type }}">
+                    {{ message is iterable ? message.key|trans(message.parameters|default({})) : message|trans }}
+                </div>
             {% endfor %}
         {% endfor %}
 
@@ -67,5 +71,6 @@
 </section>
 
 {% block javascripts %}{% endblock %}
+{% block importmap %}{{ importmap('app') }}{% endblock %}
 </body>
 </html>

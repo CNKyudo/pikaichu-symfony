@@ -1,0 +1,6 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ 'dojo.new'|trans }} · {{ app_name }}{% endblock %}
+{% block body %}
+    <h1 class="title">{{ 'dojo.new'|trans }}</h1>
+    {{ include('dojo/_form.html.twig') }}
+{% endblock %}

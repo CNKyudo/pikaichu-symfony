@@ -28,6 +28,7 @@ class Dojo implements \Stringable
 
     #[ORM\Column(length: 255, nullable: true, unique: true)]
     #[Assert\NotBlank]
+    #[Assert\Length(min: 3, max: 32)]
     private ?string $shortname = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -38,6 +39,7 @@ class Dojo implements \Stringable
     private ?string $city = null;
 
     #[ORM\Column(name: 'country_code', length: 255, nullable: true)]
+    #[Assert\NotBlank]
     private ?string $countryCode = null;
 
     public function getId(): ?int
@@ -50,9 +52,13 @@ class Dojo implements \Stringable
         return $this->shortname;
     }
 
+    /**
+     * Normalisé à l'écriture, comme le `normalizes` de Rails : la validation
+     * travaille ainsi sur la valeur définitive.
+     */
     public function setShortname(?string $shortname): static
     {
-        $this->shortname = $shortname;
+        $this->shortname = null === $shortname ? null : mb_strtolower(trim($shortname));
 
         return $this;
     }
@@ -64,7 +70,7 @@ class Dojo implements \Stringable
 
     public function setName(?string $name): static
     {
-        $this->name = $name;
+        $this->name = null === $name ? null : trim($name);
 
         return $this;
     }
@@ -88,7 +94,7 @@ class Dojo implements \Stringable
 
     public function setCountryCode(?string $countryCode): static
     {
-        $this->countryCode = $countryCode;
+        $this->countryCode = null === $countryCode ? null : mb_strtoupper(trim($countryCode));
 
         return $this;
     }

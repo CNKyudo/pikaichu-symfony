@@ -13,13 +13,13 @@ correspondant plutôt que de deviner.
 
 ### Socle — terminé
 
-- Stack Docker (PHP-FPM 8.4, nginx, PostgreSQL 16, Adminer), `Makefile`, outils
+- Stack Docker (PHP-FPM 8.5, nginx, PostgreSQL 16, Adminer), `Makefile`, outils
   qualité alignés sur ceux de l'équipe.
 - **17 entités Doctrine** couvrant l'intégralité du schéma Rails, migration
   initiale appliquée, index et contraintes repris à l'identique.
 - Authentification (connexion, déconnexion, inscription), droits par taikai.
 - Traductions `fr` / `en`.
-- **PHPStan niveau 7 sans erreur**, 23 tests verts.
+- **PHPStan niveau 7 sans erreur**, 53 tests verts.
 
 ### Fonctionnalités portées
 
@@ -30,6 +30,9 @@ correspondant plutôt que de deviner.
 | Saisie des marques | ✅ | Ajout, rotation, validation de série, avancement des tachis |
 | Tirage au sort | ✅ | Individuel, équipes, 2-en-1 ; déclenchable depuis la vue d'ensemble |
 | Classements | ✅ | Individuel, équipes, matchs ; regroupement des ex æquo |
+| Référentiel des clubs | ✅ | CRUD complet, normalisation et suppression protégée |
+| Clubs hôtes | ✅ | CRUD complet ; choix du club par liste, l'autocomplétion attend `search_controller` |
+| Participants | ⚠️ | Saisie manuelle et import Excel faits ; **réordonnancement manquant** |
 | Tie-break | ⚠️ | Calcul et figeage des rangs faits ; **écran de saisie manquant** |
 | Tableau final | ⚠️ | Bracket 4/8 et propagation des vainqueurs faits ; **écrans manquants** |
 | Rectification | ⚠️ | `MarkingService::rectify()` fait ; **écran manquant** |
@@ -40,9 +43,7 @@ Chaque ligne correspond à un contrôleur Rails sans équivalent Symfony.
 
 | Contrôleur Rails | Rôle | Difficulté |
 |---|---|---|
-| `dojos_controller` | CRUD du référentiel des clubs | faible |
-| `participating_dojos_controller` | CRUD des clubs hôtes — *le tirage au sort est déjà porté* | faible |
-| `participants_controller` | Participants, **import Excel** | moyenne |
+| `participants#reorder` | Réordonnancement par glisser-déposer | **élevée** (Stimulus) |
 | `staffs_controller` | Staff du taikai | faible |
 | `teams_controller` | CRUD des équipes | faible |
 | `teaming_controller` | Composition des équipes en glisser-déposer | **élevée** (Stimulus) |
@@ -68,7 +69,6 @@ Transverses également absents :
 - **Confirmation d'adresse par courriel.** Les colonnes existent
   (`confirmation_token`, `confirmed_at`, `unconfirmed_email`) mais l'inscription
   active le compte immédiatement.
-- **Import Excel Kyudo Gestion.** `phpoffice/phpspreadsheet` est déjà installé.
 
 ---
 
@@ -173,7 +173,26 @@ départagent. Voir `ScoreValue::compareTo()`.
 
 **Un enum ne peut pas être clé de tableau en PHP.** Utiliser une liste de paires.
 
-**CSRF.** La recette Symfony 7.4 active le mode « stateless », qui exige du
+**Domaine de traduction des messages de validation.** Symfony traduit les
+violations dans le domaine `validators`, alors que le projet range toutes ses
+clés dans `messages.*.yaml` : les messages de contrainte s'affichaient en clé
+brute (`taikai.shortname.already_used`) à l'écran. `config/packages/validator.yaml`
+force `translation_domain: messages`.
+
+**Rapprochement des licenciés à l'import.** `participants#import` compare les
+noms en majuscules (`upcase`), alors que `Kyudojin` les normalise en casse de
+titre depuis janvier 2026 : côté Rails la recherche ne peut plus aboutir. Le
+portage reprend l'intention — comparaison insensible à la casse, aux accents et
+aux traits d'union — plutôt que la lettre, qui serait morte-née.
+
+**Identity map et tests fonctionnels.** Une entité construite par le test reste
+dans l'identity map ; ses collections `OneToMany`, créées vides par le
+constructeur, passent pour déjà chargées et la requête qui suit ne voit pas les
+relations pourtant écrites en base. Un test passe alors — ou échoue — pour de
+mauvaises raisons. Appeler `commitSeeding()` (voir `App\Tests\DatabaseResetTrait`)
+entre la préparation du jeu de données et la première requête.
+
+**CSRF.** La recette Symfony active le mode « stateless », qui exige du
 JavaScript pour renseigner le jeton. L'application rendant ses pages côté
 serveur, `config/packages/csrf.yaml` rétablit le mode session.
 
@@ -188,8 +207,8 @@ le thème clair, exactement comme le correctif appliqué à l'application Rails.
 L'ordre ci-dessous suit les dépendances métier et permet de garder une
 application utilisable à chaque étape :
 
-1. `dojos` et `participating_dojos` — sans clubs hôtes, rien n'est saisissable.
-2. `participants` (saisie manuelle puis import Excel).
+1. ~~`dojos` et `participating_dojos`~~ — faits.
+2. ~~`participants` (saisie manuelle et import Excel)~~ — faits.
 3. `staffs` — condition d'accès au marquage.
 4. `tie_break` et `rectification` — les services existent, seuls les écrans manquent.
 5. `teams` puis `teaming` — débloque les formes « équipes » et « 2 en 1 ».

@@ -12,7 +12,7 @@
 
 - **All commands run inside Docker containers.** Use `docker compose exec php-fpm <cmd>` or the Makefile commands.
 - PostgreSQL 16 database. Container name: `database`, DB: `app`, user: `app`, password: `password`.
-- Symfony 7.4 + PHP 8.4.
+- Symfony 8.1 + PHP 8.5.
 - The application is served on http://localhost:8000, Adminer on http://localhost:8080.
 
 ## Makefile Commands
@@ -24,7 +24,7 @@
 - `make reset-database`: Drop, recreate, migrate and reload fixtures
 - `make test-functional`: Prep test DB (create, migrate), then run `tests/Functional/` with `--testdox`
 - `make test-unit`: Run `tests/Unit/`
-- `make rector`: Run Rector with PHP 8.4 + dead code + coding style presets
+- `make rector`: Run Rector with PHP 8.5 + dead code + coding style presets
 - `make csfixer`: Run php-cs-fixer (short array syntax, @Symfony + @PSR12)
 - `make phpstan`: Run PHPStan level 7 on `src/` and `tests/`
 - `make fix`: Run rector → php-cs-fixer → phpstan (in that order)
@@ -61,4 +61,4 @@ concepts onto their Symfony counterparts and tracks what is still missing.
 
 - Functional tests live in `tests/Functional/` and boot the kernel; unit tests in `tests/Unit/` are pure PHP and must stay fast.
 - Domain services are not all injected into a controller yet, so the container inlines them. `config/services_test.yaml` exposes them publicly for tests — add new services there when a test needs to fetch them from the container.
-- `TaikaiWorkflowTest` truncates the tables it uses in `setUp()`. If you add an entity, add its table to that list.
+- Functional tests truncate the database in `setUp()` via `App\Tests\DatabaseResetTrait`. If you add an entity, add its table to the list in that trait — it is the single place where it is declared.

@@ -1,5 +1,6 @@
 nav:
     taikais: Taikai
+    dojos: Dojos
     login: Sign in
     logout: Sign out
     register: Sign up
@@ -10,6 +11,7 @@ action:
     add: Add
     edit: Edit
     delete: Delete
+    actions: Actions
 
 user:
     email_address: Email
@@ -26,11 +28,64 @@ registration:
     success: Your account has been created, you can now sign in.
 
 dojo:
+    list: Dojo list
+    new: Add a dojo
+    edit: Edit dojo
+    empty: No dojo registered yet.
     shortname: Short name
     name: Full name
     city: City
     country_code: Country
+    shortname.help: Between 3 and 32 characters, lowercase.
     shortname.already_used: This short name is already used by another dojo.
+    created: The dojo has been created.
+    updated: The dojo has been updated.
+    deleted: The dojo has been deleted.
+    delete.confirm: Delete this dojo?
+    delete.invalid_token: Invalid security token, the deletion was cancelled.
+    delete.still_used: "This dojo cannot be deleted: it still takes part in at least one taikai."
+
+participating_dojo:
+    new: Add a host dojo
+    edit: Edit host dojo
+    dojo: Dojo
+    display_name: Display name
+    display_name.help: Leave empty to reuse the dojo short name.
+    created: The host dojo has been added.
+    updated: The host dojo has been updated.
+    deleted: The host dojo has been removed.
+    delete.confirm: Remove this host dojo from the taikai?
+    delete.invalid_token: Invalid security token, the deletion was cancelled.
+    delete.still_has_staff: "This host dojo cannot be removed: it is linked to the following staff members — %names%."
+
+participant:
+    new: Add a participant
+    edit: Edit participant
+    empty: No participant registered yet.
+    firstname: First name
+    lastname: Last name
+    club: Dojo
+    licensed: Licensed
+    index: Shooting order
+    index.help: Filled in by the draw; can be adjusted by hand if needed.
+    kyudojin: Licensee
+    kyudojin.help: Pick a licensee to reuse their identity automatically.
+    kyudojin.already_registered: This licensee is already registered in this host dojo.
+    index.already_used: This shooting order is already taken in this host dojo.
+    created: The participant has been added.
+    updated: The participant has been updated.
+    deleted: The participant has been deleted.
+    delete.confirm: Delete this participant?
+    delete.invalid_token: Invalid security token, the deletion was cancelled.
+    import.title: Excel import
+    import.file: File
+    import.help: "\"Kyudo - Interface de gestion\" export (.xlsx, .ods or .csv)."
+    import.submit: Import
+    import.file_missing: No file uploaded.
+    import.invalid_token: Invalid security token, the import was cancelled.
+    import.done: "{1}One participant has been imported.|]1,Inf[%count% participants have been imported."
+    import.not_found: "{1}%names% was not found in the FFJDA database.|]1,Inf[The following kyudojin were not found in the FFJDA database: %names%."
+    import.failed: "{1}%names% could not be imported.|]1,Inf[The following kyudojin could not be imported: %names%."
 
 kyudojin:
     license_id.already_used: This license number is already registered.

@@ -10,6 +10,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\UniqueConstraint;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * Un club hôte : la participation d'un dojo à un taikai donné.
@@ -100,11 +102,48 @@ class ParticipatingDojo implements \Stringable
         return $this->displayName ?? $this->dojo?->getShortname();
     }
 
+    /** Un nom vide équivaut à l'absence de nom, comme le `blank?` de Rails. */
     public function setDisplayName(?string $displayName): static
     {
-        $this->displayName = $displayName;
+        $displayName = null === $displayName ? null : trim($displayName);
+        $this->displayName = '' === $displayName ? null : $displayName;
 
         return $this;
+    }
+
+    /**
+     * Rails retombe sur le nom court du club avant enregistrement lorsque le nom
+     * d'affichage est laissé vide ; on stocke donc bien la valeur en base.
+     */
+    #[ORM\PrePersist]
+    #[ORM\PreUpdate]
+    public function fillDisplayNameFromDojo(): void
+    {
+        $this->displayName ??= $this->dojo?->getShortname();
+    }
+
+    /**
+     * Un taikai sur place n'accueille qu'un seul club hôte (`number_of_dojos`
+     * côté Rails). La règle est portée ici, et non sur le taikai, pour que
+     * l'erreur remonte dans le formulaire d'ajout du club hôte.
+     */
+    #[Assert\Callback]
+    public function validateHostClubIsAllowed(ExecutionContextInterface $context): void
+    {
+        $taikai = $this->taikai;
+        if (!$taikai instanceof Taikai || $taikai->isDistributed()) {
+            return;
+        }
+
+        foreach ($taikai->getParticipatingDojos() as $other) {
+            if ($other !== $this) {
+                $context->buildViolation('taikai.distributed.num_participating_dojos')
+                    ->atPath('dojo')
+                    ->addViolation();
+
+                return;
+            }
+        }
     }
 
     /** @return Collection<int, Participant> */

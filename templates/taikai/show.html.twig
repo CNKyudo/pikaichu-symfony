@@ -40,7 +40,19 @@
 
     <div class="column">
         <div class="card">
-            <header class="card-header"><p class="card-header-title">{{ 'taikai.host_clubs'|trans }}</p></header>
+            <header class="card-header">
+                <p class="card-header-title">{{ 'taikai.host_clubs'|trans }}</p>
+                {# Un taikai sur place n'accueille qu'un seul club hôte. #}
+                {% if is_granted('TAIKAI_EDIT', taikai)
+                    and (taikai.distributed or taikai.participatingDojos|length == 0) %}
+                    <div class="card-header-icon">
+                        <a class="button is-small is-primary"
+                           href="{{ path('app_participating_dojo_new', {taikaiId: taikai.id}) }}">
+                            {{ 'action.add'|trans }}
+                        </a>
+                    </div>
+                {% endif %}
+            </header>
             <div class="card-content">
                 <table class="table is-fullwidth is-narrow">
                     <thead>
@@ -48,6 +60,7 @@
                         <th>{{ 'dojo.shortname'|trans }}</th>
                         <th class="has-text-right">{{ 'taikai.participants'|trans }}</th>
                         <th class="has-text-right">{{ 'draw.label'|trans }}</th>
+                        <th class="has-text-right">{{ 'action.actions'|trans }}</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -70,9 +83,28 @@
                                     </form>
                                 {% endif %}
                             </td>
+                            <td class="has-text-right">
+                                {% if is_granted('PARTICIPATING_DOJO_EDIT', participatingDojo) %}
+                                    <a class="button is-small is-light"
+                                       href="{{ path('app_participating_dojo_edit', {taikaiId: taikai.id, id: participatingDojo.id}) }}">
+                                        {{ 'action.edit'|trans }}
+                                    </a>
+                                {% endif %}
+                                {% if is_granted('PARTICIPATING_DOJO_DELETE', participatingDojo) %}
+                                    <form method="post" style="display:inline"
+                                          action="{{ path('app_participating_dojo_delete', {taikaiId: taikai.id, id: participatingDojo.id}) }}"
+                                          onsubmit="return confirm('{{ 'participating_dojo.delete.confirm'|trans|e('js') }}')">
+                                        <input type="hidden" name="_token"
+                                               value="{{ csrf_token('delete' ~ participatingDojo.id) }}">
+                                        <button class="button is-small is-danger is-light" type="submit">
+                                            {{ 'action.delete'|trans }}
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </td>
                         </tr>
                     {% else %}
-                        <tr><td colspan="3" class="has-text-grey">{{ 'taikai.no_host_club'|trans }}</td></tr>
+                        <tr><td colspan="4" class="has-text-grey">{{ 'taikai.no_host_club'|trans }}</td></tr>
                     {% endfor %}
                     </tbody>
                 </table>

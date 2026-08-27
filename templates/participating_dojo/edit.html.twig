@@ -1,0 +1,81 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ 'participating_dojo.edit'|trans }} · {{ app_name }}{% endblock %}
+{% block body %}
+    <nav class="breadcrumb has-succeeds-separator" aria-label="breadcrumbs">
+        <ul>
+            <li><a href="{{ path('app_taikai_show', {id: taikai.id}) }}">{{ taikai.shortname }}</a></li>
+            <li class="is-active"><a aria-current="page">{{ participatingDojo.displayName }}</a></li>
+        </ul>
+    </nav>
+
+    <div class="columns">
+        <div class="column is-one-third">
+            <div class="card">
+                <header class="card-header">
+                    <p class="card-header-title">{{ 'participating_dojo.edit'|trans }}</p>
+                </header>
+                <div class="card-content">
+                    {{ include('participating_dojo/_form.html.twig') }}
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <header class="card-header">
+                    <p class="card-header-title">{{ 'participating_dojo.dojo'|trans }}</p>
+                </header>
+                <div class="card-content">
+                    <p><b>{{ 'dojo.shortname'|trans }}</b> : {{ participatingDojo.dojo.shortname }}</p>
+                    <p><b>{{ 'dojo.name'|trans }}</b> : {{ participatingDojo.dojo.name }}</p>
+                    {% if participatingDojo.dojo.city %}
+                        <p><b>{{ 'dojo.city'|trans }}</b> : {{ participatingDojo.dojo.city }}</p>
+                    {% endif %}
+                    <p>
+                        <b>{{ 'dojo.country_code'|trans }}</b> :
+                        {{ participatingDojo.dojo.countryCode ? participatingDojo.dojo.countryCode|country_name : '' }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="column">
+            {# Hors tournoi individuel, les participants se saisissent par équipe. #}
+            {% if taikai.form and taikai.form.value == 'individual' %}
+                <div class="card">
+                    <header class="card-header">
+                        <p class="card-header-title">{{ 'taikai.participants'|trans }}</p>
+                        <div class="card-header-icon">
+                            <a class="button is-small is-primary"
+                               href="{{ path('app_participant_new', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id}) }}">
+                                {{ 'action.add'|trans }}
+                            </a>
+                        </div>
+                    </header>
+                    <div class="card-content">
+                        {{ include('participant/_list.html.twig') }}
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <header class="card-header">
+                        <p class="card-header-title">{{ 'participant.import.title'|trans }}</p>
+                    </header>
+                    <div class="card-content">
+                        <form method="post" enctype="multipart/form-data"
+                              action="{{ path('app_participant_import', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('import' ~ participatingDojo.id) }}">
+                            <div class="field">
+                                <label class="label" for="excel">{{ 'participant.import.file'|trans }}</label>
+                                <div class="control">
+                                    <input class="input" type="file" id="excel" name="excel"
+                                           accept=".xlsx,.xls,.ods,.csv">
+                                </div>
+                                <p class="help">{{ 'participant.import.help'|trans }}</p>
+                            </div>
+                            <button class="button is-primary" type="submit">{{ 'participant.import.submit'|trans }}</button>
+                        </form>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

@@ -1,5 +1,6 @@
 nav:
     taikais: Taikai
+    dojos: Clubs
     login: Connexion
     logout: Déconnexion
     register: Inscription
@@ -10,6 +11,7 @@ action:
     add: Ajouter
     edit: Modifier
     delete: Supprimer
+    actions: Actions
 
 user:
     email_address: Email
@@ -26,11 +28,64 @@ registration:
     success: Votre compte a bien été créé, vous pouvez vous connecter.
 
 dojo:
+    list: Liste des clubs
+    new: Ajouter un club
+    edit: Modifier le club
+    empty: Aucun club enregistré.
     shortname: Nom court
     name: Nom entier
     city: Ville
     country_code: Pays
+    shortname.help: De 3 à 32 caractères, en minuscules.
     shortname.already_used: Ce nom court est déjà utilisé par un autre club.
+    created: Le club a bien été créé.
+    updated: Le club a bien été modifié.
+    deleted: Le club a bien été supprimé.
+    delete.confirm: Supprimer ce club ?
+    delete.invalid_token: Jeton de sécurité invalide, la suppression a été annulée.
+    delete.still_used: "Ce club ne peut pas être supprimé : il participe encore à au moins un taikai."
+
+participating_dojo:
+    new: Ajouter un club hôte
+    edit: Modifier le club hôte
+    dojo: Club
+    display_name: Nom d'affichage
+    display_name.help: Laissez vide pour reprendre le nom court du club.
+    created: Le club hôte a bien été ajouté.
+    updated: Le club hôte a bien été modifié.
+    deleted: Le club hôte a bien été retiré.
+    delete.confirm: Retirer ce club hôte du taikai ?
+    delete.invalid_token: Jeton de sécurité invalide, la suppression a été annulée.
+    delete.still_has_staff: "Ce club hôte ne peut pas être retiré : il est rattaché aux membres du staff suivants — %names%."
+
+participant:
+    new: Ajouter un participant
+    edit: Modifier le participant
+    empty: Aucun participant enregistré.
+    firstname: Prénom
+    lastname: Nom
+    club: Club
+    licensed: Licencié
+    index: Ordre de passage
+    index.help: Renseigné par le tirage au sort ; modifiable à la main si besoin.
+    kyudojin: Licencié
+    kyudojin.help: Sélectionnez un licencié pour reprendre automatiquement son identité.
+    kyudojin.already_registered: Ce licencié est déjà inscrit dans ce club hôte.
+    index.already_used: Cet ordre de passage est déjà attribué dans ce club hôte.
+    created: Le participant a bien été ajouté.
+    updated: Le participant a bien été modifié.
+    deleted: Le participant a bien été supprimé.
+    delete.confirm: Supprimer ce participant ?
+    delete.invalid_token: Jeton de sécurité invalide, la suppression a été annulée.
+    import.title: Import Excel
+    import.file: Fichier
+    import.help: Export « Kyudo - Interface de gestion » (.xlsx, .ods ou .csv).
+    import.submit: Importer
+    import.file_missing: Aucun fichier importé.
+    import.invalid_token: Jeton de sécurité invalide, l'import a été annulé.
+    import.done: "{1}Un participant a été importé.|]1,Inf[%count% participants ont été importés."
+    import.not_found: "{1}%names% n'a pas été trouvé.e dans la base FFJDA.|]1,Inf[Les kyudojin suivants n'ont pas été trouvés dans la base FFJDA : %names%."
+    import.failed: "{1}%names% n'a pas pu être importé.e.|]1,Inf[Les kyudojin suivants n'ont pas pu être importés : %names%."
 
 kyudojin:
     license_id.already_used: Ce numéro de licence est déjà enregistré.

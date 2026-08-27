@@ -1,0 +1,17 @@
+{{ form_start(form) }}
+{{ form_row(form.kyudojin) }}
+{{ form_row(form.firstname) }}
+{{ form_row(form.lastname) }}
+{{ form_row(form.club) }}
+{% if form.index is defined %}{{ form_row(form.index) }}{% endif %}
+
+<div class="field is-grouped">
+    <div class="control"><button class="button is-primary" type="submit">{{ 'action.save'|trans }}</button></div>
+    <div class="control">
+        <a class="button is-light"
+           href="{{ path('app_participating_dojo_edit', {taikaiId: taikai.id, id: participatingDojo.id}) }}">
+            {{ 'action.back'|trans }}
+        </a>
+    </div>
+</div>
+{{ form_end(form) }}

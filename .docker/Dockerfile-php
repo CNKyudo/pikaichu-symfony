@@ -1,4 +1,4 @@
-FROM php:8.4-fpm-bookworm
+FROM php:8.5-fpm-bookworm
 RUN apt-get update && apt-get install -y --no-install-recommends \
         git \
         zlib1g-dev \
@@ -17,7 +17,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         pdo_pgsql \
         soap \
         zip \
-        opcache \
         gd \
         intl \
     && pecl install apcu \
@@ -27,11 +26,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY build/php/opcache.ini /usr/local/etc/php/conf.d/
 COPY build/php/custom.ini /usr/local/etc/php/conf.d/
 RUN curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer
-
-RUN wget --no-check-certificate https://phar.phpunit.de/phpunit-10.5.3.phar && \
-    mv phpunit*.phar phpunit.phar && \
-    chmod +x phpunit.phar && \
-    mv phpunit.phar /usr/local/bin/phpunit
 
 RUN usermod -u 1000 www-data
 RUN usermod -a -G www-data root

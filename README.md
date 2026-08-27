@@ -12,12 +12,12 @@ du portage et les correspondances Rails → Symfony.
 
 | | |
 |---|---|
-| PHP | 8.4 |
-| Symfony | 7.4 |
+| PHP | 8.5 |
+| Symfony | 8.1 |
 | Base de données | PostgreSQL 16 |
 | ORM | Doctrine ORM 3 |
 | Templates | Twig + Bulma 1.0 |
-| Tests | PHPUnit 11 |
+| Tests | PHPUnit 13 |
 | Qualité | PHPStan (niveau 7), php-cs-fixer (@Symfony + @PSR12), Rector |
 
 ## Démarrage

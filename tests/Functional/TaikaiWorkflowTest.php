@@ -21,6 +21,7 @@ use App\Exception\TransitionNotAllowedException;
 use App\Service\DrawService;
 use App\Service\MarkingService;
 use App\Service\TaikaiStateMachine;
+use App\Tests\DatabaseResetTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -31,6 +32,8 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
  */
 final class TaikaiWorkflowTest extends KernelTestCase
 {
+    use DatabaseResetTrait;
+
     private EntityManagerInterface $entityManager;
 
     private TaikaiStateMachine $stateMachine;
@@ -51,7 +54,7 @@ final class TaikaiWorkflowTest extends KernelTestCase
         $this->drawService = $container->get(DrawService::class);
         $this->markingService = $container->get(MarkingService::class);
 
-        $this->resetDatabase();
+        $this->resetDatabase($this->entityManager);
         $this->loadStaffRoles();
 
         $this->user = $this->createUser($container->get(UserPasswordHasherInterface::class));
@@ -344,19 +347,5 @@ final class TaikaiWorkflowTest extends KernelTestCase
         }
 
         $this->entityManager->flush();
-    }
-
-    /** Vide les tables entre deux tests, en respectant les dépendances. */
-    private function resetDatabase(): void
-    {
-        $connection = $this->entityManager->getConnection();
-        $tables = [
-            'results', 'scores', 'tachis', 'matches', 'participants', 'teams',
-            'scoreboards', 'staffs', 'participating_dojos', 'taikai_events',
-            'taikai_transitions', 'taikais', 'staff_roles', 'dojos', 'kyudojins',
-            'sessions', 'users',
-        ];
-
-        $connection->executeStatement('TRUNCATE TABLE '.implode(', ', $tables).' RESTART IDENTITY CASCADE');
     }
 }
