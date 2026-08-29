@@ -61,4 +61,4 @@ concepts onto their Symfony counterparts and tracks what is still missing.
 
 - Functional tests live in `tests/Functional/` and boot the kernel; unit tests in `tests/Unit/` are pure PHP and must stay fast.
 - Domain services are not all injected into a controller yet, so the container inlines them. `config/services_test.yaml` exposes them publicly for tests — add new services there when a test needs to fetch them from the container.
-- Functional tests truncate the database in `setUp()` via `App\Tests\DatabaseResetTrait`. If you add an entity, add its table to the list in that trait — it is the single place where it is declared.
+- Functional tests are isolated from each other by `dama/doctrine-test-bundle`: each test runs inside a transaction that's rolled back at the end (see `phpunit.xml.dist` and `config/packages/test/dama_doctrine_test.yaml`), so no manual database reset is needed between tests. `App\Tests\DatabaseResetTrait::commitSeeding()` is still needed after seeding data and before the first request — see the identity-map pitfall in `MIGRATION.md`.

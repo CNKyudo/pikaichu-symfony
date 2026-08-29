@@ -58,7 +58,6 @@ final class MarkingShowMatchTest extends WebTestCase
         $this->matchService = $container->get(MatchService::class);
         $this->stateMachine = $container->get(TaikaiStateMachine::class);
 
-        $this->resetDatabase($this->entityManager);
         $this->loadStaffRoles();
 
         $this->admin = $this->createUser('admin@pikaichu.test');

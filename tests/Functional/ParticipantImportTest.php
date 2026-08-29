@@ -50,7 +50,6 @@ final class ParticipantImportTest extends WebTestCase
 
         $this->entityManager = $container->get(EntityManagerInterface::class);
 
-        $this->resetDatabase($this->entityManager);
         $this->loadStaffRoles();
 
         $this->admin = $this->createUser(

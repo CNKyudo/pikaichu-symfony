@@ -49,7 +49,6 @@ final class ParticipatingDojoCrudTest extends WebTestCase
         $this->entityManager = $container->get(EntityManagerInterface::class);
         $this->passwordHasher = $container->get(UserPasswordHasherInterface::class);
 
-        $this->resetDatabase($this->entityManager);
         $this->loadStaffRoles();
 
         $this->admin = $this->createUser('admin@pikaichu.test');

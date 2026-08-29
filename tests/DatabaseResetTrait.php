@@ -7,33 +7,13 @@ namespace App\Tests;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
- * Vide la base entre deux tests.
- *
- * Point unique où déclarer les tables : en ajoutant une entité, complétez la
- * liste ici et tous les tests en bénéficient.
+ * L'isolation entre deux tests est assurée par `dama/doctrine-test-bundle`
+ * (transaction annulée à la fin de chaque test) — voir `phpunit.xml.dist` et
+ * `config/packages/test/dama_doctrine_test.yaml`. Ce trait ne porte donc plus
+ * que `commitSeeding()`.
  */
 trait DatabaseResetTrait
 {
-    /**
-     * Tables purgées, dans un ordre sans importance : `CASCADE` lève les
-     * dépendances et `RESTART IDENTITY` remet les séquences à zéro.
-     *
-     * @var list<string>
-     */
-    private const array RESETTABLE_TABLES = [
-        'results', 'scores', 'tachis', 'matches', 'participants', 'teams',
-        'scoreboards', 'staffs', 'participating_dojos', 'taikai_events',
-        'taikai_transitions', 'taikais', 'staff_roles', 'dojos', 'kyudojins',
-        'sessions', 'users', 'reset_password_requests', 'ext_log_entries',
-    ];
-
-    private function resetDatabase(EntityManagerInterface $entityManager): void
-    {
-        $entityManager->getConnection()->executeStatement(
-            'TRUNCATE TABLE '.implode(', ', self::RESETTABLE_TABLES).' RESTART IDENTITY CASCADE',
-        );
-    }
-
     /**
      * À appeler entre la préparation du jeu de données et la première requête.
      *

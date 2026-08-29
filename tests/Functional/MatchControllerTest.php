@@ -54,7 +54,6 @@ final class MatchControllerTest extends WebTestCase
         $this->matchService = $container->get(MatchService::class);
         $this->scoreInitializer = $container->get(ScoreInitializer::class);
 
-        $this->resetDatabase($this->entityManager);
         $this->loadStaffRoles();
 
         $this->admin = $this->createUser('admin@pikaichu.test');

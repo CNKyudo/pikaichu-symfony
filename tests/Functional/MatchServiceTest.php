@@ -38,7 +38,6 @@ final class MatchServiceTest extends KernelTestCase
         $this->entityManager = $container->get(EntityManagerInterface::class);
         $this->matchService = $container->get(MatchService::class);
 
-        $this->resetDatabase($this->entityManager);
     }
 
     protected function tearDown(): void

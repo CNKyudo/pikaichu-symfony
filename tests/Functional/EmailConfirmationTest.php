@@ -33,7 +33,6 @@ final class EmailConfirmationTest extends WebTestCase
         $container = static::getContainer();
         $this->entityManager = $container->get(EntityManagerInterface::class);
 
-        $this->resetDatabase($this->entityManager);
     }
 
     protected function tearDown(): void

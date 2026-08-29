@@ -64,7 +64,6 @@ final class TaikaiGenerationTest extends WebTestCase
         $this->markingService = $container->get(MarkingService::class);
         $this->generationService = $container->get(TaikaiGenerationService::class);
 
-        $this->resetDatabase($this->entityManager);
         $this->loadStaffRoles();
 
         $this->admin = $this->createUser('admin@pikaichu.test');

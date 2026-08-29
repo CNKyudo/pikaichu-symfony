@@ -36,7 +36,6 @@ final class UserAccountControllerTest extends WebTestCase
         $this->entityManager = $container->get(EntityManagerInterface::class);
         $this->passwordHasher = $container->get(UserPasswordHasherInterface::class);
 
-        $this->resetDatabase($this->entityManager);
     }
 
     protected function tearDown(): void

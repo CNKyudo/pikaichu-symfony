@@ -56,7 +56,6 @@ final class RectificationControllerTest extends WebTestCase
         $this->drawService = $container->get(DrawService::class);
         $this->markingService = $container->get(MarkingService::class);
 
-        $this->resetDatabase($this->entityManager);
         $this->loadStaffRoles();
 
         $this->admin = $this->createUser('admin@pikaichu.test');

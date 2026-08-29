@@ -54,7 +54,6 @@ final class TaikaiWorkflowTest extends KernelTestCase
         $this->drawService = $container->get(DrawService::class);
         $this->markingService = $container->get(MarkingService::class);
 
-        $this->resetDatabase($this->entityManager);
         $this->loadStaffRoles();
 
         $this->user = $this->createUser($container->get(UserPasswordHasherInterface::class));

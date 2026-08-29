@@ -51,7 +51,6 @@ final class TaikaiExportControllerTest extends WebTestCase
         $this->passwordHasher = $container->get(UserPasswordHasherInterface::class);
         $this->stateMachine = $container->get(TaikaiStateMachine::class);
 
-        $this->resetDatabase($this->entityManager);
         $this->loadStaffRoles();
 
         $this->admin = $this->createUser('admin@pikaichu.test');

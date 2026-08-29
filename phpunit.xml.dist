@@ -44,5 +44,8 @@
             <parameter name="clock-mock-namespaces" value="App" />
             <parameter name="dns-mock-namespaces" value="App" />
         </bootstrap>
+        <!-- Isole chaque test dans une transaction annulée à la fin, au lieu du
+             TRUNCATE manuel de DatabaseResetTrait : bien plus rapide. -->
+        <bootstrap class="DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension" />
     </extensions>
 </phpunit>

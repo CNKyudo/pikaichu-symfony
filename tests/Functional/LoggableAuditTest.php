@@ -35,7 +35,6 @@ final class LoggableAuditTest extends WebTestCase
         $container = static::getContainer();
 
         $this->entityManager = $container->get(EntityManagerInterface::class);
-        $this->resetDatabase($this->entityManager);
 
         $this->admin = $this->createUser('admin@pikaichu.test');
         $this->client->loginUser($this->admin);

@@ -39,7 +39,6 @@ final class DojoCrudTest extends WebTestCase
         $container = static::getContainer();
 
         $this->entityManager = $container->get(EntityManagerInterface::class);
-        $this->resetDatabase($this->entityManager);
 
         $this->client->loginUser($this->createUser($container->get(UserPasswordHasherInterface::class)));
     }

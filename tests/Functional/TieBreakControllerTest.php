@@ -64,7 +64,6 @@ final class TieBreakControllerTest extends WebTestCase
         $this->markingService = $container->get(MarkingService::class);
         $this->tieBreakService = $container->get(TieBreakService::class);
 
-        $this->resetDatabase($this->entityManager);
         $this->loadStaffRoles();
 
         $this->admin = $this->createUser('admin@pikaichu.test');

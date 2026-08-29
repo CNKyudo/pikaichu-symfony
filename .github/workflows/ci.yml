@@ -54,6 +54,14 @@ jobs:
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
 
+      # tools/phpstan.dist.neon lit le conteneur compilé de l'environnement dev
+      # (phpstan-symfony) : sans ce warmup il n'existe pas, le job tournant en
+      # APP_ENV=test (composer install ne réchauffe donc que le cache test).
+      - name: Warm up dev container for phpstan
+        env:
+          APP_ENV: dev
+        run: php bin/console cache:warmup --env=dev
+
       - name: Check php-cs-fixer
         run: vendor/bin/php-cs-fixer fix --config=tools/.php-cs-fixer.dist.php --dry-run --diff --allow-risky=yes
 
