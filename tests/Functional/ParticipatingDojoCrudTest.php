@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional;
 
 use App\Entity\Dojo;
+use App\Entity\Participant;
 use App\Entity\ParticipatingDojo;
 use App\Entity\Staff;
 use App\Entity\StaffRole;
@@ -13,6 +14,8 @@ use App\Entity\User;
 use App\Enum\StaffRoleCode;
 use App\Enum\TaikaiForm;
 use App\Enum\TaikaiScoring;
+use App\Enum\TaikaiState;
+use App\Service\TaikaiStateMachine;
 use App\Tests\DatabaseResetTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -76,7 +79,7 @@ final class ParticipatingDojoCrudTest extends WebTestCase
             'participating_dojo[displayName]' => '',
         ]));
 
-        self::assertResponseRedirects('/taikais/'.$taikai->getId());
+        self::assertResponseRedirects('/taikais/'.$taikai->getId().'/edit');
 
         $participatingDojo = $this->findParticipatingDojo($taikai);
         self::assertSame('nantes', $participatingDojo->getDisplayName());
@@ -97,7 +100,7 @@ final class ParticipatingDojoCrudTest extends WebTestCase
             'participating_dojo[displayName]' => 'Club organisateur',
         ]));
 
-        self::assertResponseRedirects('/taikais/'.$taikai->getId());
+        self::assertResponseRedirects('/taikais/'.$taikai->getId().'/edit');
         self::assertSame('Club organisateur', $this->findParticipatingDojo($taikai)->getDisplayName());
     }
 
@@ -119,7 +122,7 @@ final class ParticipatingDojoCrudTest extends WebTestCase
             'participating_dojo[displayName]' => 'Brest Kyudo',
         ]));
 
-        self::assertResponseRedirects('/taikais/'.$taikai->getId());
+        self::assertResponseRedirects('/taikais/'.$taikai->getId().'/edit');
 
         $this->entityManager->clear();
         self::assertSame('Brest Kyudo', $this->findParticipatingDojo($taikai)->getDisplayName());
@@ -161,7 +164,7 @@ final class ParticipatingDojoCrudTest extends WebTestCase
         $this->commitSeeding($this->entityManager);
         $this->submitDeleteForm($taikai, $id);
 
-        self::assertResponseRedirects('/taikais/'.$taikai->getId());
+        self::assertResponseRedirects('/taikais/'.$taikai->getId().'/edit');
 
         $this->entityManager->clear();
         self::assertNull($this->entityManager->getRepository(ParticipatingDojo::class)->find($id));
@@ -184,7 +187,7 @@ final class ParticipatingDojoCrudTest extends WebTestCase
         $this->commitSeeding($this->entityManager);
         $this->submitDeleteForm($taikai, $id);
 
-        self::assertResponseRedirects('/taikais/'.$taikai->getId());
+        self::assertResponseRedirects('/taikais/'.$taikai->getId().'/edit');
         $this->client->followRedirect();
         self::assertSelectorExists('.notification.is-danger');
 
@@ -236,6 +239,56 @@ final class ParticipatingDojoCrudTest extends WebTestCase
             '/taikais/'.$taikai->getId().'/participating-dojos/'.$participatingDojo->getId(),
         );
         self::assertResponseStatusCodeSame(403);
+    }
+
+    /**
+     * Un second tirage au sort réattribue de nouveaux index à des participants qui
+     * en portent déjà : sans vider les valeurs existantes au préalable, une des
+     * réattributions peut heurter la contrainte d'unicité (participating_dojo_id,
+     * index) encore détenue par un autre participant.
+     */
+    public function testCanDrawTwiceInARow(): void
+    {
+        $taikai = $this->createTaikai(distributed: true);
+        $this->makeTaikaiAdmin($taikai, $this->admin);
+        $participatingDojo = $this->addParticipatingDojo($taikai, $this->createDojo('nantes'));
+
+        for ($i = 0; $i < 4; ++$i) {
+            $participant = new Participant();
+            $participant->setFirstname('Archer')->setLastname((string) $i)->setClub('nantes');
+            $participatingDojo->addParticipant($participant);
+            $this->entityManager->persist($participant);
+        }
+
+        $this->entityManager->flush();
+
+        static::getContainer()->get(TaikaiStateMachine::class)
+            ->transitionTo($taikai, TaikaiState::Registration, $this->admin);
+
+        $this->commitSeeding($this->entityManager);
+
+        $this->submitDrawForm($taikai, $participatingDojo->getId());
+        self::assertResponseRedirects();
+
+        $this->submitDrawForm($taikai, $participatingDojo->getId());
+        self::assertResponseRedirects();
+
+        $this->entityManager->clear();
+        $participatingDojo = $this->findParticipatingDojo($taikai);
+        $indexes = array_map(
+            static fn (Participant $participant): ?int => $participant->getIndex(),
+            $participatingDojo->getParticipants()->toArray(),
+        );
+        sort($indexes);
+        self::assertSame([1, 2, 3, 4], $indexes);
+    }
+
+    private function submitDrawForm(Taikai $taikai, ?int $participatingDojoId): void
+    {
+        $crawler = $this->client->request('GET', '/taikais/'.$taikai->getId().'/edit');
+        $action = '/taikais/'.$taikai->getId().'/participating-dojos/'.$participatingDojoId.'/draw';
+
+        $this->client->submit($crawler->filter('form[action="'.$action.'"]')->form());
     }
 
     private function submitDeleteForm(Taikai $taikai, ?int $participatingDojoId): void

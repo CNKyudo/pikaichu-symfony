@@ -1,6 +1,14 @@
 {% extends 'base.html.twig' %}
 {% block title %}{{ 'dojo.new'|trans }} · {{ app_name }}{% endblock %}
 {% block body %}
-    <h1 class="title">{{ 'dojo.new'|trans }}</h1>
-    {{ include('dojo/_form.html.twig') }}
+<div class="columns">
+    <div class="column is-half is-offset-2">
+        <div class="card">
+            <div class="card-content">
+                <p class="title">{{ 'dojo.new'|trans }}</p>
+                {{ include('dojo/_form.html.twig') }}
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

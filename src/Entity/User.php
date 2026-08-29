@@ -8,16 +8,24 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * `password_digest` et les colonnes de confirmation (jeton, date d'envoi,
+ * adresse en attente) sont volontairement exclues de la piste d'audit : ce
+ * sont des données techniques/sensibles, pas des faits métier, comme
+ * `User.non_audited_columns = [:password_digest]` côté Rails.
+ */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'users')]
 #[ORM\UniqueConstraint(name: 'index_users_on_email_address', columns: ['email_address'])]
 #[ORM\HasLifecycleCallbacks]
 #[UniqueEntity(fields: ['emailAddress'], message: 'user.email_address.already_used')]
+#[Gedmo\Loggable(logEntryClass: LogEntry::class)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     use TimestampableTrait;
@@ -30,6 +38,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(name: 'email_address', length: 255, unique: true)]
     #[Assert\NotBlank]
     #[Assert\Email]
+    #[Gedmo\Versioned]
     private ?string $emailAddress = null;
 
     #[ORM\Column(name: 'password_digest', length: 255, nullable: true)]
@@ -37,20 +46,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotBlank]
+    #[Gedmo\Versioned]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotBlank]
+    #[Gedmo\Versioned]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 255, options: ['default' => 'fr'])]
     #[Assert\Choice(choices: ['fr', 'en'])]
+    #[Gedmo\Versioned]
     private string $locale = 'fr';
 
     #[ORM\Column(options: ['default' => false])]
+    #[Gedmo\Versioned]
     private bool $admin = false;
 
     #[ORM\Column(name: 'confirmed_at', type: 'datetime_immutable', nullable: true)]
+    #[Gedmo\Versioned]
     private ?\DateTimeImmutable $confirmedAt = null;
 
     #[ORM\Column(name: 'confirmation_token', length: 255, nullable: true, unique: true)]

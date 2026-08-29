@@ -1,0 +1,52 @@
+{# Boutons d'action d'un taikai, repris de `taikais/_icons.html.erb`.
+   `size` vaut "is-small" dans la liste, "" sur la page de détail. #}
+{% if taikai.form and taikai.form.value == 'matches' %}
+    {% if is_granted('TAIKAI_EDIT', taikai) %}
+        <a class="button {{ size }} has-background-light" href="{{ path('app_match_index', {taikaiId: taikai.id}) }}" title="{{ 'taikai.marking_sheet'|trans }}">
+            <span class="icon {{ size }}"><i class="fas fa-filter"></i></span>
+        </a>
+    {% endif %}
+{% else %}
+    {% if is_granted('TAIKAI_MARK', taikai) %}
+        <a class="button {{ size }} has-background-light" href="{{ path('app_marking_show', {taikaiId: taikai.id}) }}" title="{{ 'taikai.marking_sheet'|trans }}">
+            <span class="icon {{ size }}"><i class="far fa-dot-circle"></i></span>
+        </a>
+    {% endif %}
+{% endif %}
+
+{% if is_granted('TAIKAI_LEADERBOARD', taikai) %}
+    <a class="button {{ size }} has-background-light" href="{{ path('app_leaderboard_show', {taikaiId: taikai.id}) }}" title="{{ 'taikai.results'|trans }}">
+        <span class="icon {{ size }}"><i class="fas fa-medal"></i></span>
+    </a>
+{% endif %}
+
+{% if is_granted('TAIKAI_RECTIFY', taikai) %}
+    <a class="button {{ size }} has-background-light" href="{{ path('app_rectification_index', {taikaiId: taikai.id}) }}" title="{{ 'rectification.title'|trans }}">
+        <span class="icon {{ size }}"><i class="fas fa-eraser"></i></span>
+    </a>
+{% endif %}
+
+{% if is_granted('TAIKAI_TIE_BREAK', taikai) and not (taikai.form and taikai.form.value == 'matches') %}
+    <a class="button {{ size }} has-background-light" href="{{ path('app_tie_break_edit', {taikaiId: taikai.id}) }}" title="{{ 'tie_break.title'|trans }}">
+        <span class="icon {{ size }}"><i class="fas fa-scissors"></i></span>
+    </a>
+{% endif %}
+
+{% if is_granted('TAIKAI_EXPORT', taikai) %}
+    <a class="button {{ size }} has-background-light" href="{{ path('app_taikai_export', {id: taikai.id}) }}" title="{{ 'taikai.export.title'|trans }}">
+        <span class="icon {{ size }}"><i class="fas fa-file-excel"></i></span>
+    </a>
+{% endif %}
+
+{% if is_granted('TAIKAI_EDIT', taikai) %}
+    <a class="button {{ size }} has-background-light ml-3" href="{{ path('app_taikai_edit', {id: taikai.id}) }}" title="{{ 'action.edit'|trans }}">
+        <span class="icon {{ size }}"><i class="fas fa-pen"></i></span>
+    </a>
+    <form method="post" action="{{ path('app_taikai_delete', {id: taikai.id}) }}" style="display:inline"
+          onsubmit="return confirm('{{ 'taikai.delete.confirm'|trans|e('js') }}');">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ taikai.id) }}">
+        <button class="button {{ size }} has-background-light" type="submit" title="{{ 'taikai.destroy'|trans }}">
+            <span class="icon {{ size }}"><i class="fas fa-trash"></i></span>
+        </button>
+    </form>
+{% endif %}

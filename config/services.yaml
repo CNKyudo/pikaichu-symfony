@@ -15,3 +15,16 @@ services:
             - '../src/DTO/'
             - '../src/Exception/'
             - '../src/Kernel.php'
+
+    # Piste d'audit (voir MIGRATION.md) : équivalent du gem `audited` côté Rails.
+    # `LoggableListener` implémente `EventSubscriber`, mais le bridge Doctrine de
+    # Symfony n'étend plus le tag `doctrine.event_subscriber` en un tag par
+    # événement — il faut lister explicitement chacun des événements renvoyés par
+    # `getSubscribedEvents()` (onFlush, loadClassMetadata, postPersist).
+    Gedmo\Loggable\LoggableListener:
+        tags:
+            - { name: doctrine.event_listener, event: onFlush, connection: default }
+            - { name: doctrine.event_listener, event: loadClassMetadata, connection: default }
+            - { name: doctrine.event_listener, event: postPersist, connection: default }
+        calls:
+            - setActorProvider: ['@App\Security\LoggableActorProvider']

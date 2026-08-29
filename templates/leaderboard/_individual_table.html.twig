@@ -1,0 +1,48 @@
+{# Classement individuel détaillé flèche par flèche, repris de `leaderboard/_individual.html.erb`. #}
+<table class="table is-narrow is-bordered is-striped has-text-centered">
+    <thead>
+    <tr>
+        <th rowspan="2">{{ 'leaderboard.rank'|trans }}</th>
+        <th rowspan="2" colspan="3">{{ 'leaderboard.name'|trans }}</th>
+        {% for i in 1..taikai.numRounds %}
+            <th colspan="{{ taikai.numArrows }}">{{ 'leaderboard.round'|trans }} {{ i }}</th>
+        {% endfor %}
+        <th rowspan="2">{{ 'leaderboard.score'|trans }}</th>
+    </tr>
+    <tr>
+        {% for i in 1..taikai.totalNumArrows %}
+            <th>{{ i }}</th>
+        {% endfor %}
+    </tr>
+    </thead>
+    <tbody>
+    {% for group in groups %}
+        {% for member in group.members %}
+            {% set score = member.getScore() %}
+            <tr>
+                {% if loop.first %}
+                    <th rowspan="{{ group.members|length }}" class="has-text-centered">{{ group.rank }}</th>
+                {% endif %}
+                <td class="has-text-left">{{ taikai.distributed ? (member.participatingDojo ? member.participatingDojo.displayName : '') : member.club }}</td>
+                <td>{{ member.index }}</td>
+                <td class="has-text-left">{{ member.displayName }}</td>
+                {% for result in (score ? score.results : []) %}
+                    <td>{{ result.value is not null ? result.value : (result.status ? result.status.glyph : '') }}</td>
+                {% endfor %}
+                {% if loop.first %}
+                    <th rowspan="{{ group.members|length }}">
+                        {% set groupScore = group.score %}
+                        {% if taikai.scoring.usesArrowValues %}
+                            {{ groupScore ? groupScore.value : (score ? score.value : 0) }}&nbsp;/&nbsp;{{ groupScore ? groupScore.hits : (score ? score.hits : 0) }}
+                        {% else %}
+                            {{ groupScore ? groupScore.hits : (score ? score.hits : 0) }}
+                        {% endif %}
+                    </th>
+                {% endif %}
+            </tr>
+        {% endfor %}
+    {% else %}
+        <tr><td colspan="{{ 4 + taikai.totalNumArrows }}" class="has-text-grey">{{ 'leaderboard.empty'|trans }}</td></tr>
+    {% endfor %}
+    </tbody>
+</table>

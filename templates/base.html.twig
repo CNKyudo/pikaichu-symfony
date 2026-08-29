@@ -5,51 +5,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}{{ app_name }}{% endblock %}</title>
 
-    {# Bulma, comme l'application Rails d'origine, pour ne pas dérouter les utilisateurs. #}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
-    <style>
-        /* Le mode sombre automatique de Bulma 1.x rend l'application illisible :
-           on force le thème clair, comme sur l'application Rails. */
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bulma-scheme-brightness: light;
-                --bulma-scheme-main-l: 100%;
-                --bulma-scheme-main-bis-l: 98%;
-                --bulma-scheme-main-ter-l: 96%;
-                --bulma-background-l: 96%;
-                --bulma-border-weak-l: 93%;
-                --bulma-border-l: 86%;
-                --bulma-text-weak-l: 48%;
-                --bulma-text-strong-l: 21%;
-                --bulma-text-title-l: 14%;
-            }
-        }
-    </style>
+    {{ include('_head_assets.html.twig') }}
     {% block stylesheets %}{% endblock %}
 </head>
 <body>
-<nav class="navbar is-light" role="navigation" aria-label="main navigation">
-    <div class="container">
-        <div class="navbar-brand">
-            <a class="navbar-item has-text-weight-bold" href="{{ path('app_taikai_index') }}">{{ app_name }}</a>
+<nav class="navbar has-background-info-light" role="navigation" aria-label="main navigation" data-controller="navbar">
+    <div class="navbar-brand">
+        <a class="navbar-item" href="https://www.kyudo.fr/">
+            <img src="{{ asset('logo_fr.jpg') }}" alt="Comité National De Kyudo">
+        </a>
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false"
+           data-navbar-target="burger" data-action="click->navbar#toggle">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+    </div>
+    <div class="navbar-menu" data-navbar-target="menu">
+        <div class="navbar-start">
+            <a class="navbar-item" href="{{ path('app_taikai_index') }}">
+                <span class="icon is-medium mr-2" style="white-space:nowrap">大会</span>
+                <span>{{ 'nav.taikais'|trans }}</span>
+            </a>
+            <a class="navbar-item" href="{{ path('app_dojo_index') }}">
+                <span class="icon is-medium mr-2" style="white-space:nowrap">道場</span>
+                <span>{{ 'nav.dojos'|trans }}</span>
+            </a>
         </div>
-        <div class="navbar-menu is-active">
-            <div class="navbar-start">
-                <a class="navbar-item" href="{{ path('app_taikai_index') }}">{{ 'nav.taikais'|trans }}</a>
-                <a class="navbar-item" href="{{ path('app_dojo_index') }}">{{ 'nav.dojos'|trans }}</a>
-            </div>
-            <div class="navbar-end">
-                {% if app.user %}
-                    <div class="navbar-item">{{ app.user.displayName }}</div>
-                    <div class="navbar-item">
+        <div class="navbar-end">
+            {% if app.user %}
+                <a class="navbar-item" href="{{ asset('docs/guide.pdf') }}" target="_blank">
+                    <span class="icon is-medium"><i class="fas fa-compass"></i></span>
+                    <span>{{ 'nav.guide'|trans }}</span>
+                </a>
+                <a class="navbar-item" href="{{ asset('docs/tutorial.pdf') }}" target="_blank">
+                    <span class="icon is-medium"><i class="fas fa-circle-question"></i></span>
+                    <span>{{ 'nav.tutorial'|trans }}</span>
+                </a>
+                <a class="navbar-item" href="{{ path('app_account_edit') }}">{{ 'nav.account'|trans }}</a>
+            {% endif %}
+            <div class="navbar-item">
+                <div class="buttons">
+                    {% if app.user %}
                         <form method="post" action="{{ path('app_logout') }}">
-                            <button class="button is-small is-light" type="submit">{{ 'nav.logout'|trans }}</button>
+                            <button class="button" type="submit">
+                                <span class="icon is-medium"><i class="fas fa-power-off"></i></span>
+                                <span>{{ 'nav.logout'|trans }}</span>
+                            </button>
                         </form>
-                    </div>
-                {% else %}
-                    <a class="navbar-item" href="{{ path('app_login') }}">{{ 'nav.login'|trans }}</a>
-                    <a class="navbar-item" href="{{ path('app_register') }}">{{ 'nav.register'|trans }}</a>
-                {% endif %}
+                    {% else %}
+                        <a class="button" href="{{ path('app_login') }}">
+                            <span class="icon is-medium"><i class="fas fa-sign-in-alt"></i></span>
+                            <span>{{ 'nav.login'|trans }}</span>
+                        </a>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>

@@ -10,6 +10,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\UniqueConstraint;
+use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
@@ -20,6 +21,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 #[ORM\Table(name: 'participating_dojos')]
 #[UniqueConstraint(name: 'by_taikai_dojo', columns: ['taikai_id', 'dojo_id'])]
 #[ORM\HasLifecycleCallbacks]
+#[Gedmo\Loggable(logEntryClass: LogEntry::class)]
 class ParticipatingDojo implements \Stringable
 {
     use TimestampableTrait;
@@ -38,6 +40,7 @@ class ParticipatingDojo implements \Stringable
     private ?Dojo $dojo = null;
 
     #[ORM\Column(name: 'display_name', length: 255, nullable: true)]
+    #[Gedmo\Versioned]
     private ?string $displayName = null;
 
     /** @var Collection<int, Participant> */

@@ -1,0 +1,50 @@
+{# Staff du taikai, reprise de `staffs/_list.html.erb`. Utilisée uniquement
+   sur `taikai/edit.html.twig` : le tableau du show est en lecture seule. #}
+<table class="table is-narrow is-hoverable is-fullwidth">
+    <thead>
+    <tr class="has-text-centered">
+        <th>{{ 'staff.display_name'|trans }}</th>
+        <th>{{ 'staff.participating_dojo'|trans }}</th>
+        <th>{{ 'staff.role'|trans }}</th>
+        <th>{{ 'staff.user'|trans }}</th>
+        <th class="has-text-right">
+            {% if is_granted('TAIKAI_EDIT', taikai) %}
+                <a class="button is-small has-background-light" href="{{ path('app_staff_new', {taikaiId: taikai.id}) }}"
+                   title="{{ 'staff.new'|trans }}">
+                    <span class="icon is-small"><i class="fas fa-plus"></i></span>
+                    <span>{{ 'action.add'|trans }}</span>
+                </a>
+            {% endif %}
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for staff in taikai.staffs|sort((a, b) => (a.role ? a.role.translatedLabel(app.request.locale) : '') <=> (b.role ? b.role.translatedLabel(app.request.locale) : '')) %}
+        <tr>
+            <td>{{ staff.displayName }}</td>
+            <td>{{ staff.participatingDojo ? staff.participatingDojo.displayName : '' }}</td>
+            <td>{{ staff.role ? staff.role.translatedLabel(app.request.locale) : '' }}</td>
+            <td>{{ staff.user ? staff.user.displayName : '' }}</td>
+            <td class="has-text-right">
+                {% if is_granted('TAIKAI_EDIT', taikai) %}
+                    <a class="button is-small has-background-light"
+                       href="{{ path('app_staff_edit', {taikaiId: taikai.id, id: staff.id}) }}"
+                       title="{{ 'staff.edit'|trans }}">
+                        <span class="icon is-small"><i class="fas fa-pen"></i></span>
+                    </a>
+                    <form method="post" style="display:inline"
+                          action="{{ path('app_staff_delete', {taikaiId: taikai.id, id: staff.id}) }}"
+                          onsubmit="return confirm('{{ 'staff.delete.confirm'|trans|e('js') }}')">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ staff.id) }}">
+                        <button class="button is-small has-background-light" type="submit" title="{{ 'staff.destroy'|trans }}">
+                            <span class="icon is-small"><i class="fas fa-trash"></i></span>
+                        </button>
+                    </form>
+                {% endif %}
+            </td>
+        </tr>
+    {% else %}
+        <tr><td colspan="5" class="has-text-centered has-text-grey">{{ 'taikai.no_staff'|trans }}</td></tr>
+    {% endfor %}
+    </tbody>
+</table>

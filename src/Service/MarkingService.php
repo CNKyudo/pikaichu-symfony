@@ -9,7 +9,9 @@ use App\Entity\ParticipatingDojo;
 use App\Entity\Result;
 use App\Entity\Score;
 use App\Entity\Tachi;
+use App\Entity\TaikaiEvent;
 use App\Entity\TaikaiMatch;
+use App\Entity\User;
 use App\Enum\ResultStatus;
 use App\Exception\MarkingException;
 use Doctrine\ORM\EntityManagerInterface;
@@ -120,8 +122,11 @@ final readonly class MarkingService
      * Modifie une flèche depuis l'écran de rectification, y compris si elle est
      * déjà validée. La flèche est alors marquée comme forcée.
      */
-    public function rectify(Result $result, ResultStatus $status, ?int $value = null): bool
+    public function rectify(Result $result, ResultStatus $status, ?int $value, User $user): bool
     {
+        $previousStatus = $result->getStatus() ?? ResultStatus::Unknown;
+        $previousValue = $result->getValue();
+
         $changed = $result->overrideStatus($status);
         if (null !== $value) {
             $changed = $result->overrideValue($value) || $changed;
@@ -131,6 +136,11 @@ final readonly class MarkingService
             $score = $result->getScore();
             if (null !== $score) {
                 $this->recalculate($score);
+            }
+
+            $taikai = $result->getTaikai();
+            if (null !== $taikai) {
+                $taikai->addEvent(TaikaiEvent::rectification($taikai, $user, $result, $previousStatus, $previousValue));
             }
 
             $this->entityManager->flush();

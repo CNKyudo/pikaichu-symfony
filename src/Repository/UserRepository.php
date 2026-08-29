@@ -39,6 +39,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
     /**
      * Recherche par nom, prénom ou email, pour l'autocomplétion du staff.
+     * Ne porte que sur les comptes confirmés, comme `User.containing` côté Rails.
      *
      * @return list<User>
      */
@@ -50,6 +51,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
         /** @var list<User> $result */
         $result = $this->createQueryBuilder('u')
+            ->andWhere('u.confirmedAt IS NOT NULL')
             ->andWhere('LOWER(u.firstname) LIKE :q OR LOWER(u.lastname) LIKE :q OR LOWER(u.emailAddress) LIKE :q')
             ->setParameter('q', '%'.mb_strtolower(trim($query)).'%')
             ->orderBy('u.lastname', 'ASC')

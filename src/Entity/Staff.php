@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Enum\StaffRoleCode;
+use App\Enum\TaikaiState;
 use App\Repository\StaffRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
@@ -15,6 +18,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 #[ORM\Entity(repositoryClass: StaffRepository::class)]
 #[ORM\Table(name: 'staffs')]
 #[ORM\HasLifecycleCallbacks]
+#[Gedmo\Loggable(logEntryClass: LogEntry::class)]
 class Staff implements \Stringable
 {
     use TimestampableTrait;
@@ -43,10 +47,12 @@ class Staff implements \Stringable
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotBlank]
+    #[Gedmo\Versioned]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotBlank]
+    #[Gedmo\Versioned]
     private ?string $lastname = null;
 
     public function getId(): ?int
@@ -160,6 +166,44 @@ class Staff implements \Stringable
             $context->buildViolation('staff.participating_dojo.required_for_role')
                 ->atPath('participatingDojo')
                 ->addViolation();
+        }
+    }
+
+    /**
+     * Le taikai doit conserver au moins un administrateur : on ne peut pas
+     * rétrograder le dernier `taikai_admin` restant. Comme côté Rails, la règle
+     * ne s'applique qu'aux staffs déjà enregistrés — un nouveau membre peut
+     * prendre n'importe quel rôle sans y toucher.
+     */
+    #[Assert\Callback]
+    public function validateAtLeastOneAdminRemains(ExecutionContextInterface $context): void
+    {
+        if (null === $this->id || null === $this->taikai || StaffRoleCode::TaikaiAdmin === $this->role?->getCode()) {
+            return;
+        }
+
+        foreach ($this->taikai->getStaffs() as $other) {
+            if ($other !== $this && StaffRoleCode::TaikaiAdmin === $other->getRole()?->getCode()) {
+                return;
+            }
+        }
+
+        $context->buildViolation('staff.at_least_one_admin')
+            ->atPath('role')
+            ->addViolation();
+    }
+
+    /**
+     * Un taikai à l'étape « Terminé » est figé, comme le fait `ValidateChangeBasedOnState`
+     * (`no_change_if_taikai_is_done`) côté Rails. Contrairement à Rails on ne
+     * distingue pas les modifications qui ne changent en fait rien : resoumettre
+     * un formulaire identique une fois le taikai clos reste refusé.
+     */
+    #[Assert\Callback]
+    public function validateTaikaiIsNotDone(ExecutionContextInterface $context): void
+    {
+        if (null !== $this->id && ($this->taikai?->isState(TaikaiState::Done) ?? false)) {
+            $context->buildViolation('taikai.no_change_if_taikai_is_done')->addViolation();
         }
     }
 

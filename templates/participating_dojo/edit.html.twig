@@ -1,81 +1,81 @@
-{% extends 'base.html.twig' %}
+{% extends 'taikai/_layout.html.twig' %}
 {% block title %}{{ 'participating_dojo.edit'|trans }} · {{ app_name }}{% endblock %}
-{% block body %}
-    <nav class="breadcrumb has-succeeds-separator" aria-label="breadcrumbs">
-        <ul>
-            <li><a href="{{ path('app_taikai_show', {id: taikai.id}) }}">{{ taikai.shortname }}</a></li>
-            <li class="is-active"><a aria-current="page">{{ participatingDojo.displayName }}</a></li>
-        </ul>
-    </nav>
-
-    <div class="columns">
-        <div class="column is-one-third">
-            <div class="card">
-                <header class="card-header">
-                    <p class="card-header-title">{{ 'participating_dojo.edit'|trans }}</p>
-                </header>
-                <div class="card-content">
-                    {{ include('participating_dojo/_form.html.twig') }}
-                </div>
+{% block taikai_content %}
+<div class="columns">
+    <div class="column is-one-third is-offset-2">
+        <div class="card">
+            <header class="card-header"><p class="card-header-title">{{ 'participating_dojo.edit'|trans }}</p></header>
+            <div class="card-content">
+                <nav class="breadcrumb has-succeeds-separator" aria-label="breadcrumbs">
+                    <ul>
+                        <li><a href="{{ path('app_taikai_edit', {id: taikai.id}) }}">{{ taikai.shortname }}</a></li>
+                        <li class="is-active"><a aria-current="page">{{ participatingDojo.displayName }}</a></li>
+                    </ul>
+                </nav>
+                {{ include('participating_dojo/_form.html.twig') }}
             </div>
-
-            <div class="card mt-4">
-                <header class="card-header">
-                    <p class="card-header-title">{{ 'participating_dojo.dojo'|trans }}</p>
-                </header>
-                <div class="card-content">
-                    <p><b>{{ 'dojo.shortname'|trans }}</b> : {{ participatingDojo.dojo.shortname }}</p>
-                    <p><b>{{ 'dojo.name'|trans }}</b> : {{ participatingDojo.dojo.name }}</p>
-                    {% if participatingDojo.dojo.city %}
-                        <p><b>{{ 'dojo.city'|trans }}</b> : {{ participatingDojo.dojo.city }}</p>
-                    {% endif %}
-                    <p>
-                        <b>{{ 'dojo.country_code'|trans }}</b> :
-                        {{ participatingDojo.dojo.countryCode ? participatingDojo.dojo.countryCode|country_name : '' }}
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <div class="column">
-            {# Hors tournoi individuel, les participants se saisissent par équipe. #}
-            {% if taikai.form and taikai.form.value == 'individual' %}
-                <div class="card">
-                    <header class="card-header">
-                        <p class="card-header-title">{{ 'taikai.participants'|trans }}</p>
-                        <div class="card-header-icon">
-                            <a class="button is-small is-primary"
-                               href="{{ path('app_participant_new', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id}) }}">
-                                {{ 'action.add'|trans }}
-                            </a>
-                        </div>
-                    </header>
-                    <div class="card-content">
-                        {{ include('participant/_list.html.twig') }}
-                    </div>
-                </div>
-
-                <div class="card mt-4">
-                    <header class="card-header">
-                        <p class="card-header-title">{{ 'participant.import.title'|trans }}</p>
-                    </header>
-                    <div class="card-content">
-                        <form method="post" enctype="multipart/form-data"
-                              action="{{ path('app_participant_import', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id}) }}">
-                            <input type="hidden" name="_token" value="{{ csrf_token('import' ~ participatingDojo.id) }}">
-                            <div class="field">
-                                <label class="label" for="excel">{{ 'participant.import.file'|trans }}</label>
-                                <div class="control">
-                                    <input class="input" type="file" id="excel" name="excel"
-                                           accept=".xlsx,.xls,.ods,.csv">
-                                </div>
-                                <p class="help">{{ 'participant.import.help'|trans }}</p>
-                            </div>
-                            <button class="button is-primary" type="submit">{{ 'participant.import.submit'|trans }}</button>
-                        </form>
-                    </div>
-                </div>
-            {% endif %}
         </div>
     </div>
+
+    <div class="column is-two-fifths">
+        <div class="card">
+            <header class="card-header"><p class="card-header-title">{{ 'participating_dojo.title'|trans }}</p></header>
+            <div class="card-content">
+                <p><b>{{ 'dojo.shortname'|trans }}</b>: {{ participatingDojo.dojo.shortname }}</p>
+                <p><b>{{ 'dojo.name'|trans }}</b>: {{ participatingDojo.dojo.name }}</p>
+                {% if participatingDojo.dojo.city %}
+                    <b>{{ 'dojo.city'|trans }}</b>: {{ participatingDojo.dojo.city }}
+                {% endif %}
+                <p><b>{{ 'dojo.country_code'|trans }}</b>: {{ participatingDojo.dojo.countryCode ? participatingDojo.dojo.countryCode|country_name : '' }}</p>
+            </div>
+        </div>
+
+        {# Hors tournoi individuel, les participants se saisissent par équipe. #}
+        {% if taikai.form and taikai.form.value == 'individual' %}
+            <div class="card mt-5">
+                <header class="card-header"><p class="card-header-title">{{ 'taikai.participants'|trans }}</p></header>
+                <div class="card-content">
+                    {{ include('participant/_list.html.twig') }}
+                </div>
+            </div>
+        {% else %}
+            <div class="card mt-5">
+                <header class="card-header"><p class="card-header-title">{{ 'team.title'|trans }}</p></header>
+                <div class="card-content">
+                    {{ include('team/_list.html.twig') }}
+                </div>
+            </div>
+        {% endif %}
+
+        {% if is_granted('PARTICIPATING_DOJO_EDIT', participatingDojo) %}
+            <div class="card mt-5">
+                <header class="card-header"><p class="card-header-title">{{ 'participant.import.title'|trans }}</p></header>
+                <div class="card-content">
+                    <form method="post" enctype="multipart/form-data"
+                          action="{{ path('app_participant_import', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('import' ~ participatingDojo.id) }}">
+                        <div class="field" id="file-js">
+                            <label class="label" for="excel">{{ 'participant.import.file'|trans }}</label>
+                            <div class="control">
+                                <div class="file has-name is-warning" data-controller="file-upload">
+                                    <label class="file-label">
+                                        <input class="file-input" type="file" id="excel" name="excel"
+                                               accept=".xlsx,.xls,.ods,.csv" data-file-upload-target="file">
+                                        <span class="file-cta">
+                                            <span class="file-icon"><i class="fas fa-upload"></i></span>
+                                            <span class="file-label">{{ 'participant.import.placeholders.choose_a_file'|trans }}</span>
+                                        </span>
+                                        <span class="file-name" data-file-upload-target="name">{{ 'participant.import.placeholders.no_file_uploaded'|trans }}</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <p class="help">{{ 'participant.import.help'|trans }}</p>
+                        </div>
+                        <button class="button has-background-light" type="submit">{{ 'participant.import.submit'|trans }}</button>
+                    </form>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

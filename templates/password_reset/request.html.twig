@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'password_reset.request.title'|trans }} · {{ app_name }}{% endblock %}
+
+{% block body %}
+<div class="columns is-centered">
+    <div class="column is-one-third">
+        <div class="card">
+            <header class="card-header"><p class="card-header-title">{{ 'password_reset.request.title'|trans }}</p></header>
+            <div class="card-content">
+                <p class="subtitle is-size-7">{{ 'password_reset.request.instructions'|trans }}</p>
+
+                {{ form_start(form) }}
+                {{ form_widget(form) }}
+                <div class="field">
+                    <button class="button is-primary is-fullwidth" type="submit">{{ 'password_reset.request.submit'|trans }}</button>
+                </div>
+                {{ form_end(form) }}
+
+                <p class="mt-4"><a href="{{ path('app_login') }}">{{ 'password_reset.back_to_login'|trans }}</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

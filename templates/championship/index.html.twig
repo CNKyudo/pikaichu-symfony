@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'championship.title'|trans }} · {{ app_name }}{% endblock %}
+
+{% block body %}
+<h1 class="title">{{ 'championship.title'|trans }}</h1>
+
+{% if years is empty %}
+    <p>{{ 'championship.empty'|trans }}</p>
+{% else %}
+    <div class="content">
+        <ul>
+            {% for year in years %}
+                <li><a href="{{ path('app_championship_export', {year: year}) }}">{{ year }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+{% endblock %}

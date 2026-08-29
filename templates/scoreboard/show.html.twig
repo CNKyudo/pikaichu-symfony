@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="{{ app.request.locale|default('fr') }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="refresh" content="{{ scoreboard.delay }}">
+    <title>{{ 'scoreboard.title'|trans }} · {{ app_name }}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
+</head>
+<body>
+<section class="section">
+    <div class="container">
+        {% if displayTachi %}
+            <table class="table is-fullwidth is-narrow">
+                <thead>
+                <tr>
+                    <th>{{ 'tachi.participant'|trans }}</th>
+                    <th colspan="4">{{ 'tachi.results'|trans }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for participant in displayTachi.participants %}
+                    {% set score = participant.getScore(displayTachi.match) %}
+                    <tr>
+                        <td>{{ participant.displayName }}</td>
+                        {% for result in score ? score.getResultsForRound(displayTachi.round) : [] %}
+                            <td class="is-size-4 has-text-centered">{{ result.status ? result.status.glyph : '·' }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="has-text-grey">{{ 'scoreboard.empty'|trans }}</p>
+        {% endif %}
+    </div>
+</section>
+</body>
+</html>

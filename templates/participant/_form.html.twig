@@ -6,9 +6,9 @@
 {% if form.index is defined %}{{ form_row(form.index) }}{% endif %}
 
 <div class="field is-grouped">
-    <div class="control"><button class="button is-primary" type="submit">{{ 'action.save'|trans }}</button></div>
+    <div class="control"><button class="button has-background-light" type="submit">{{ 'action.save'|trans }}</button></div>
     <div class="control">
-        <a class="button is-light"
+        <a class="button"
            href="{{ path('app_participating_dojo_edit', {taikaiId: taikai.id, id: participatingDojo.id}) }}">
             {{ 'action.back'|trans }}
         </a>

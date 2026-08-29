@@ -55,10 +55,40 @@ final class Ranker
      */
     private function groupByStoredRank(array $scoreables): array
     {
+        return $this->groupByField($scoreables, static fn (Participant|Team $s): ?int => $s->getRank());
+    }
+
+    /**
+     * Groupes d'ex æquo tels qu'ils étaient à l'entrée du tie-break, sur la base
+     * du rang intermédiaire figé par `LeaderboardService::computeIntermediateRanks()`
+     * — à la différence du rang courant, il n'est jamais modifié par la saisie
+     * manuelle qui suit, et sert donc de repère stable pour l'écran d'ajustement.
+     *
+     * @template T of Participant|Team
+     *
+     * @param list<T> $scoreables
+     *
+     * @return list<RankedGroup<T>>
+     */
+    public function groupByIntermediateRank(array $scoreables): array
+    {
+        return $this->groupByField($scoreables, static fn (Participant|Team $s): ?int => $s->getIntermediateRank());
+    }
+
+    /**
+     * @template T of Participant|Team
+     *
+     * @param list<T>                 $scoreables
+     * @param callable(T): (int|null) $fieldOf
+     *
+     * @return list<RankedGroup<T>>
+     */
+    private function groupByField(array $scoreables, callable $fieldOf): array
+    {
         /** @var array<int, list<T>> $buckets */
         $buckets = [];
         foreach ($scoreables as $scoreable) {
-            $buckets[$scoreable->getRank() ?? \PHP_INT_MAX][] = $scoreable;
+            $buckets[$fieldOf($scoreable) ?? \PHP_INT_MAX][] = $scoreable;
         }
 
         ksort($buckets);

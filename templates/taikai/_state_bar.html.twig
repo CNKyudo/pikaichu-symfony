@@ -1,38 +1,55 @@
-{# Frise d'avancement du taikai, avec les boutons d'étape précédente / suivante. #}
+{# Frise d'avancement du taikai, avec les boutons d'étape précédente / suivante.
+   Reprise de `taikais/_states.html.erb` : les boutons restent visibles hors
+   des gardes, mais passent en rouge quand la transition n'est pas permise. #}
 {% set current = taikai.currentState %}
+{% set allowed = taikai_allowed_transitions(taikai) %}
+{% set previous = taikai.previousState %}
+{% set next = taikai.nextState %}
+{% set states = taikai_states() %}
 
-<div class="level">
-    <div class="level-left">
-        {% if taikai.previousState and taikai.previousState in allowed_transitions %}
+<nav class="level">
+    <div class="level-item has-text-right">
+        {% if previous and is_granted('TAIKAI_EDIT', taikai) %}
             <form method="post" action="{{ path('app_taikai_transition', {id: taikai.id}) }}"
                   onsubmit="return confirm('{{ 'taikai.transition.confirm_backward'|trans|e('js') }}')">
                 <input type="hidden" name="_token" value="{{ csrf_token('transition' ~ taikai.id) }}">
-                <input type="hidden" name="to_state" value="{{ taikai.previousState.value }}">
-                <button class="button is-light" type="submit">&laquo; {{ 'taikai.transition.previous'|trans }}</button>
+                <input type="hidden" name="to_state" value="{{ previous.value }}">
+                <button class="button is-light {{ previous not in allowed ? 'is-danger' : 'is-link' }}" type="submit"
+                        title="{{ previous.label|trans }}">
+                    <span class="icon is-small"><i class="fas fa-angles-left"></i></span>
+                    <span>{{ 'taikai.transition.previous'|trans }}</span>
+                </button>
             </form>
         {% endif %}
     </div>
 
-    <div class="level-item">
-        <nav class="breadcrumb has-succeeds-separator" aria-label="{{ 'taikai.state'|trans }}">
+    <div class="level-item has-text-centered">
+        <div class="tabs is-toggle is-centered">
             <ul>
                 {% for state in states %}
-                    <li class="{{ state == current ? 'is-active' : '' }}">
-                        <a>{{ state.position }} {{ state.label|trans }}</a>
+                    <li class="inactiveLink {{ state == current ? 'is-active' : '' }}">
+                        <a>
+                            <span class="icon is-small"><i class="fas fa-{{ state.position }}"></i></span>
+                            <span>{{ state.label|trans }}</span>
+                        </a>
                     </li>
                 {% endfor %}
             </ul>
-        </nav>
+        </div>
     </div>
 
-    <div class="level-right">
-        {% if taikai.nextState and taikai.nextState in allowed_transitions %}
+    <div class="level-item has-text-left">
+        {% if next and is_granted('TAIKAI_EDIT', taikai) %}
             <form method="post" action="{{ path('app_taikai_transition', {id: taikai.id}) }}"
                   onsubmit="return confirm('{{ 'taikai.transition.confirm_forward'|trans|e('js') }}')">
                 <input type="hidden" name="_token" value="{{ csrf_token('transition' ~ taikai.id) }}">
-                <input type="hidden" name="to_state" value="{{ taikai.nextState.value }}">
-                <button class="button is-primary" type="submit">{{ 'taikai.transition.next'|trans }} &raquo;</button>
+                <input type="hidden" name="to_state" value="{{ next.value }}">
+                <button class="button is-light {{ next not in allowed ? 'is-danger' : 'is-link' }}" type="submit"
+                        title="{{ next.label|trans }}">
+                    <span>{{ 'taikai.transition.next'|trans }}</span>
+                    <span class="icon is-small"><i class="fas fa-angles-right"></i></span>
+                </button>
             </form>
         {% endif %}
     </div>
-</div>
+</nav>

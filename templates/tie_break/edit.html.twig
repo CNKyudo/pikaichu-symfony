@@ -1,0 +1,75 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ 'tie_break.title'|trans }} · {{ taikai.shortname }}{% endblock %}
+{% block body %}
+<div class="card">
+    <header class="card-header"><p class="card-header-title">{{ 'tie_break.title'|trans }}</p></header>
+    <div class="card-content">
+        <p class="mb-3">
+            {% if taikai.form and taikai.form.value == '2in1' %}
+                {% if individual %}
+                    <a class="button is-light" href="{{ path('app_tie_break_edit', {taikaiId: taikai.id, individual: false}) }}">
+                        {{ 'tie_break.team'|trans }}
+                    </a>
+                {% else %}
+                    <a class="button is-light" href="{{ path('app_tie_break_edit', {taikaiId: taikai.id, individual: true}) }}">
+                        {{ 'tie_break.individual'|trans }}
+                    </a>
+                {% endif %}
+            {% endif %}
+        </p>
+
+        <form method="post" action="{{ path('app_tie_break_update', {taikaiId: taikai.id}) }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('tie_break' ~ taikai.id) }}">
+            {% if taikai.form and taikai.form.value == '2in1' %}
+                <input type="hidden" name="individual" value="{{ individual ? 'true' : 'false' }}">
+            {% endif %}
+
+            <table class="table is-narrow is-bordered is-striped has-text-centered">
+                <thead>
+                <tr>
+                    <th>{{ 'tie_break.intermediate_rank'|trans }}</th>
+                    <th>{{ 'tie_break.display_name'|trans }}</th>
+                    <th>{{ 'tie_break.rank'|trans }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for group in groups %}
+                    {% for member in group.members %}
+                        <tr>
+                            {% if loop.first %}
+                                <th class="has-text-centered" rowspan="{{ group.count }}">{{ group.rank }}</th>
+                            {% endif %}
+                            <td class="has-text-left">
+                                {{ member.displayName }}{{ member.isMixed is defined and member.isMixed ? '*' : '' }}
+                            </td>
+                            <th class="has-text-centered">
+                                {% if group.isTied %}
+                                    <div class="select is-small">
+                                        <select name="rank[{{ member.id }}]">
+                                            {% for choice in range(group.rank, group.rank + group.count - 1) %}
+                                                <option value="{{ choice }}" {{ choice == member.rank ? 'selected' : '' }}>{{ choice }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                {% else %}
+                                    {{ member.rank }}
+                                {% endif %}
+                            </th>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr><td colspan="3" class="has-text-grey">{{ 'tie_break.empty'|trans }}</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="field is-grouped">
+                <div class="control"><button class="button has-background-light" type="submit">{{ 'action.save'|trans }}</button></div>
+                <div class="control">
+                    <a class="button" href="{{ path('app_taikai_show', {id: taikai.id}) }}">{{ 'action.back'|trans }}</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

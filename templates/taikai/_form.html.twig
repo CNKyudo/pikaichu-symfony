@@ -1,24 +1,35 @@
 {{ form_start(form) }}
+{{ form_row(form.shortname) }}
+{{ form_row(form.name) }}
+{{ form_row(form.description) }}
+{{ form_row(form.startDate) }}
+{{ form_row(form.endDate) }}
+
 <div class="columns">
-    <div class="column">
-        {{ form_row(form.shortname) }}
-        {{ form_row(form.name) }}
-        {{ form_row(form.description) }}
-        {{ form_row(form.startDate) }}
-        {{ form_row(form.endDate) }}
-    </div>
-    <div class="column">
-        {{ form_row(form.scoring) }}
-        {{ form_row(form.form) }}
-        {{ form_row(form.totalNumArrows) }}
-        {{ form_row(form.numTargets) }}
-        {{ form_row(form.tachiSize) }}
-        {{ form_row(form.category) }}
-        {{ form_row(form.distributed) }}
-    </div>
+    <div class="column">{{ form_row(form.scoring) }}</div>
+    <div class="column">{{ form_row(form.form) }}</div>
 </div>
+
+<div class="columns">
+    <div class="column">{{ form_row(form.totalNumArrows) }}</div>
+    <div class="column">{{ form_row(form.numTargets) }}</div>
+</div>
+
+<div class="columns">
+    <div class="column">{{ form_row(form.tachiSize) }}</div>
+    <div class="column">{{ form_row(form.category) }}</div>
+</div>
+
+{{ form_row(form.distributed) }}
+
 <div class="field is-grouped">
-    <div class="control"><button class="button is-primary" type="submit">{{ 'action.save'|trans }}</button></div>
-    <div class="control"><a class="button is-light" href="{{ path('app_taikai_index') }}">{{ 'action.back'|trans }}</a></div>
+    <div class="control">
+        <button class="button has-background-light" type="submit">{{ 'action.save'|trans }}</button>
+    </div>
+    <div class="control">
+        <a class="button" href="{{ taikai.id ? path('app_taikai_show', {id: taikai.id}) : path('app_taikai_index') }}">
+            {{ 'action.back'|trans }}
+        </a>
+    </div>
 </div>
 {{ form_end(form) }}

@@ -3,21 +3,21 @@
 {% block title %}{{ 'dojo.list'|trans }} · {{ app_name }}{% endblock %}
 
 {% block body %}
-<div class="level">
-    <div class="level-left"><h1 class="title">{{ 'dojo.list'|trans }}</h1></div>
-    <div class="level-right">
-        <a class="button is-primary" href="{{ path('app_dojo_new') }}">{{ 'action.add'|trans }}</a>
-    </div>
-</div>
+<h1 class="title">{{ 'dojo.list'|trans }}</h1>
 
-<table class="table is-fullwidth is-striped is-hoverable">
+<table class="table">
     <thead>
-    <tr>
+    <tr class="has-text-centered">
         <th>{{ 'dojo.shortname'|trans }}</th>
         <th>{{ 'dojo.name'|trans }}</th>
         <th>{{ 'dojo.city'|trans }}</th>
         <th>{{ 'dojo.country_code'|trans }}</th>
-        <th class="has-text-right">{{ 'action.actions'|trans }}</th>
+        <th>
+            <a class="button is-small has-background-light" href="{{ path('app_dojo_new') }}" title="{{ 'dojo.new'|trans }}">
+                <span class="icon is-small"><i class="fas fa-plus"></i></span>
+                <span>{{ 'action.add'|trans }}</span>
+            </a>
+        </th>
     </tr>
     </thead>
     <tbody>
@@ -27,23 +27,17 @@
             <td>{{ dojo.name }}</td>
             <td>{{ dojo.city }}</td>
             <td>{{ dojo.countryCode ? dojo.countryCode|country_name : '' }}</td>
-            <td class="has-text-right">
-                <div class="field is-grouped is-grouped-right">
-                    <p class="control">
-                        <a class="button is-small is-light" href="{{ path('app_dojo_edit', {id: dojo.id}) }}">
-                            {{ 'action.edit'|trans }}
-                        </a>
-                    </p>
-                    <p class="control">
-                        <form method="post" action="{{ path('app_dojo_delete', {id: dojo.id}) }}"
-                              onsubmit="return confirm('{{ 'dojo.delete.confirm'|trans|e('js') }}');">
-                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ dojo.id) }}">
-                            <button class="button is-small is-danger is-light" type="submit">
-                                {{ 'action.delete'|trans }}
-                            </button>
-                        </form>
-                    </p>
-                </div>
+            <td>
+                <a class="button is-small has-background-light" href="{{ path('app_dojo_edit', {id: dojo.id}) }}" title="{{ 'dojo.edit'|trans }}">
+                    <span class="icon is-small"><i class="fas fa-pen"></i></span>
+                </a>
+                <form method="post" action="{{ path('app_dojo_delete', {id: dojo.id}) }}" style="display:inline"
+                      onsubmit="return confirm('{{ 'dojo.delete.confirm'|trans|e('js') }}');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ dojo.id) }}">
+                    <button class="button is-small has-background-light" type="submit" title="{{ 'dojo.destroy'|trans }}">
+                        <span class="icon is-small"><i class="fas fa-trash"></i></span>
+                    </button>
+                </form>
             </td>
         </tr>
     {% else %}

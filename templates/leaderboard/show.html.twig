@@ -1,15 +1,21 @@
-{% extends 'base.html.twig' %}
+{% extends 'taikai/_layout.html.twig' %}
 
 {% block title %}{{ 'leaderboard.title'|trans }} · {{ taikai.shortname }}{% endblock %}
 
-{% block body %}
+{% block taikai_content %}
 <h1 class="title">{{ 'leaderboard.title'|trans }} — {{ taikai.shortname }}</h1>
 
 <div class="buttons mb-4">
-    <a class="button" href="{{ path('app_taikai_show', {id: taikai.id}) }}">{{ 'marking.back_to_taikai'|trans }}</a>
-    <a class="button is-light" href="{{ path('app_leaderboard_public', {taikaiId: taikai.id}) }}">
+    <a class="button is-light" href="{{ path('app_taikai_show', {id: taikai.id}) }}">{{ 'marking.back_to_taikai'|trans }}</a>
+    <a class="button is-light"
+       href="{{ path('app_leaderboard_public', taikai.form and taikai.form.value == '2in1' ? {taikaiId: taikai.id, individual: 1} : {taikaiId: taikai.id}) }}">
         {{ 'leaderboard.public_view'|trans }}
     </a>
+    {% if taikai.form and taikai.form.value == '2in1' %}
+        <a class="button is-light" href="{{ path('app_leaderboard_2in1', {taikaiId: taikai.id}) }}">
+            {{ 'leaderboard.2in1'|trans }}
+        </a>
+    {% endif %}
 </div>
 
 {{ include('leaderboard/_content.html.twig') }}

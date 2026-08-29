@@ -4,38 +4,49 @@
 
 {% block body %}
 <div class="columns is-centered">
-    <div class="column is-one-third">
-        <div class="card">
-            <header class="card-header"><p class="card-header-title">{{ 'nav.login'|trans }}</p></header>
-            <div class="card-content">
-                {% if error %}
-                    <div class="notification is-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-                {% endif %}
+    <div class="column is-5-tablet is-4-desktop is-3-widescreen">
+        <div class="box">
+            <h1 class="title has-text-centered">{{ 'nav.login'|trans }}</h1>
 
-                <form method="post">
-                    <div class="field">
-                        <label class="label" for="email_address">{{ 'user.email_address'|trans }}</label>
-                        <div class="control">
-                            <input class="input" type="email" id="email_address" name="email_address"
-                                   value="{{ last_username }}" required autofocus>
-                        </div>
+            {% if error %}
+                <div class="notification is-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            {% endif %}
+
+            <form method="post" class="mt-5">
+                <div class="field">
+                    <label class="label" for="email_address">{{ 'user.email_address'|trans }}</label>
+                    <div class="control has-icons-left">
+                        <input class="input" type="email" id="email_address" name="email_address"
+                               value="{{ last_username }}" required autofocus autocomplete="email">
+                        <span class="icon is-small is-left"><i class="fas fa-envelope"></i></span>
                     </div>
-                    <div class="field">
-                        <label class="label" for="password">{{ 'user.password'|trans }}</label>
-                        <div class="control">
-                            <input class="input" type="password" id="password" name="password" required>
-                        </div>
+                </div>
+                <div class="field">
+                    <label class="label" for="password">{{ 'user.password'|trans }}</label>
+                    <div class="control has-icons-left">
+                        <input class="input" type="password" id="password" name="password" required
+                               autocomplete="current-password">
+                        <span class="icon is-small is-left"><i class="fas fa-lock"></i></span>
                     </div>
+                </div>
 
-                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
-                    <div class="field">
-                        <button class="button is-primary is-fullwidth" type="submit">{{ 'nav.login'|trans }}</button>
+                <div class="field">
+                    <div class="control">
+                        <button class="button is-primary is-fullwidth" type="submit">{{ 'login.submit'|trans }}</button>
                     </div>
-                </form>
+                </div>
 
-                <p class="mt-4"><a href="{{ path('app_register') }}">{{ 'nav.register'|trans }}</a></p>
-            </div>
+                <div class="has-text-centered mt-4">
+                    <a class="is-size-7" href="{{ path('app_password_reset_request') }}">{{ 'login.forgot_password'|trans }}</a>
+                </div>
+
+                <div class="has-text-centered mt-3">
+                    {{ 'login.no_account'|trans }}
+                    <a class="is-size-7" href="{{ path('app_register') }}">{{ 'login.sign_up_link'|trans }}</a>
+                </div>
+            </form>
         </div>
     </div>
 </div>

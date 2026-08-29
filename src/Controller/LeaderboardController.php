@@ -9,6 +9,7 @@ use App\Enum\TaikaiForm;
 use App\Service\LeaderboardService;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -36,11 +37,57 @@ final class LeaderboardController extends AbstractController
 
     /**
      * Même classement, sans authentification, pour projection en salle.
+     *
+     * Pour un 2-en-1, contrairement à `show`, la projection publique affiche
+     * un seul classement à la fois — équipes par défaut, individuel si
+     * `?individual` est présent — comme `leaderboard_controller#public` côté
+     * Rails. Deux classements superposés sur un écran de projection seraient
+     * illisibles.
      */
     #[Route('/public', name: 'app_leaderboard_public', methods: ['GET'])]
-    public function public(#[MapEntity(id: 'taikaiId')] Taikai $taikai): Response
+    public function public(#[MapEntity(id: 'taikaiId')] Taikai $taikai, Request $request): Response
     {
+        if (TaikaiForm::TwoInOne === $taikai->getForm()) {
+            $data = $this->emptyViewData($taikai);
+            if ($request->query->has('individual')) {
+                [$data['individual'], $data['by_dojo']] = $this->leaderboardService->computeIndividualLeaderboard($taikai);
+            } else {
+                [$data['teams'], $data['by_dojo']] = $this->leaderboardService->computeTeamLeaderboard($taikai);
+            }
+
+            return $this->render('leaderboard/public.html.twig', $data);
+        }
+
         return $this->render('leaderboard/public.html.twig', $this->buildViewData($taikai));
+    }
+
+    /**
+     * Classement par équipes seul d'un 2-en-1, porté de `leaderboard#show_2in1`.
+     * `show` affiche déjà équipes et individuel ensemble pour un 2-en-1 ; cet
+     * écran isole les équipes, par exemple pour une projection ciblée.
+     */
+    #[Route('/2in1', name: 'app_leaderboard_2in1', methods: ['GET'])]
+    public function showTeamOnly(#[MapEntity(id: 'taikaiId')] Taikai $taikai): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_USER');
+
+        $data = $this->emptyViewData($taikai);
+        [$data['teams'], $data['by_dojo']] = $this->leaderboardService->computeTeamLeaderboard($taikai);
+
+        return $this->render('leaderboard/show_2in1.html.twig', $data);
+    }
+
+    /** @return array<string, mixed> */
+    private function emptyViewData(Taikai $taikai): array
+    {
+        return [
+            'taikai' => $taikai,
+            'individual' => [],
+            'teams' => [],
+            'by_dojo' => [],
+            'podium' => [],
+            'matches' => [],
+        ];
     }
 
     /**
@@ -50,14 +97,7 @@ final class LeaderboardController extends AbstractController
      */
     private function buildViewData(Taikai $taikai): array
     {
-        $data = [
-            'taikai' => $taikai,
-            'individual' => [],
-            'teams' => [],
-            'by_dojo' => [],
-            'podium' => [],
-            'matches' => [],
-        ];
+        $data = $this->emptyViewData($taikai);
 
         switch ($taikai->getForm()) {
             case TaikaiForm::Individual:

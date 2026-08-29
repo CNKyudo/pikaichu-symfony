@@ -36,6 +36,7 @@ dépendances Composer et applique les migrations.
 |---|---|
 | Application | http://localhost:8000 |
 | Adminer (base) | http://localhost:8080 |
+| Mailpit (emails envoyés en local) | http://localhost:8025 |
 
 Pour charger un jeu de données de démonstration :
 

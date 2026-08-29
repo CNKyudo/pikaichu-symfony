@@ -1,6 +1,30 @@
-{% extends 'base.html.twig' %}
+{% extends 'taikai/_layout.html.twig' %}
+
 {% block title %}{{ taikai.shortname }} · {{ app_name }}{% endblock %}
-{% block body %}
-    <h1 class="title">{{ 'taikai.edit'|trans }} — {{ taikai.shortname }}</h1>
-    {{ include('taikai/_form.html.twig') }}
+
+{% block taikai_content %}
+<div class="columns">
+    <div class="column is-5 is-offset-2">
+        <div class="card">
+            <header class="card-header"><p class="card-header-title">{{ 'taikai.edit'|trans }}</p></header>
+            <div class="card-content">
+                {{ include('taikai/_form.html.twig') }}
+            </div>
+        </div>
+    </div>
+    <div class="column">
+        <div class="card">
+            <header class="card-header"><p class="card-header-title">{{ 'taikai.host_clubs'|trans }}</p></header>
+            <div class="card-content">
+                {{ include('participating_dojo/_list.html.twig') }}
+            </div>
+        </div>
+        <div class="card mt-5">
+            <header class="card-header"><p class="card-header-title">{{ 'taikai.staff'|trans }}</p></header>
+            <div class="card-content">
+                {{ include('staff/_list.html.twig') }}
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

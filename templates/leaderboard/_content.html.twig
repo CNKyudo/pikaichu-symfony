@@ -1,15 +1,39 @@
-{% if teams|length %}
-    <h2 class="subtitle">{{ 'leaderboard.by_team'|trans }}</h2>
-    {{ include('leaderboard/_table.html.twig', {groups: teams}) }}
-{% endif %}
+{% if taikai.form and (taikai.form.value == 'individual' or taikai.form.value == '2in1') %}
+    {# Pour un 2-en-1, on affiche équipes et individuel ensemble : plus riche
+       que les deux écrans séparés de Rails (`show` + `show_2in1`). #}
+    {% if teams|length %}
+        <h2 class="title is-4">{{ 'leaderboard.by_team'|trans }}</h2>
+        {{ include('leaderboard/_team_table.html.twig', {groups: teams}) }}
+        <h2 class="title is-4 mt-5">{{ 'leaderboard.individual'|trans }}</h2>
+    {% elseif taikai.distributed %}
+        <h2 class="title is-4">{{ 'leaderboard.all'|trans }}</h2>
+    {% endif %}
+    {{ include('leaderboard/_individual_table.html.twig', {groups: individual}) }}
 
-{% if individual|length %}
-    <h2 class="subtitle mt-5">{{ 'leaderboard.individual'|trans }}</h2>
-    {{ include('leaderboard/_table.html.twig', {groups: individual}) }}
-{% endif %}
-
-{% if podium|length %}
-    <h2 class="subtitle">{{ 'leaderboard.final_standings'|trans }}</h2>
+    {% if taikai.distributed %}
+        {% for participatingDojo in taikai.participatingDojos %}
+            {% set groups = by_dojo[participatingDojo.id]|default([]) %}
+            <h2 class="title is-4 mt-5">{{ participatingDojo.displayName }}</h2>
+            {% if groups|length == 0 %}
+                <p>{{ 'leaderboard.no_participants_yet'|trans }}</p>
+            {% else %}
+                {{ include('leaderboard/_individual_table.html.twig', {groups: groups}) }}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+{% elseif taikai.form and taikai.form.value == 'team' %}
+    {% if taikai.distributed %}
+        {% for participatingDojo in taikai.participatingDojos %}
+            {% set groups = by_dojo[participatingDojo.id]|default([]) %}
+            <h2 class="title is-4 mt-5">{{ participatingDojo.displayName }}</h2>
+            {% if groups|length == 0 %}
+                <p>{{ 'leaderboard.no_participants_yet'|trans }}</p>
+            {% else %}
+                {{ include('leaderboard/_team_table.html.twig', {groups: groups}) }}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+{% elseif taikai.form and taikai.form.value == 'matches' %}
     <table class="table is-fullwidth is-striped is-narrow">
         <tbody>
         {% for entry in podium %}
@@ -20,15 +44,4 @@
         {% endfor %}
         </tbody>
     </table>
-{% endif %}
-
-{% if by_dojo|length %}
-    <h2 class="subtitle mt-6">{{ 'leaderboard.by_host_club'|trans }}</h2>
-    {% for participatingDojo in taikai.participatingDojos %}
-        {% set groups = by_dojo[participatingDojo.id]|default([]) %}
-        {% if groups|length %}
-            <h3 class="is-size-5 mt-4">{{ participatingDojo.displayName }}</h3>
-            {{ include('leaderboard/_table.html.twig', {groups: groups}) }}
-        {% endif %}
-    {% endfor %}
 {% endif %}

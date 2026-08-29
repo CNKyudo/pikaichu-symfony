@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2 style="color: #3273dc;">{{ 'password_reset.email.subject'|trans({}, 'messages', locale) }}</h2>
+
+        <p>{{ 'password_reset.email.greeting'|trans({'%name%': user.firstname}, 'messages', locale) }}</p>
+
+        <p>{{ 'password_reset.email.body'|trans({}, 'messages', locale) }}</p>
+
+        <div style="margin: 30px 0;">
+            <a href="{{ url('app_password_reset', {token: resetToken.token}) }}"
+               style="background-color: #3273dc; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">
+                {{ 'password_reset.email.button'|trans({}, 'messages', locale) }}
+            </a>
+        </div>
+
+        <p style="color: #666; font-size: 14px;">{{ 'password_reset.email.expiration'|trans({}, 'messages', locale) }}</p>
+        <p style="color: #666; font-size: 14px;">{{ 'password_reset.email.ignore'|trans({}, 'messages', locale) }}</p>
+
+        <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
+
+        <p style="color: #999; font-size: 12px;">
+            {{ 'password_reset.email.manual_link'|trans({}, 'messages', locale) }}<br>
+            {{ url('app_password_reset', {token: resetToken.token}) }}
+        </p>
+    </div>
+</body>
+</html>

@@ -24,7 +24,7 @@ trait DatabaseResetTrait
         'results', 'scores', 'tachis', 'matches', 'participants', 'teams',
         'scoreboards', 'staffs', 'participating_dojos', 'taikai_events',
         'taikai_transitions', 'taikais', 'staff_roles', 'dojos', 'kyudojins',
-        'sessions', 'users',
+        'sessions', 'users', 'reset_password_requests', 'ext_log_entries',
     ];
 
     private function resetDatabase(EntityManagerInterface $entityManager): void

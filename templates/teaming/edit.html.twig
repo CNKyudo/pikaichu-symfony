@@ -1,0 +1,131 @@
+{% extends 'taikai/_layout.html.twig' %}
+{% block title %}{{ 'teaming.title'|trans }} · {{ app_name }}{% endblock %}
+{% block taikai_content %}
+    <nav class="level">
+        <div class="level-left">
+            <div class="level-item">
+                <a class="button is-light" href="{{ path('app_participating_dojo_edit', {taikaiId: taikai.id, id: participatingDojo.id}) }}">
+                    {{ 'action.back'|trans }}
+                </a>
+            </div>
+            <div class="level-item">
+                <form method="post"
+                      action="{{ path('app_teaming_create_team', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('teaming' ~ participatingDojo.id) }}">
+                    <div class="field has-addons">
+                        <div class="control">
+                            <input class="input" type="text" name="shortname" placeholder="{{ 'teaming.placeholders.team_shortname'|trans }}">
+                        </div>
+                        <div class="control">
+                            <button class="button" type="submit">{{ 'teaming.add_team'|trans }}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="level-item">
+                <form method="post"
+                      action="{{ path('app_teaming_form_randomly', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('teaming' ~ participatingDojo.id) }}">
+                    <div class="field has-addons">
+                        <div class="control">
+                            <input class="input" type="text" name="prefix" placeholder="{{ 'teaming.placeholders.team_prefix'|trans }}">
+                        </div>
+                        <div class="control">
+                            <button class="button" type="submit">{{ 'teaming.form_randomly'|trans }}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="level-right">
+            <div class="level-item">
+                <form method="post"
+                      action="{{ path('app_teaming_clear', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id}) }}"
+                      onsubmit="return confirm('{{ 'teaming.clear_confirm'|trans|e('js') }}')">
+                    <input type="hidden" name="_token" value="{{ csrf_token('teaming' ~ participatingDojo.id) }}">
+                    <button class="button is-danger" type="submit">
+                        <span class="icon"><i class="fas fa-trash"></i></span>
+                        <span>{{ 'teaming.clear_all'|trans }}</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <div class="columns">
+        <div class="column is-narrow">
+            <div class="box">
+                <p class="team-title">{{ 'teaming.unassigned'|trans }}</p>
+                {% for participant in unteamedParticipants %}
+                    <div class="field has-addons mb-2">
+                        <div class="control">
+                            <span class="tag">{{ participant.displayName }} ({{ participant.club }})</span>
+                        </div>
+                        <div class="control">
+                            <form method="post"
+                                  action="{{ path('app_teaming_move', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('teaming' ~ participatingDojo.id) }}">
+                                <input type="hidden" name="participant_id" value="{{ participant.id }}">
+                                <div class="field has-addons">
+                                    <div class="control">
+                                        <div class="select is-small">
+                                            <select name="team_id">
+                                                <option value="">{{ 'teaming.select_team'|trans }}</option>
+                                                {% for team in teams %}
+                                                    <option value="{{ team.id }}">{{ team.shortname }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="control">
+                                        <button class="button is-small" type="submit">{{ 'teaming.assign'|trans }}</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                {% else %}
+                    <p class="has-text-grey">{{ 'team.empty'|trans }}</p>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="column">
+            <div class="columns is-multiline">
+                {% for team in teams %}
+                    <div class="column is-4">
+                        <div class="box">
+                            <p class="team-title">
+                                <a class="button is-small has-background-light mb-1"
+                                   href="{{ path('app_team_edit', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id, id: team.id}) }}">
+                                    {{ 'action.edit'|trans }}
+                                </a>
+                                {{ team.shortname }}{{ team.mixed ? ' (' ~ 'team.mixed'|trans ~ ')' : '' }}
+                            </p>
+                            {# L'identifiant 0 sert de gabarit : aucune entité ne porte cet identifiant,
+                               le contrôleur Stimulus le remplace par l'identifiant réel du participant déplacé. #}
+                            <div data-controller="reorder"
+                                 data-reorder-url-value="{{ path('app_team_participant_reorder', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id, id: team.id, participantId: 0}) }}">
+                                {% for participant in team.participants %}
+                                    <div class="field has-addons mb-2" data-reorder-id="{{ participant.id }}"
+                                         data-reorder-token="{{ csrf_token('reorder' ~ participant.id) }}">
+                                        <div class="control" data-reorder-handle title="{{ 'teaming.drag_to_reorder'|trans }}">
+                                            <span class="tag"><i class="fas fa-grip-vertical mr-1"></i>{{ participant.displayName }} ({{ participant.club }})</span>
+                                        </div>
+                                        <div class="control">
+                                            <form method="post"
+                                                  action="{{ path('app_teaming_move', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id}) }}">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('teaming' ~ participatingDojo.id) }}">
+                                                <input type="hidden" name="participant_id" value="{{ participant.id }}">
+                                                <button class="button is-small" type="submit">{{ 'teaming.unassign'|trans }}</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

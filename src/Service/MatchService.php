@@ -12,8 +12,9 @@ use Doctrine\ORM\EntityManagerInterface;
 /**
  * Construction du tableau final et désignation des vainqueurs.
  *
- * Reprend `Taikai.create_matches` et `Match#select_winner` de l'application Rails,
- * y compris l'ordre d'appariement issu du guide des tournois de novembre 2021.
+ * Reprend `Taikai.create_matches`, `Match#select_winner` et le `before_update`
+ * de `Match` (réaffectation manuelle des équipes) de l'application Rails, y
+ * compris l'ordre d'appariement issu du guide des tournois de novembre 2021.
  */
 final readonly class MatchService
 {
@@ -79,6 +80,67 @@ final readonly class MatchService
         $this->entityManager->persist($match);
 
         return $match;
+    }
+
+    /**
+     * Réaffecte manuellement les équipes d'une rencontre, porté du `before_update`
+     * du modèle `Match` Rails : change d'équipe supprime le score et les résultats
+     * de l'ancienne (refusé si déjà validés), et initialise ceux de la nouvelle.
+     *
+     * @return string|null clé de traduction de l'erreur, ou null en cas de succès
+     */
+    public function updateTeams(TaikaiMatch $match, ?Team $team1, ?Team $team2): ?string
+    {
+        if ($team1 !== $match->getTeam1()) {
+            $error = $this->reassignTeam($match, 1, $team1);
+            if (null !== $error) {
+                return $error;
+            }
+        }
+
+        if ($team2 !== $match->getTeam2()) {
+            $error = $this->reassignTeam($match, 2, $team2);
+            if (null !== $error) {
+                return $error;
+            }
+        }
+
+        $this->entityManager->flush();
+
+        return null;
+    }
+
+    private function reassignTeam(TaikaiMatch $match, int $slot, ?Team $newTeam): ?string
+    {
+        $oldTeam = $match->getTeam($slot);
+        if (null !== $oldTeam) {
+            if ($oldTeam->getScore($match)?->isFinalized() ?? false) {
+                return 'match.cant_change_teams_if_results_exist';
+            }
+
+            $oldScore = $oldTeam->getScore($match);
+            if (null !== $oldScore) {
+                $this->entityManager->remove($oldScore);
+            }
+
+            foreach ($oldTeam->getParticipants() as $participant) {
+                $participantScore = $participant->getScore($match);
+                if (null !== $participantScore) {
+                    $this->entityManager->remove($participantScore);
+                }
+            }
+        }
+
+        $match->setTeam($slot, $newTeam);
+
+        if (null !== $newTeam) {
+            $this->scoreInitializer->createTeamScore($newTeam, $match);
+            foreach ($newTeam->getParticipants() as $participant) {
+                $this->scoreInitializer->createParticipantScore($participant, $match);
+            }
+        }
+
+        return null;
     }
 
     /**

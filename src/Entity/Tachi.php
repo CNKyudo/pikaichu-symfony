@@ -7,6 +7,7 @@ namespace App\Entity;
 use App\Repository\TachiRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\UniqueConstraint;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * Un tachi : le groupe d'archers qui tire ensemble sur les cibles disponibles,
@@ -16,6 +17,7 @@ use Doctrine\ORM\Mapping\UniqueConstraint;
 #[ORM\Table(name: 'tachis')]
 #[UniqueConstraint(name: 'index_tachis_on_participating_dojo_id_and_index_and_round', columns: ['participating_dojo_id', 'index', 'round'])]
 #[ORM\HasLifecycleCallbacks]
+#[Gedmo\Loggable(logEntryClass: LogEntry::class)]
 class Tachi
 {
     use TimestampableTrait;
@@ -34,12 +36,15 @@ class Tachi
     private ?TaikaiMatch $match = null;
 
     #[ORM\Column]
+    #[Gedmo\Versioned]
     private int $round = 1;
 
     #[ORM\Column(name: '`index`')]
+    #[Gedmo\Versioned]
     private int $index = 1;
 
     #[ORM\Column(options: ['default' => false])]
+    #[Gedmo\Versioned]
     private bool $finished = false;
 
     public function getId(): ?int

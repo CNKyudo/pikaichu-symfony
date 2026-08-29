@@ -3,9 +3,9 @@
 {{ form_row(form.displayName) }}
 
 <div class="field is-grouped">
-    <div class="control"><button class="button is-primary" type="submit">{{ 'action.save'|trans }}</button></div>
+    <div class="control"><button class="button has-background-light" type="submit">{{ 'action.save'|trans }}</button></div>
     <div class="control">
-        <a class="button is-light" href="{{ path('app_taikai_show', {id: taikai.id}) }}">{{ 'action.back'|trans }}</a>
+        <a class="button" href="{{ path('app_taikai_edit', {id: taikai.id}) }}">{{ 'action.back'|trans }}</a>
     </div>
 </div>
 {{ form_end(form) }}

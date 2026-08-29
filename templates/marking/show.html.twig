@@ -5,106 +5,72 @@
 {% block body %}
 <h1 class="title">{{ 'marking.title'|trans }} — {{ taikai.shortname }}</h1>
 
-<div class="buttons has-addons mb-4">
-    <a class="button" href="{{ path('app_taikai_show', {id: taikai.id}) }}">{{ 'marking.back_to_taikai'|trans }}</a>
-    <a class="button {{ round is null ? 'is-info is-selected' : '' }}"
+<p class="mb-3">
+    <a class="button is-light mr-5" href="{{ path('app_taikai_show', {id: taikai.id}) }}">{{ 'marking.back_to_taikai'|trans }}</a>
+    <a class="button is-light {{ round is null ? 'is-primary' : '' }}"
        href="{{ path('app_marking_show', {taikaiId: taikai.id}) }}">{{ 'marking.all_rounds'|trans }}</a>
     {% for r in rounds %}
-        <a class="button {{ round == r ? 'is-info is-selected' : '' }}"
+        <a class="button is-light {{ round == r ? 'is-primary' : '' }}"
            href="{{ path('app_marking_show', {taikaiId: taikai.id, round: r}) }}">{{ r }}</a>
     {% endfor %}
-</div>
+</p>
 
-{# Séries affichées : toutes, ou uniquement celle sélectionnée. #}
 {% set visibleRounds = round is null ? rounds : [round] %}
+{% set individual = taikai.form and taikai.form.value == 'individual' %}
 
-{% for participatingDojo in taikai.participatingDojos %}
-    <h2 class="subtitle mt-5">{{ participatingDojo.displayName }}</h2>
-
-    <table class="table is-fullwidth is-bordered is-narrow">
-        <thead>
-        <tr>
-            <th style="width: 4rem">{{ 'marking.order'|trans }}</th>
-            <th>{{ 'marking.name'|trans }}</th>
-            <th style="width: 12rem">{{ 'marking.input'|trans }}</th>
-            {% for r in visibleRounds %}
-                <th class="has-text-centered">{{ 'marking.round'|trans }} {{ r }}</th>
-            {% endfor %}
-            <th class="has-text-right" style="width: 5rem">{{ 'marking.score'|trans }}</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for participant in participatingDojo.drawOrderedParticipants %}
-            {% set score = participant.getScore() %}
-            <tr>
-                <td>{{ participant.index }}</td>
-                <td>{{ participant.displayName }}</td>
-
-                <td>
-                    {# Boutons de saisie : touché, manqué, incertain. #}
-                    {% if score and score.firstEmptyResult %}
-                        <div class="buttons has-addons are-small">
-                            {% for status in ['hit', 'miss', 'unknown'] %}
-                                <form method="post" style="display:inline"
-                                      action="{{ path('app_marking_add', {taikaiId: taikai.id, participantId: participant.id}) }}">
-                                    <input type="hidden" name="status" value="{{ status }}">
-                                    <button class="button" type="submit" title="{{ ('marking.status.' ~ status)|trans }}">
-                                        {{ status == 'hit' ? '◯' : (status == 'miss' ? '⨯' : '?') }}
-                                    </button>
-                                </form>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <span class="has-text-grey is-size-7">{{ 'marking.complete'|trans }}</span>
-                    {% endif %}
-                </td>
-
-                {% for r in visibleRounds %}
-                    {% set roundResults = score ? score.getResultsForRound(r) : [] %}
-                    {% set allMarked = roundResults|length > 0 and roundResults|filter(res => not res.isMarked)|length == 0 %}
-                    {% set hasUnknown = roundResults|filter(res => res.isUnknown)|length > 0 %}
-                    {% set finalized = score and score.isRoundFinalized(r) %}
-
-                    <td class="has-text-centered">
-                        {% for result in roundResults %}
-                            {% if result.isFinal or not result.isMarked %}
-                                <span class="is-size-5 mx-1">{{ result.status ? result.status.glyph : '·' }}</span>
-                            {% else %}
-                                {# Tant que la série n'est pas validée, un clic fait tourner la marque. #}
-                                <form method="post" style="display:inline"
-                                      action="{{ path('app_marking_rotate', {taikaiId: taikai.id, resultId: result.id}) }}">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('rotate' ~ result.id) }}">
-                                    <button class="button is-small is-ghost is-size-5" type="submit">
-                                        {{ result.status.glyph }}
-                                    </button>
-                                </form>
-                            {% endif %}
-                        {% endfor %}
-
-                        {# La coche de validation n'apparaît qu'une fois la série
-                           complète et sans marque incertaine. #}
-                        {% if allMarked and not hasUnknown and not finalized %}
-                            <form method="post" style="display:inline"
-                                  action="{{ path('app_marking_finalize', {taikaiId: taikai.id, participantId: participant.id, round: r}) }}">
-                                <input type="hidden" name="_token"
-                                       value="{{ csrf_token('finalize' ~ participant.id ~ '-' ~ r) }}">
-                                <button class="button is-small is-info ml-2" type="submit"
-                                        title="{{ 'marking.validate_round'|trans }}">✓</button>
-                            </form>
-                        {% elseif finalized %}
-                            <span class="tag is-success is-light ml-2">✓</span>
-                        {% endif %}
-                    </td>
-                {% endfor %}
-
-                <td class="has-text-right has-text-weight-bold">
-                    {{ score ? score.intermediateHits : 0 }}
-                </td>
-            </tr>
+<table class="table is-narrow is-striped is-bordered">
+    <thead>
+    <tr class="has-text-centered">
+        <th>{{ 'marking.club'|trans }}</th>
+        {% if individual %}
+            <th>{{ 'marking.order'|trans }}</th>
         {% else %}
-            <tr><td colspan="{{ 4 + visibleRounds|length }}" class="has-text-grey">{{ 'marking.no_participant'|trans }}</td></tr>
+            <th>{{ 'marking.team'|trans }}</th>
+        {% endif %}
+        <th>{{ 'marking.name'|trans }}</th>
+        <th>{{ 'marking.input'|trans }}</th>
+        {% for r in visibleRounds %}
+            <th colspan="2">{{ 'marking.round'|trans }} {{ r }}</th>
         {% endfor %}
-        </tbody>
-    </table>
-{% endfor %}
+        <th colspan="{{ individual ? 1 : 2 }}">{{ 'marking.score'|trans }}</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% if individual %}
+        {% for participatingDojo in taikai.participatingDojos %}
+            {% for participant in participatingDojo.participants %}
+                <tr class="has-text-centered">
+                    {% if loop.first %}
+                        <th class="is-vcentered" rowspan="{{ participatingDojo.participants|length }}">{{ participatingDojo.displayName }}</th>
+                    {% endif %}
+                    {{ include('marking/_cells.html.twig', {participant: participant, taikai: taikai, visibleRounds: visibleRounds}) }}
+                </tr>
+            {% endfor %}
+        {% else %}
+            <tr><td colspan="{{ individual ? 4 : 5 }}" class="has-text-centered has-text-grey">{{ 'marking.no_participant'|trans }}</td></tr>
+        {% endfor %}
+    {% else %}
+        {% for participatingDojo in taikai.participatingDojos %}
+            {% for team in participatingDojo.teams %}
+                {% for participant in team.participants %}
+                    <tr class="has-text-left">
+                        {% if loop.parent.loop.first and loop.first %}
+                            <th class="is-vcentered has-text-centered" rowspan="{{ participatingDojo.participants|length }}">{{ participatingDojo.displayName }}</th>
+                        {% endif %}
+                        {% if loop.first %}
+                            <th class="is-vcentered has-text-centered" rowspan="{{ team.participants|length }}">{{ team.index }} - {{ team.shortname }}</th>
+                        {% endif %}
+                        {{ include('marking/_cells.html.twig', {participant: participant, taikai: taikai, visibleRounds: visibleRounds}) }}
+                        {% if loop.first %}
+                            <th class="is-vcentered has-text-centered">{{ team.getScore(null) ? team.getScore(null).intermediateHits : 0 }}</th>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+        {% else %}
+            <tr><td colspan="{{ individual ? 4 : 5 }}" class="has-text-centered has-text-grey">{{ 'marking.no_participant'|trans }}</td></tr>
+        {% endfor %}
+    {% endif %}
+    </tbody>
+</table>
 {% endblock %}

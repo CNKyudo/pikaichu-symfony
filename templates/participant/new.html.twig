@@ -1,6 +1,21 @@
-{% extends 'base.html.twig' %}
+{% extends 'taikai/_layout.html.twig' %}
 {% block title %}{{ 'participant.new'|trans }} · {{ app_name }}{% endblock %}
-{% block body %}
-    <h1 class="title">{{ 'participant.new'|trans }} — {{ participatingDojo.displayName }}</h1>
-    {{ include('participant/_form.html.twig') }}
+{% block taikai_content %}
+<div class="columns">
+    <div class="column is-one-third is-offset-2">
+        <div class="card">
+            <header class="card-header"><p class="card-header-title">{{ 'participant.new'|trans }}</p></header>
+            <div class="card-content">
+                <nav class="breadcrumb has-succeeds-separator" aria-label="breadcrumbs">
+                    <ul>
+                        <li><a href="{{ path('app_taikai_edit', {id: taikai.id}) }}">{{ taikai.shortname }}</a></li>
+                        <li><a href="{{ path('app_participating_dojo_edit', {taikaiId: taikai.id, id: participatingDojo.id}) }}">{{ participatingDojo.displayName }}</a></li>
+                        <li class="is-active"><a aria-current="page">{{ 'action.add'|trans }}</a></li>
+                    </ul>
+                </nav>
+                {{ include('participant/_form.html.twig') }}
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

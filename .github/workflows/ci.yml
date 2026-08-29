@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    services:
+      database:
+        image: postgres:16
+        env:
+          POSTGRES_USER: app
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: app
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U app"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      APP_ENV: test
+      DATABASE_URL: "postgresql://app:password@localhost:5432/app?serverVersion=16&charset=utf8"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          coverage: none
+          tools: composer:v2
+
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Check php-cs-fixer
+        run: vendor/bin/php-cs-fixer fix --config=tools/.php-cs-fixer.dist.php --dry-run --diff --allow-risky=yes
+
+      - name: Run rector (dry-run)
+        run: vendor/bin/rector process --config=tools/rector.php --dry-run
+
+      - name: Run phpstan
+        run: vendor/bin/phpstan analyse --configuration=tools/phpstan.dist.neon
+
+      - name: Create test database
+        run: php bin/console doctrine:database:create --env=test --if-not-exists
+
+      - name: Run migrations
+        run: php bin/console doctrine:migrations:migrate --env=test --no-interaction
+
+      - name: Run unit tests
+        run: php bin/phpunit tests/Unit/ --testdox
+
+      - name: Run functional tests
+        run: php bin/phpunit tests/Functional/ --testdox

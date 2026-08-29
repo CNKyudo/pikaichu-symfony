@@ -1,0 +1,76 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ 'match.edit'|trans }} · {{ app_name }}{% endblock %}
+{% block body %}
+    <div class="columns">
+        <div class="column is-half is-offset-2">
+            <div class="card">
+                <header class="card-header">
+                    <p class="card-header-title">{{ 'match.edit'|trans }} — {{ match }}</p>
+                </header>
+                <div class="card-content">
+                    <form method="post" name="match" action="{{ path('app_match_edit', {taikaiId: taikai.id, id: match.id}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('match' ~ match.id) }}">
+
+                        <div class="field">
+                            <label class="label">{{ 'match.level'|trans }}</label>
+                            <div class="control"><input class="input" type="text" value="{{ match.level }}" disabled></div>
+                        </div>
+                        <div class="field">
+                            <label class="label">{{ 'match.index'|trans }}</label>
+                            <div class="control"><input class="input" type="text" value="{{ match.index }}" disabled></div>
+                        </div>
+                        <div class="field">
+                            <label class="label">{{ 'match.winner'|trans }}</label>
+                            <div class="control">
+                                <div class="select">
+                                    <select name="winner">
+                                        <option value=""{{ match.winner is null ? ' selected' }}></option>
+                                        <option value="1"{{ match.winner == 1 ? ' selected' }}>1</option>
+                                        <option value="2"{{ match.winner == 2 ? ' selected' }}>2</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">{{ 'match.team1'|trans }}</label>
+                            <div class="control">
+                                <div class="select">
+                                    <select name="team1_id">
+                                        <option value=""></option>
+                                        {% for team in teams %}
+                                            <option value="{{ team.id }}"{{ match.team1 and match.team1.id == team.id ? ' selected' }}>
+                                                {{ team.shortname }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">{{ 'match.team2'|trans }}</label>
+                            <div class="control">
+                                <div class="select">
+                                    <select name="team2_id">
+                                        <option value=""></option>
+                                        {% for team in teams %}
+                                            <option value="{{ team.id }}"{{ match.team2 and match.team2.id == team.id ? ' selected' }}>
+                                                {{ team.shortname }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field is-grouped mt-4">
+                            <div class="control"><button class="button has-background-light" type="submit">{{ 'action.save'|trans }}</button></div>
+                            <div class="control">
+                                <a class="button" href="{{ path('app_match_index', {taikaiId: taikai.id}) }}">{{ 'action.back'|trans }}</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

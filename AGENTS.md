@@ -49,7 +49,7 @@ concepts onto their Symfony counterparts and tracks what is still missing.
 ### Domain rules that are easy to get wrong
 
 - **`Match` is a reserved word in PHP.** The entity is `TaikaiMatch`; the table stays `matches`.
-- **Business logic belongs in `src/Service/`**, not in entities. Entities carry data plus simple derived predicates.
+- **Business logic belongs in `src/Service/`**, not in entities. Entities carry data, simple derived predicates, and recalculation of their own cached counters (e.g. `Score::recalculateFromResults()`); anything that reaches across entities or enforces a cross-entity rule belongs in a service.
 - **Score counters are derived, never set directly.** Go through `MarkingService`, which recomputes the participant score and then the team score.
 - **`hits`/`value` count only validated arrows**; `intermediate_hits`/`intermediate_value` also count arrows that are merely marked. Provisional leaderboards use the latter.
 - **Ties consume places.** Two competitors tied at rank 1 are followed by rank 3, not 2. See `Ranker`.

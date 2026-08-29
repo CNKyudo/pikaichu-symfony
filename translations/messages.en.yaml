@@ -1,9 +1,12 @@
 nav:
     taikais: Taikai
     dojos: Dojos
+    guide: Guide
+    tutorial: Tutorial
     login: Sign in
     logout: Sign out
     register: Sign up
+    account: My account
 
 action:
     save: Save
@@ -12,6 +15,25 @@ action:
     edit: Edit
     delete: Delete
     actions: Actions
+
+home:
+    taikais: Taikai
+    taikais_summary: "%nb% Managed Taikai."
+    manage_taikais: Manage Taikai
+    dojos: Dojos
+    dojos_summary: "%nb% Managed Dojos."
+    manage_dojos: Manage Dojos
+
+championship:
+    title: Championship
+    empty: No taikai registered yet.
+    export:
+        category: Category
+        club: Club
+        display_name: Name Surname
+        rank: Rank
+        taikai_name: Taikai Name
+        total: Total
 
 user:
     email_address: Email
@@ -23,14 +45,66 @@ user:
     password.mismatch: The two passwords do not match.
     password.too_short: The password must be at least {{ limit }} characters long.
     email_address.already_used: This email address is already in use.
+    locale: Language
+    locale.fr: French
+    locale.en: English
+    account.title: My account
+    account.updated: Your account has been updated.
 
 registration:
-    success: Your account has been created, you can now sign in.
+    success: Your account has been created. Check your inbox to confirm your address before signing in.
+
+email_confirmation:
+    invalid_token: Invalid or already used confirmation link.
+    confirmed: Your email address has been confirmed, you can now sign in.
+    resent: If that email address exists and is not yet confirmed, we have sent a new confirmation link.
+    email.blank: An email address is required.
+    resend:
+        title: Resend confirmation email
+        instructions: Enter your email address and we will send you a new confirmation link.
+        submit: Resend the link
+    email:
+        subject: Confirm your email address
+        greeting: 'Hello %name%,'
+        body: "Click the button below to confirm your email address and activate your Pikaichu account:"
+        button: Confirm my email address
+        ignore: If you did not sign up for this account, you can safely ignore this email.
+
+login:
+    submit: Log in
+    forgot_password: Forgot your password?
+    no_account: "Don't have an account?"
+    sign_up_link: Sign up
+
+password_reset:
+    back_to_login: Back to sign in
+    invalid_token: Invalid or expired reset link.
+    updated: Your password has been reset, you can now sign in.
+    email.blank: An email address is required.
+    request:
+        title: Forgot your password?
+        instructions: Enter your email address and we will send you a link to reset your password.
+        submit: Send the link
+    check_email:
+        title: Check your email
+        instructions: If that email address is in our system, we have sent a password reset link.
+    reset:
+        title: New password
+        submit: Reset password
+    email:
+        subject: Reset your password
+        greeting: 'Hello %name%,'
+        body: "Someone requested a password reset for your account. Click the button below to choose a new password:"
+        button: Reset my password
+        expiration: This link will expire in 15 minutes.
+        ignore: If you did not request this, you can safely ignore this email. Your password will not change.
+        manual_link: 'If the button does not work, copy and paste this URL into your browser:'
 
 dojo:
     list: Dojo list
     new: Add a dojo
-    edit: Edit dojo
+    edit: Edit a dojo
+    destroy: Delete a dojo
     empty: No dojo registered yet.
     shortname: Short name
     name: Full name
@@ -41,26 +115,31 @@ dojo:
     created: The dojo has been created.
     updated: The dojo has been updated.
     deleted: The dojo has been deleted.
-    delete.confirm: Delete this dojo?
+    delete.confirm: "Are you sure?"
     delete.invalid_token: Invalid security token, the deletion was cancelled.
     delete.still_used: "This dojo cannot be deleted: it still takes part in at least one taikai."
 
 participating_dojo:
+    title: Host dojo
     new: Add a host dojo
-    edit: Edit host dojo
+    edit: Edit a host dojo
+    destroy: Delete a host dojo
     dojo: Dojo
-    display_name: Display name
+    display_name: Short name
     display_name.help: Leave empty to reuse the dojo short name.
+    num_participants: No.
     created: The host dojo has been added.
     updated: The host dojo has been updated.
     deleted: The host dojo has been removed.
-    delete.confirm: Remove this host dojo from the taikai?
+    delete.confirm: "Are you sure?"
     delete.invalid_token: Invalid security token, the deletion was cancelled.
     delete.still_has_staff: "This host dojo cannot be removed: it is linked to the following staff members — %names%."
 
 participant:
+    title: Participants
     new: Add a participant
-    edit: Edit participant
+    edit: Edit a participant
+    destroy: Remove a participant
     empty: No participant registered yet.
     firstname: First name
     lastname: Last name
@@ -75,12 +154,14 @@ participant:
     created: The participant has been added.
     updated: The participant has been updated.
     deleted: The participant has been deleted.
-    delete.confirm: Delete this participant?
+    delete.confirm: "Are you sure?"
     delete.invalid_token: Invalid security token, the deletion was cancelled.
-    import.title: Excel import
-    import.file: File
+    import.title: Import participant list
+    import.file: CNKyudo Excel File
     import.help: "\"Kyudo - Interface de gestion\" export (.xlsx, .ods or .csv)."
     import.submit: Import
+    import.placeholders.choose_a_file: Choose a file
+    import.placeholders.no_file_uploaded: No file uploaded
     import.file_missing: No file uploaded.
     import.invalid_token: Invalid security token, the import was cancelled.
     import.done: "{1}One participant has been imported.|]1,Inf[%count% participants have been imported."
@@ -96,10 +177,16 @@ taikai:
     edit: Edit Taikai
     overview: Overview of
     details: Details
+    participants_overview.dojo: Host club
+    participants_overview.team: Team
+    participants_overview.name: Name
     empty: No taikai registered yet.
+    no_change_if_taikai_is_done: A taikai in the done stage can no longer be modified.
     created: The taikai has been created.
     updated: The taikai has been updated.
     deleted: The taikai has been deleted.
+    delete.confirm: "Are you sure?"
+    destroy: Delete
     shortname: Short name
     shortname.help: Explicit acronym, without spaces, including the dojo or territorial commission name.
     shortname.already_used: This short name is already used by another taikai.
@@ -120,7 +207,10 @@ taikai:
     num_targets: Targets / shooters
     tachi_size: Tachi size
     distributed: Remote
+    distributed_local: Local
     distributed.help: Tick to allow several host dojos in different locations.
+    title.total_num_arrows: "%count% arrows"
+    title.category: "Category %category%"
     distributed.num_participating_dojos: An on-site taikai can only have one host dojo.
     participants: Participants
     host_clubs: Host dojos
@@ -130,6 +220,51 @@ taikai:
     history: History
     marking_sheet: Marking sheet
     results: Results table
+    timeline.now: Now
+    timeline.you_are_here: You are here!
+
+    export:
+        title: Excel Export
+        infos: Information
+        type: Type
+        summary: Summary
+        staff:
+            title: Staff
+            lastname: Lastname
+            firstname: Firstname
+            role: Role
+            participating_dojo: Org. dojo
+        participants:
+            title: Participants
+            participating_dojo: Org. dojo
+            index: "#"
+            display_name: Name
+            club: Club
+            team: Team
+        results:
+            title:
+                individual: Individual Results
+                team: Team Results
+                matches: Match Results
+            rank: Rank
+            index: "#"
+            club: Club
+            participating_dojo: Org. dojo
+            display_name: Name
+            round: "Round %count%"
+            score: Score
+            team: Team
+            team_score: Total
+        journal:
+            title: Journal
+            time: Timestamp
+            user: User
+            message: Message
+            category: Category
+
+    event.category.state_transition: State transition
+    event.category.tie_break: Tie-break
+    event.category.rectification: Rectification
 
     form.individual: Individual
     form.team: Teams
@@ -160,6 +295,21 @@ taikai:
         draw_not_done: 'Cannot move to the "Marking" stage: the draw has not been done for every host dojo.'
         results_not_finalized: 'Cannot move to the "Tie-Break" stage: some marks are not validated yet.'
 
+    generate:
+        action: Generate part 2
+        confirm: Generate the match bracket from the team standings?
+        invalid_token: Invalid security token, please try again.
+        wrong_form: Only a 2-in-1 taikai can generate a part 2.
+        wrong_bracket_size: The bracket size must be 4 or 8.
+        not_finalized: All results must be finalized before creating the match tournament.
+        not_enough_teams: 'There are not enough teams to create a match tournament of %bracket_size% teams.'
+        not_enough_non_mixed_teams: 'There are not enough non-mixed teams to create a match tournament of %bracket_size% teams (%available% available).'
+
+taikai_event:
+    state_transition:
+        forward: "%user% has moved '%taikai%' from the '%from%' state to the '%to%' state."
+        backward: "%user% has returned '%taikai%' from the '%from%' state to the '%to%' state."
+
 draw:
     label: Draw
     done: Done
@@ -170,12 +320,41 @@ draw:
     confirm: Are you sure you want to run the draw?
     no_change_if_taikai_is_marking: The draw is only possible during the "Registration" stage.
 
+rectification:
+    title: Rectification
+    edit_title: Result rectification
+    back: Back to Taikai
+    back_to_list: Back to results list
+    edit: Rectify
+    index: ID
+    round: Round
+    participant: Participant
+    description: Description
+    description_template: "Round %round%, Arrow %index%"
+    value: Value
+    status: Status
+    rectified: "The result of arrow %index% of round %round% for %participant% has been rectified to %result%."
+
+tie_break:
+    title: Tie-Break
+    individual: Individual tie-break
+    team: Team tie-break
+    intermediate_rank: Intermediate rank
+    display_name: Name
+    rank: Final rank
+    empty: No competitor to rank.
+    success: The ranks have been updated.
+    invalid_token: Invalid security token, please try again.
+
 marking:
     title: Marking sheet
     back_to_taikai: Back to Taikai
+    back_to_match: Back to match
     all_rounds: All rounds
     round: Round
     order: No.
+    club: Dojo
+    team: Team
     name: Name
     input: Input
     score: Score
@@ -189,17 +368,24 @@ marking:
     status.unknown: Uncertain
 
 leaderboard:
-    title: Results table
+    title: Intermediate results table
     rank: Rank
     name: Name
     hits: Hits
     points: Points
+    round: Round
+    score: Score
+    team_score: Total
+    all: All dojos
     individual: Individual results
     by_team: Team results
-    by_host_club: Ranking per dojo
     final_standings: Final standings
     public_view: Public results
+    2in1: Team results
+    show_individual: Show individual results
+    show_team: Show team results
     empty: No result yet.
+    no_participants_yet: No participant registered.
 
 score:
     team_xor_participant: A score belongs to a participant or to a team, not both.
@@ -208,10 +394,94 @@ result:
     value.invalid_for_enteki: In enteki each arrow must carry a value among 0, 3, 5, 7, 9 or 10.
 
 staff:
+    new: Add a staff member
+    edit: Edit a staff member
+    destroy: Delete a staff member
+    user: User account
+    user.help: Pick an account to reuse its identity automatically.
+    firstname: First name
+    lastname: Last name
+    role: Role
+    display_name: Name
+    participating_dojo: Host dojo
     user.required_for_role: This role must be attached to a user account.
     participating_dojo.required_for_role: This role must be attached to a host dojo.
     at_least_one_admin: The taikai must keep at least one administrator.
+    created: The staff member has been added.
+    updated: The staff member has been updated.
+    deleted: The staff member has been removed.
+    delete.confirm: "Are you sure?"
+    delete.invalid_token: Invalid security token, the deletion was cancelled.
 
 match:
+    title: Match bracket
+    back: Back to Taikai
+    edit: Edit a match
+    updated: The match has been updated.
+    level: Level
+    index: Index
+    winner: Winner
+    team1: Team 1
+    team2: Team 2
+    marking_sheet: Marking sheet
+    decide_winner: Decide the winner
+    decide_winner_confirm: Decide the winner based on the score?
+    invalid_token: Invalid security token, please try again.
     no_taikai: This match is not attached to any taikai.
     defined_results_for_target_match: Marks have already been entered on the next match, the winner can no longer be changed.
+    cant_change_teams_if_results_exist: 'Cannot change team: marks already exist and are validated for this match.'
+
+scoreboard:
+    title: Public display
+    empty: No shooting in progress.
+
+tachi:
+    title: Shajo tracking
+    round: Round
+    index: Tachi
+    finished: Finished
+    not_finished: In progress
+    participant: Participant
+    results: Results
+    no_result: No result yet.
+    no_participant: No participant in this tachi.
+    empty: No tachi yet.
+
+team:
+    title: Teams
+    new: Add a team
+    edit: Edit a team
+    destroy: Delete a team
+    empty: No team registered.
+    index: Index
+    index.help: Leave blank for a default choice.
+    index.already_used: This index is already used in this host dojo.
+    shortname: Shortname
+    shortname.already_used: A team with this name already exists in this host dojo.
+    mixed: Mixed
+    num_participants: Nb.
+    teamed: "%teamed% participants assigned out of %total%."
+    form_teams: Form teams
+    created: The team has been added.
+    updated: The team has been updated.
+    deleted: The team has been deleted.
+    delete.confirm: Delete this team? Its participants will be deleted too.
+    delete.invalid_token: Invalid security token, the deletion was cancelled.
+
+teaming:
+    title: Team composition
+    unassigned: Unassigned
+    select_team: Choose a team…
+    assign: Assign
+    unassign: Remove
+    add_team: Add a team
+    drag_to_reorder: Drag to reorder
+    clear_all: Clear teams
+    clear_confirm: Clear all teams?
+    form_randomly: Form randomly
+    empty_team_prefix: The team name prefix cannot be empty.
+    empty_team_shortname: A team name cannot be empty.
+    taken_team_shortname: "A team with the name '%shortname%' already exists."
+    placeholders:
+        team_shortname: Team name
+        team_prefix: Prefix

@@ -25,4 +25,28 @@ class DojoRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('d')
             ->orderBy('d.shortname', 'ASC');
     }
+
+    /**
+     * Recherche par nom court, nom entier ou pays, pour l'autocomplétion des
+     * clubs hôtes (`Dojo.containing` côté Rails).
+     *
+     * @return list<Dojo>
+     */
+    public function search(string $query, int $limit = 20): array
+    {
+        if ('' === trim($query)) {
+            return [];
+        }
+
+        /** @var list<Dojo> $result */
+        $result = $this->createQueryBuilder('d')
+            ->andWhere('LOWER(d.shortname) LIKE :q OR LOWER(d.name) LIKE :q OR LOWER(d.countryCode) LIKE :q')
+            ->setParameter('q', '%'.mb_strtolower(trim($query)).'%')
+            ->orderBy('d.shortname', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+
+        return $result;
+    }
 }

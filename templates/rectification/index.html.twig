@@ -1,0 +1,47 @@
+{% extends 'taikai/_layout.html.twig' %}
+
+{% block title %}{{ 'rectification.title'|trans }} · {{ taikai.shortname }}{% endblock %}
+
+{% block taikai_content %}
+<p class="mb-3">
+    <a class="button is-light mr-5" href="{{ path('app_taikai_show', {id: taikai.id}) }}">{{ 'rectification.back'|trans }}</a>
+</p>
+
+<table class="table is-narrow is-bordered is-striped is-fullwidth">
+    <thead>
+    <tr class="has-text-centered">
+        <th rowspan="2">{{ 'taikai.name'|trans }}</th>
+        {% for r in 1..taikai.numRounds %}
+            <th colspan="{{ taikai.numArrows }}">{{ 'rectification.round'|trans }} {{ r }}</th>
+        {% endfor %}
+    </tr>
+    <tr>
+        {% for i in 1..taikai.totalNumArrows %}
+            <th>{{ i }}</th>
+        {% endfor %}
+    </tr>
+    </thead>
+    <tbody>
+    {% for participant in taikai.participants %}
+        {% for score in participant.scores %}
+            <tr>
+                <td>{{ participant.displayName }}</td>
+                {% for result in score.results %}
+                    <td class="has-text-centered">
+                        {% if result.isFinal %}
+                            <a class="button is-small is-light"
+                               href="{{ path('app_rectification_edit', {taikaiId: taikai.id, resultId: result.id}) }}"
+                               title="{{ 'rectification.edit'|trans }}">
+                                {{ result.value is not null ? result.value : (result.status ? result.status.glyph : '') }}
+                            </a>
+                        {% endif %}
+                    </td>
+                {% endfor %}
+            </tr>
+        {% else %}
+            <tr><td colspan="{{ 1 + taikai.totalNumArrows }}" class="has-text-grey">{{ 'marking.no_participant'|trans }}</td></tr>
+        {% endfor %}
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

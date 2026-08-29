@@ -1,0 +1,64 @@
+{% set teamedCount = participatingDojo.participants|filter(p => p.team is not null)|length %}
+<nav class="level">
+    <div class="level-left">
+        <div class="level-item">
+            {% if participatingDojo.participants|length > 0 %}
+                {{ 'team.teamed'|trans({'%teamed%': teamedCount, '%total%': participatingDojo.participants|length}) }}
+            {% endif %}
+        </div>
+    </div>
+    <div class="level-right">
+        <div class="level-item">
+            <a class="button has-background-light"
+               href="{{ path('app_teaming_edit', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id}) }}"
+               title="{{ 'team.form_teams'|trans }}">
+                <span class="icon is-small"><i class="fas fa-list-ol"></i></span>
+                <span>{{ 'team.form_teams'|trans }}</span>
+            </a>
+        </div>
+    </div>
+</nav>
+
+<table class="table is-narrow is-hoverable is-fullwidth">
+    <thead>
+    <tr class="has-text-centered">
+        <th>{{ 'team.index'|trans }}</th>
+        <th>{{ 'team.shortname'|trans }}</th>
+        <th>{{ 'team.num_participants'|trans }}</th>
+        <th class="has-text-right">
+            <a class="button is-small has-background-light"
+               href="{{ path('app_team_new', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id}) }}"
+               title="{{ 'team.new'|trans }}">
+                <span class="icon is-small"><i class="fas fa-plus"></i></span>
+                <span>{{ 'action.add'|trans }}</span>
+            </a>
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for team in participatingDojo.teams %}
+        <tr>
+            <td>{{ team.index }}</td>
+            <td>{{ team.shortname }}</td>
+            <td>{{ team.participants|length }}{{ team.mixed ? '*' : '' }}</td>
+            <td class="has-text-right">
+                <a class="button is-small has-background-light"
+                   href="{{ path('app_team_edit', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id, id: team.id}) }}"
+                   title="{{ 'team.edit'|trans }}">
+                    <span class="icon is-small"><i class="fas fa-pen"></i></span>
+                </a>
+                <form method="post" style="display:inline"
+                      action="{{ path('app_team_delete', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id, id: team.id}) }}"
+                      onsubmit="return confirm('{{ 'team.delete.confirm'|trans|e('js') }}')">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ team.id) }}">
+                    <button class="button is-small has-background-light" type="submit" title="{{ 'team.destroy'|trans }}">
+                        <span class="icon is-small"><i class="fas fa-trash"></i></span>
+                    </button>
+                </form>
+            </td>
+        </tr>
+    {% else %}
+        <tr><td colspan="4" class="has-text-centered has-text-grey">{{ 'team.empty'|trans }}</td></tr>
+    {% endfor %}
+    </tbody>
+</table>

@@ -22,14 +22,15 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 /**
  * Clubs hôtes d'un taikai, portés de `participating_dojos_controller`.
  *
- * Rails renvoie vers `taikais#edit` après chaque écriture, cette page y portant
- * la liste des clubs hôtes ; ici la liste vit sur la vue d'ensemble du taikai,
- * qui sert donc de cible.
+ * Comme côté Rails : la création, la modification et la suppression renvoient
+ * vers `taikais#edit`, le tirage au sort vers `taikais#show`.
  */
 #[Route('/taikais/{taikaiId}/participating-dojos', requirements: ['taikaiId' => '\d+'])]
 #[IsGranted('ROLE_USER')]
 final class ParticipatingDojoController extends AbstractController
 {
+    use AssertsEntityOwnershipTrait;
+
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
     ) {
@@ -52,7 +53,7 @@ final class ParticipatingDojoController extends AbstractController
 
             $this->addFlash('success', 'participating_dojo.created');
 
-            return $this->redirectToRoute('app_taikai_show', ['id' => $taikai->getId()]);
+            return $this->redirectToRoute('app_taikai_edit', ['id' => $taikai->getId()]);
         }
 
         // Le club hôte a été rattaché au taikai pour que la validation puisse
@@ -73,7 +74,7 @@ final class ParticipatingDojoController extends AbstractController
         #[MapEntity(id: 'id')] ParticipatingDojo $participatingDojo,
         Request $request,
     ): Response {
-        $this->assertBelongsToTaikai($taikai, $participatingDojo);
+        $this->assertBelongsTo($participatingDojo->getTaikai(), $taikai, 'Participating dojo does not belong to this taikai');
         $this->denyAccessUnlessGranted(ParticipatingDojoVoter::EDIT, $participatingDojo);
 
         $form = $this->createForm(ParticipatingDojoType::class, $participatingDojo);
@@ -84,7 +85,7 @@ final class ParticipatingDojoController extends AbstractController
 
             $this->addFlash('success', 'participating_dojo.updated');
 
-            return $this->redirectToRoute('app_taikai_show', ['id' => $taikai->getId()]);
+            return $this->redirectToRoute('app_taikai_edit', ['id' => $taikai->getId()]);
         }
 
         return $this->render('participating_dojo/edit.html.twig', [
@@ -100,13 +101,13 @@ final class ParticipatingDojoController extends AbstractController
         #[MapEntity(id: 'id')] ParticipatingDojo $participatingDojo,
         Request $request,
     ): RedirectResponse {
-        $this->assertBelongsToTaikai($taikai, $participatingDojo);
+        $this->assertBelongsTo($participatingDojo->getTaikai(), $taikai, 'Participating dojo does not belong to this taikai');
         $this->denyAccessUnlessGranted(ParticipatingDojoVoter::DELETE, $participatingDojo);
 
         if (!$this->isCsrfTokenValid('delete'.$participatingDojo->getId(), (string) $request->request->get('_token'))) {
             $this->addFlash('error', 'participating_dojo.delete.invalid_token');
 
-            return $this->redirectToRoute('app_taikai_show', ['id' => $taikai->getId()]);
+            return $this->redirectToRoute('app_taikai_edit', ['id' => $taikai->getId()]);
         }
 
         // Rails refuse la suppression tant que des membres du staff y sont
@@ -122,7 +123,7 @@ final class ParticipatingDojoController extends AbstractController
                 'parameters' => ['%names%' => implode(', ', $names)],
             ]);
 
-            return $this->redirectToRoute('app_taikai_show', ['id' => $taikai->getId()]);
+            return $this->redirectToRoute('app_taikai_edit', ['id' => $taikai->getId()]);
         }
 
         $this->entityManager->remove($participatingDojo);
@@ -130,7 +131,7 @@ final class ParticipatingDojoController extends AbstractController
 
         $this->addFlash('success', 'participating_dojo.deleted');
 
-        return $this->redirectToRoute('app_taikai_show', ['id' => $taikai->getId()]);
+        return $this->redirectToRoute('app_taikai_edit', ['id' => $taikai->getId()]);
     }
 
     /**
@@ -143,7 +144,7 @@ final class ParticipatingDojoController extends AbstractController
         Request $request,
         DrawService $drawService,
     ): RedirectResponse {
-        $this->assertBelongsToTaikai($taikai, $participatingDojo);
+        $this->assertBelongsTo($participatingDojo->getTaikai(), $taikai, 'Participating dojo does not belong to this taikai');
         $this->denyAccessUnlessGranted(ParticipatingDojoVoter::EDIT, $participatingDojo);
 
         if (!$this->isCsrfTokenValid('draw'.$participatingDojo->getId(), (string) $request->request->get('_token'))) {
@@ -161,12 +162,5 @@ final class ParticipatingDojoController extends AbstractController
         }
 
         return $this->redirectToRoute('app_taikai_show', ['id' => $taikai->getId()]);
-    }
-
-    private function assertBelongsToTaikai(Taikai $taikai, ParticipatingDojo $participatingDojo): void
-    {
-        if ($participatingDojo->getTaikai() !== $taikai) {
-            throw $this->createNotFoundException('Participating dojo does not belong to this taikai');
-        }
     }
 }

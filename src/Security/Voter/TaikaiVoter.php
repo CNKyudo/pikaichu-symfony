@@ -31,9 +31,18 @@ final class TaikaiVoter extends Voter
     /** Rectifier une marque déjà validée. */
     public const string RECTIFY = 'TAIKAI_RECTIFY';
 
+    /** Ajuster les rangs à l'entrée du tie-break. */
+    public const string TIE_BREAK = 'TAIKAI_TIE_BREAK';
+
+    /** Consulter le classement. Reprend `TaikaiPolicy#leaderboard_show?`. */
+    public const string LEADERBOARD = 'TAIKAI_LEADERBOARD';
+
+    /** Exporter les résultats en Excel. Reprend `TaikaiPolicy#export?`. */
+    public const string EXPORT = 'TAIKAI_EXPORT';
+
     protected function supports(string $attribute, mixed $subject): bool
     {
-        return \in_array($attribute, [self::EDIT, self::MARK, self::RECTIFY], true)
+        return \in_array($attribute, [self::EDIT, self::MARK, self::RECTIFY, self::TIE_BREAK, self::LEADERBOARD, self::EXPORT], true)
             && $subject instanceof Taikai;
     }
 
@@ -41,6 +50,31 @@ final class TaikaiVoter extends Voter
     {
         $user = $token->getUser();
         if (!$user instanceof User) {
+            return false;
+        }
+
+        // Les deux seules permissions qui ne dépendent pas du rôle tenu dans le staff.
+        if (self::LEADERBOARD === $attribute) {
+            return !$subject->isState(TaikaiState::New, TaikaiState::Registration);
+        }
+
+        if (self::EXPORT === $attribute) {
+            return $subject->isState(TaikaiState::Done);
+        }
+
+        // L'étape requise s'applique à tout le monde, y compris aux administrateurs :
+        // seule la condition de rôle qui suit peut être court-circuitée pour eux.
+        // Reprend `TaikaiPolicy#marking_update?`/`#rectification_update?`/`#tie_break_update?`,
+        // où `taikai.in_state?(...)` est un ET, jamais contourné par `user.admin?`.
+        if (self::MARK === $attribute && !$subject->isState(TaikaiState::Marking)) {
+            return false;
+        }
+
+        if (self::RECTIFY === $attribute && !$subject->isState(TaikaiState::Marking)) {
+            return false;
+        }
+
+        if (self::TIE_BREAK === $attribute && !$subject->isState(TaikaiState::TieBreak)) {
             return false;
         }
 
@@ -52,6 +86,7 @@ final class TaikaiVoter extends Voter
             self::EDIT => $this->canEdit($subject, $user),
             self::MARK => $this->canMark($subject, $user),
             self::RECTIFY => $this->canRectify($subject, $user),
+            self::TIE_BREAK => $this->canTieBreak($subject, $user),
             default => false,
         };
     }
@@ -63,37 +98,44 @@ final class TaikaiVoter extends Voter
     }
 
     /**
-     * La saisie est ouverte aux administrateurs et aux enregistreurs,
-     * uniquement pendant l'étape « Marquage ».
+     * La saisie est ouverte aux administrateurs, enregistreurs et juges de cible.
+     * Reprend `MARKING_ROLES` de `TaikaiPolicy` (`taikai_admin`, `dojo_admin`,
+     * `marking_referee`, `target_referee`) ; l'étape « Marquage » est déjà vérifiée
+     * par l'appelant.
      */
     private function canMark(Taikai $taikai, User $user): bool
     {
-        if (!$taikai->isState(TaikaiState::Marking)) {
-            return false;
-        }
-
         return $taikai->hasRole(
             $user,
             StaffRoleCode::TaikaiAdmin,
             StaffRoleCode::DojoAdmin,
             StaffRoleCode::MarkingReferee,
+            StaffRoleCode::TargetReferee,
         );
     }
 
     /**
-     * La rectification reste possible tant que le marquage n'est pas clos,
-     * et relève du directeur de tournoi ou du juge de cible.
+     * Réservée aux administrateurs du taikai. Reprend `ADMIN_ROLES` de
+     * `TaikaiPolicy#rectification_update?` — volontairement plus restreint que
+     * la saisie elle-même. L'étape « Marquage » est déjà vérifiée par l'appelant.
      */
     private function canRectify(Taikai $taikai, User $user): bool
     {
-        if (!$taikai->isState(TaikaiState::Marking)) {
-            return false;
-        }
+        return $taikai->hasRole($user, StaffRoleCode::TaikaiAdmin);
+    }
 
+    /**
+     * L'ajustement manuel des rangs est ouvert aux mêmes rôles que la saisie
+     * (`MARKING_ROLES` de `TaikaiPolicy#tie_break_update?`) ; l'étape « Tie-Break »
+     * est déjà vérifiée par l'appelant.
+     */
+    private function canTieBreak(Taikai $taikai, User $user): bool
+    {
         return $taikai->hasRole(
             $user,
             StaffRoleCode::TaikaiAdmin,
-            StaffRoleCode::Chairman,
+            StaffRoleCode::DojoAdmin,
+            StaffRoleCode::MarkingReferee,
             StaffRoleCode::TargetReferee,
         );
     }

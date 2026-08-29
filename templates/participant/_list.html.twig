@@ -1,12 +1,20 @@
-<table class="table is-fullwidth is-narrow is-hoverable">
+{# Reprise de `participants/_list.html.erb`. #}
+<table class="table is-narrow is-hoverable is-fullwidth is-size-6">
     <thead>
-    <tr>
+    <tr class="has-text-centered">
         <th>{{ 'participant.index'|trans }}</th>
         <th>{{ 'participant.firstname'|trans }}</th>
         <th>{{ 'participant.lastname'|trans }}</th>
         <th>{{ 'participant.club'|trans }}</th>
-        <th>{{ 'participant.licensed'|trans }}</th>
-        <th class="has-text-right">{{ 'action.actions'|trans }}</th>
+        <th></th>
+        <th class="has-text-right">
+            <a class="button is-small has-background-light"
+               href="{{ path('app_participant_new', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id}) }}"
+               title="{{ 'participant.new'|trans }}">
+                <span class="icon is-small"><i class="fas fa-plus"></i></span>
+                <span>{{ 'action.add'|trans }}</span>
+            </a>
+        </th>
     </tr>
     </thead>
     <tbody>
@@ -16,22 +24,25 @@
             <td>{{ participant.firstname }}</td>
             <td>{{ participant.lastname }}</td>
             <td>{{ participant.club }}</td>
-            <td>{{ participant.kyudojin ? '✔' : '' }}</td>
-            <td class="has-text-right">
-                <a class="button is-small is-light"
-                   href="{{ path('app_participant_edit', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id, id: participant.id}) }}">
-                    {{ 'action.edit'|trans }}
+            <td>{% if participant.kyudojin %}<i class="far fa-id-badge"></i>{% endif %}</td>
+            <td>
+                <a class="button is-small has-background-light"
+                   href="{{ path('app_participant_edit', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id, id: participant.id}) }}"
+                   title="{{ 'participant.edit'|trans }}">
+                    <span class="icon is-small"><i class="fas fa-pen"></i></span>
                 </a>
                 <form method="post" style="display:inline"
                       action="{{ path('app_participant_delete', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id, id: participant.id}) }}"
                       onsubmit="return confirm('{{ 'participant.delete.confirm'|trans|e('js') }}')">
                     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ participant.id) }}">
-                    <button class="button is-small is-danger is-light" type="submit">{{ 'action.delete'|trans }}</button>
+                    <button class="button is-small has-background-light" type="submit" title="{{ 'participant.destroy'|trans }}">
+                        <span class="icon is-small"><i class="fas fa-trash"></i></span>
+                    </button>
                 </form>
             </td>
         </tr>
     {% else %}
-        <tr><td colspan="6" class="has-text-grey">{{ 'participant.empty'|trans }}</td></tr>
+        <tr><td colspan="6" class="has-text-centered has-text-grey">{{ 'participant.empty'|trans }}</td></tr>
     {% endfor %}
     </tbody>
 </table>

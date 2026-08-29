@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'password_reset.check_email.title'|trans }} · {{ app_name }}{% endblock %}
+
+{% block body %}
+<div class="columns is-centered">
+    <div class="column is-one-third">
+        <div class="card">
+            <header class="card-header"><p class="card-header-title">{{ 'password_reset.check_email.title'|trans }}</p></header>
+            <div class="card-content">
+                <p>{{ 'password_reset.check_email.instructions'|trans }}</p>
+
+                <p class="mt-4"><a href="{{ path('app_login') }}">{{ 'password_reset.back_to_login'|trans }}</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

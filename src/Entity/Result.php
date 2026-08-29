@@ -8,6 +8,7 @@ use App\Enum\ResultStatus;
 use App\Enum\TaikaiScoring;
 use App\Repository\ResultRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
@@ -20,6 +21,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 #[ORM\Entity(repositoryClass: ResultRepository::class)]
 #[ORM\Table(name: 'results')]
 #[ORM\HasLifecycleCallbacks]
+#[Gedmo\Loggable(logEntryClass: LogEntry::class)]
 class Result implements \Stringable
 {
     use TimestampableTrait;
@@ -42,24 +44,30 @@ class Result implements \Stringable
 
     /** Numéro de série (volée), à partir de 1. */
     #[ORM\Column(nullable: true)]
+    #[Gedmo\Versioned]
     private ?int $round = null;
 
     /** Numéro de la flèche au sein de la série, à partir de 1. */
     #[ORM\Column(name: '`index`', nullable: true)]
+    #[Gedmo\Versioned]
     private ?int $index = null;
 
     #[ORM\Column(type: 'string', nullable: true, enumType: ResultStatus::class)]
+    #[Gedmo\Versioned]
     private ?ResultStatus $status = null;
 
     /** Points de la flèche, uniquement en enteki. */
     #[ORM\Column(nullable: true)]
+    #[Gedmo\Versioned]
     private ?int $value = null;
 
     #[ORM\Column(options: ['default' => false])]
+    #[Gedmo\Versioned]
     private bool $final = false;
 
     /** Posé par l'écran de rectification, autorise la modification d'une flèche validée. */
     #[ORM\Column(options: ['default' => false])]
+    #[Gedmo\Versioned]
     private bool $overriden = false;
 
     public function getId(): ?int

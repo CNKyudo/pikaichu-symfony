@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Entity\Participant;
 use App\Entity\ParticipatingDojo;
 use App\Entity\Team;
 use App\Enum\TaikaiForm;
@@ -71,8 +72,13 @@ final readonly class DrawService
     private function drawIndividual(ParticipatingDojo $participatingDojo): void
     {
         $participants = array_values($participatingDojo->getParticipants()->toArray());
-        shuffle($participants);
 
+        // Un re-tirage doit d'abord vider les index existants : sinon, réattribuer
+        // directement de nouvelles valeurs peut heurter la contrainte d'unicité
+        // d'un autre participant qui détient encore temporairement cette valeur.
+        $this->clearIndexes($participants);
+
+        shuffle($participants);
         foreach ($participants as $position => $participant) {
             $participant->setIndex($position + 1);
         }
@@ -84,8 +90,10 @@ final readonly class DrawService
     private function drawTeams(ParticipatingDojo $participatingDojo): void
     {
         $teams = array_values($participatingDojo->getTeams()->toArray());
-        shuffle($teams);
 
+        $this->clearIndexes($teams);
+
+        shuffle($teams);
         foreach ($teams as $position => $team) {
             $team->setIndex($position + 1);
         }
@@ -115,6 +123,8 @@ final readonly class DrawService
             }
         }
 
+        $this->clearIndexes([...$complete, ...$incomplete]);
+
         shuffle($complete);
         shuffle($incomplete);
 
@@ -141,6 +151,8 @@ final readonly class DrawService
             static fn (Team $a, Team $b): int => ($a->getIndex() ?? \PHP_INT_MAX) <=> ($b->getIndex() ?? \PHP_INT_MAX)
         );
 
+        $this->clearIndexes(array_values($participatingDojo->getParticipants()->toArray()));
+
         $position = 0;
         foreach ($teams as $team) {
             foreach ($team->getParticipants() as $participant) {
@@ -148,9 +160,23 @@ final readonly class DrawService
             }
         }
 
-        // Les archers sans équipe perdent leur ordre de passage.
-        foreach ($participatingDojo->getUnteamedParticipants() as $participant) {
-            $participant->setIndex(null);
+        // Les archers sans équipe perdent leur ordre de passage (déjà à null ci-dessus).
+    }
+
+    /**
+     * Vide et persiste immédiatement l'index d'une liste d'entités (participants ou
+     * équipes) avant de leur en attribuer de nouveaux : un re-tirage ne peut pas
+     * réattribuer directement les valeurs, sous peine de heurter la contrainte
+     * d'unicité d'une autre entité qui détient encore temporairement cette valeur.
+     *
+     * @param list<Participant|Team> $entities
+     */
+    private function clearIndexes(array $entities): void
+    {
+        foreach ($entities as $entity) {
+            $entity->setIndex(null);
         }
+
+        $this->entityManager->flush();
     }
 }

@@ -1,150 +1,86 @@
-{% extends 'base.html.twig' %}
+{% extends 'taikai/_layout.html.twig' %}
 
 {% block title %}{{ taikai.shortname }} · {{ app_name }}{% endblock %}
 
-{% block body %}
-<h1 class="title">{{ 'taikai.overview'|trans }} « {{ taikai.shortname }} »</h1>
-
-{{ include('taikai/_state_bar.html.twig') }}
-
-<div class="buttons">
-    {% if is_granted('TAIKAI_MARK', taikai) %}
-        <a class="button is-link" href="{{ path('app_marking_show', {taikaiId: taikai.id}) }}">
-            {{ 'taikai.marking_sheet'|trans }}
-        </a>
-    {% endif %}
-    <a class="button" href="{{ path('app_leaderboard_show', {taikaiId: taikai.id}) }}">
-        {{ 'taikai.results'|trans }}
-    </a>
-    {% if is_granted('TAIKAI_EDIT', taikai) %}
-        <a class="button" href="{{ path('app_taikai_edit', {id: taikai.id}) }}">{{ 'action.edit'|trans }}</a>
-    {% endif %}
-</div>
-
-<div class="columns">
-    <div class="column">
-        <div class="card">
-            <header class="card-header"><p class="card-header-title">{{ 'taikai.details'|trans }}</p></header>
-            <div class="card-content content">
-                <p><strong>{{ 'taikai.name'|trans }}:</strong> {{ taikai.name }}</p>
-                <p><strong>{{ 'taikai.form'|trans }}:</strong> {{ taikai.form ? taikai.form.label|trans : '' }}</p>
-                <p><strong>{{ 'taikai.scoring'|trans }}:</strong> {{ taikai.scoring.label|trans }}</p>
-                <p><strong>{{ 'taikai.total_num_arrows'|trans }}:</strong> {{ taikai.totalNumArrows }}
-                    ({{ taikai.numRounds }} × {{ taikai.numArrows }})</p>
-                <p><strong>{{ 'taikai.num_targets'|trans }}:</strong> {{ taikai.numTargets }}</p>
-                <p><strong>{{ 'taikai.tachi_size'|trans }}:</strong> {{ taikai.tachiSize }}</p>
-                {% if taikai.description %}<p>{{ taikai.description|nl2br }}</p>{% endif %}
-            </div>
-        </div>
+{% block taikai_content %}
+<div class="media">
+    <div class="media-content has-text-centered">
+        <p class="title is-4">{{ 'taikai.overview'|trans }} « {{ taikai.name }} »</p>
+        {% if taikai.description %}<p>{{ taikai.description|nl2br }}</p>{% endif %}
     </div>
 
-    <div class="column">
-        <div class="card">
-            <header class="card-header">
-                <p class="card-header-title">{{ 'taikai.host_clubs'|trans }}</p>
-                {# Un taikai sur place n'accueille qu'un seul club hôte. #}
-                {% if is_granted('TAIKAI_EDIT', taikai)
-                    and (taikai.distributed or taikai.participatingDojos|length == 0) %}
-                    <div class="card-header-icon">
-                        <a class="button is-small is-primary"
-                           href="{{ path('app_participating_dojo_new', {taikaiId: taikai.id}) }}">
-                            {{ 'action.add'|trans }}
-                        </a>
+    <div class="media-right">
+        {{ include('taikai/_icons.html.twig', {taikai: taikai, size: ''}) }}
+        {% if is_granted('TAIKAI_EDIT', taikai) and taikai.form and taikai.form.value == '2in1' and taikai.currentState.value == 'done' %}
+            <form method="post" action="{{ path('app_taikai_generate', {id: taikai.id}) }}"
+                  onsubmit="return confirm('{{ 'taikai.generate.confirm'|trans|e('js') }}')">
+                <input type="hidden" name="_token" value="{{ csrf_token('generate' ~ taikai.id) }}">
+                <div class="field has-addons mt-3">
+                    <div class="control">
+                        <div class="select">
+                            <select name="bracket_size">
+                                <option value="4">4</option>
+                                <option value="8">8</option>
+                            </select>
+                        </div>
                     </div>
-                {% endif %}
-            </header>
-            <div class="card-content">
-                <table class="table is-fullwidth is-narrow">
-                    <thead>
-                    <tr>
-                        <th>{{ 'dojo.shortname'|trans }}</th>
-                        <th class="has-text-right">{{ 'taikai.participants'|trans }}</th>
-                        <th class="has-text-right">{{ 'draw.label'|trans }}</th>
-                        <th class="has-text-right">{{ 'action.actions'|trans }}</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for participatingDojo in taikai.participatingDojos %}
-                        <tr>
-                            <td>{{ participatingDojo.displayName }}</td>
-                            <td class="has-text-right">{{ participatingDojo.participants|length }}</td>
-                            <td class="has-text-right">
-                                <span class="tag is-{{ participatingDojo.isDrawn ? 'success' : 'warning' }}">
-                                    {{ (participatingDojo.isDrawn ? 'draw.done' : 'draw.pending')|trans }}
-                                </span>
-                                {# Le tirage au sort n'est possible qu'à l'étape « Enregistrement ». #}
-                                {% if taikai.currentState.value == 'registration' and is_granted('TAIKAI_EDIT', taikai) %}
-                                    <form method="post" style="display:inline"
-                                          action="{{ path('app_participating_dojo_draw', {taikaiId: taikai.id, id: participatingDojo.id}) }}"
-                                          onsubmit="return confirm('{{ 'draw.confirm'|trans|e('js') }}')">
-                                        <input type="hidden" name="_token"
-                                               value="{{ csrf_token('draw' ~ participatingDojo.id) }}">
-                                        <button class="button is-small ml-2" type="submit">{{ 'draw.label'|trans }}</button>
-                                    </form>
-                                {% endif %}
-                            </td>
-                            <td class="has-text-right">
-                                {% if is_granted('PARTICIPATING_DOJO_EDIT', participatingDojo) %}
-                                    <a class="button is-small is-light"
-                                       href="{{ path('app_participating_dojo_edit', {taikaiId: taikai.id, id: participatingDojo.id}) }}">
-                                        {{ 'action.edit'|trans }}
-                                    </a>
-                                {% endif %}
-                                {% if is_granted('PARTICIPATING_DOJO_DELETE', participatingDojo) %}
-                                    <form method="post" style="display:inline"
-                                          action="{{ path('app_participating_dojo_delete', {taikaiId: taikai.id, id: participatingDojo.id}) }}"
-                                          onsubmit="return confirm('{{ 'participating_dojo.delete.confirm'|trans|e('js') }}')">
-                                        <input type="hidden" name="_token"
-                                               value="{{ csrf_token('delete' ~ participatingDojo.id) }}">
-                                        <button class="button is-small is-danger is-light" type="submit">
-                                            {{ 'action.delete'|trans }}
-                                        </button>
-                                    </form>
-                                {% endif %}
-                            </td>
-                        </tr>
-                    {% else %}
-                        <tr><td colspan="4" class="has-text-grey">{{ 'taikai.no_host_club'|trans }}</td></tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+                    <div class="control">
+                        <button class="button" type="submit">{{ 'taikai.generate.action'|trans }}</button>
+                    </div>
+                </div>
+            </form>
+        {% endif %}
+    </div>
+</div>
+
+<div class="content">
+    <div class="columns">
+        <div class="column">
+            <div class="card">
+                <header class="card-header"><p class="card-header-title">{{ 'taikai.participants'|trans }}</p></header>
+                <div class="card-content">
+                    {{ include('taikai/_participants_overview.html.twig') }}
+                </div>
             </div>
         </div>
 
-        <div class="card mt-4">
-            <header class="card-header"><p class="card-header-title">{{ 'taikai.staff'|trans }}</p></header>
-            <div class="card-content">
-                <table class="table is-fullwidth is-narrow">
-                    <tbody>
-                    {% for staff in taikai.staffs %}
-                        <tr>
-                            <td>{{ staff.displayName }}</td>
-                            <td>{{ staff.role ? staff.role.translatedLabel(app.request.locale) : '' }}</td>
-                            <td>{{ staff.participatingDojo ? staff.participatingDojo.displayName : '' }}</td>
+        <div class="column">
+            <div class="card mb-5">
+                <header class="card-header"><p class="card-header-title">{{ 'taikai.host_clubs'|trans }}</p></header>
+                <div class="card-content">
+                    {{ include('participating_dojo/_list.html.twig') }}
+                </div>
+            </div>
+
+            <div class="card">
+                <header class="card-header"><p class="card-header-title">{{ 'taikai.staff'|trans }}</p></header>
+                <div class="card-content">
+                    <table class="table is-narrow">
+                        <thead>
+                        <tr class="has-text-centered">
+                            <th>{{ 'staff.role'|trans }}</th>
+                            <th>{{ 'staff.participating_dojo'|trans }}</th>
+                            <th>{{ 'staff.display_name'|trans }}</th>
                         </tr>
-                    {% else %}
-                        <tr><td class="has-text-grey">{{ 'taikai.no_staff'|trans }}</td></tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                        {# Triés par rôle comme le scope `ordered` côté Rails. #}
+                        {% for staff in taikai.staffs|sort((a, b) => (a.role ? a.role.translatedLabel(app.request.locale) : '') <=> (b.role ? b.role.translatedLabel(app.request.locale) : '')) %}
+                            <tr>
+                                <td>{{ staff.role ? staff.role.translatedLabel(app.request.locale) : '' }}</td>
+                                <td>{{ staff.participatingDojo ? staff.participatingDojo.displayName : '' }}</td>
+                                <td>{{ staff.displayName }}</td>
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="3" class="has-text-grey">{{ 'taikai.no_staff'|trans }}</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-{% if taikai.events|length %}
-    <div class="card mt-4">
-        <header class="card-header"><p class="card-header-title">{{ 'taikai.history'|trans }}</p></header>
-        <div class="card-content content">
-            <ul>
-                {% for event in taikai.events %}
-                    <li>
-                        <small class="has-text-grey">{{ event.createdAt ? event.createdAt|date('d/m/Y H:i') : '' }}</small>
-                        — {{ event.message }}
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
-{% endif %}
+{{ include('taikai/_timeline.html.twig') }}
 {% endblock %}

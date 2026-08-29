@@ -1,6 +1,14 @@
 {% extends 'base.html.twig' %}
 {% block title %}{{ 'taikai.new'|trans }} · {{ app_name }}{% endblock %}
 {% block body %}
-    <h1 class="title">{{ 'taikai.new'|trans }}</h1>
-    {{ include('taikai/_form.html.twig') }}
+<div class="columns">
+    <div class="column is-half is-offset-2">
+        <div class="card">
+            <div class="card-content">
+                <p class="title">{{ 'taikai.new'|trans }}</p>
+                {{ include('taikai/_form.html.twig') }}
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

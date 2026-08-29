@@ -38,6 +38,7 @@ final class TaikaiType extends AbstractType
             ->add('description', TextareaType::class, [
                 'label' => 'taikai.description',
                 'required' => false,
+                'attr' => ['rows' => 5],
             ])
             ->add('startDate', DateType::class, [
                 'label' => 'taikai.start_date',
@@ -63,13 +64,11 @@ final class TaikaiType extends AbstractType
                 'label' => 'taikai.total_num_arrows',
                 'help' => 'taikai.total_num_arrows.help',
             ])
-            ->add('numTargets', ChoiceType::class, [
+            ->add('numTargets', IntegerType::class, [
                 'label' => 'taikai.num_targets',
-                'choices' => array_combine(Taikai::NUM_TARGETS, Taikai::NUM_TARGETS),
             ])
-            ->add('tachiSize', ChoiceType::class, [
+            ->add('tachiSize', IntegerType::class, [
                 'label' => 'taikai.tachi_size',
-                'choices' => array_combine(Taikai::TACHI_SIZES, Taikai::TACHI_SIZES),
             ])
             ->add('category', ChoiceType::class, [
                 'label' => 'taikai.category',

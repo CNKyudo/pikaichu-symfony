@@ -1,9 +1,12 @@
 nav:
     taikais: Taikai
     dojos: Clubs
+    guide: Guide
+    tutorial: Tutoriel
     login: Connexion
     logout: Déconnexion
     register: Inscription
+    account: Mon compte
 
 action:
     save: Sauvegarder
@@ -12,6 +15,25 @@ action:
     edit: Modifier
     delete: Supprimer
     actions: Actions
+
+home:
+    taikais: Taikai
+    taikais_summary: "%nb% Taikai gérés."
+    manage_taikais: Gérer les Taikai
+    dojos: Clubs
+    dojos_summary: "%nb% Clubs gérés."
+    manage_dojos: Gérer les Clubs
+
+championship:
+    title: Championnat
+    empty: Aucun taikai enregistré pour le moment.
+    export:
+        category: Catégorie
+        club: Club
+        display_name: Nom Prénom
+        rank: Rang
+        taikai_name: Nom du Taikai
+        total: Total
 
 user:
     email_address: Email
@@ -23,14 +45,66 @@ user:
     password.mismatch: Les deux mots de passe ne correspondent pas.
     password.too_short: Le mot de passe doit faire au moins {{ limit }} caractères.
     email_address.already_used: Cette adresse email est déjà utilisée.
+    locale: Langue
+    locale.fr: Français
+    locale.en: Anglais
+    account.title: Mon compte
+    account.updated: Votre compte a bien été modifié.
 
 registration:
-    success: Votre compte a bien été créé, vous pouvez vous connecter.
+    success: Votre compte a bien été créé. Vérifiez votre boîte mail pour confirmer votre adresse avant de vous connecter.
+
+email_confirmation:
+    invalid_token: Lien de confirmation invalide ou déjà utilisé.
+    confirmed: Votre adresse email a bien été confirmée, vous pouvez vous connecter.
+    resent: Si cette adresse email existe et n'est pas encore confirmée, nous avons envoyé un nouveau lien de confirmation.
+    email.blank: L'adresse email est obligatoire.
+    resend:
+        title: Renvoyer le courriel de confirmation
+        instructions: Entrez votre adresse email et nous vous renverrons un lien de confirmation.
+        submit: Renvoyer le lien
+    email:
+        subject: Confirmez votre adresse email
+        greeting: 'Bonjour %name%,'
+        body: "Cliquez sur le bouton ci-dessous pour confirmer votre adresse email et activer votre compte Pikaichu :"
+        button: Confirmer mon adresse email
+        ignore: Si vous n'êtes pas à l'origine de cette inscription, vous pouvez ignorer cet email.
+
+login:
+    submit: Se connecter
+    forgot_password: Mot de passe oublié ?
+    no_account: Vous n'avez pas de compte ?
+    sign_up_link: S'inscrire
+
+password_reset:
+    back_to_login: Retour à la connexion
+    invalid_token: Lien de réinitialisation invalide ou expiré.
+    updated: Votre mot de passe a bien été réinitialisé, vous pouvez vous connecter.
+    email.blank: L'adresse email est obligatoire.
+    request:
+        title: Mot de passe oublié
+        instructions: Entrez votre adresse email et nous vous enverrons un lien pour réinitialiser votre mot de passe.
+        submit: Envoyer le lien
+    check_email:
+        title: Vérifiez votre boîte mail
+        instructions: Si cette adresse email existe dans notre système, nous avons envoyé un lien de réinitialisation.
+    reset:
+        title: Nouveau mot de passe
+        submit: Réinitialiser le mot de passe
+    email:
+        subject: Réinitialisation de votre mot de passe
+        greeting: 'Bonjour %name%,'
+        body: "Quelqu'un a demandé une réinitialisation de mot de passe pour votre compte. Cliquez sur le bouton ci-dessous pour choisir un nouveau mot de passe :"
+        button: Réinitialiser mon mot de passe
+        expiration: Ce lien expirera dans 15 minutes.
+        ignore: Si vous n'avez pas fait cette demande, vous pouvez ignorer cet email. Votre mot de passe ne changera pas.
+        manual_link: 'Si le bouton ne fonctionne pas, copiez et collez cette URL dans votre navigateur :'
 
 dojo:
-    list: Liste des clubs
+    list: Liste des Clubs
     new: Ajouter un club
-    edit: Modifier le club
+    edit: Modifier un club
+    destroy: Effacer un club
     empty: Aucun club enregistré.
     shortname: Nom court
     name: Nom entier
@@ -41,26 +115,31 @@ dojo:
     created: Le club a bien été créé.
     updated: Le club a bien été modifié.
     deleted: Le club a bien été supprimé.
-    delete.confirm: Supprimer ce club ?
+    delete.confirm: "Êtes-vous certain.e ?"
     delete.invalid_token: Jeton de sécurité invalide, la suppression a été annulée.
     delete.still_used: "Ce club ne peut pas être supprimé : il participe encore à au moins un taikai."
 
 participating_dojo:
+    title: Club hôte
     new: Ajouter un club hôte
-    edit: Modifier le club hôte
+    edit: Modifier un club hôte
+    destroy: Effacer un club hôte
     dojo: Club
-    display_name: Nom d'affichage
+    display_name: Nom court
     display_name.help: Laissez vide pour reprendre le nom court du club.
+    num_participants: Nb.
     created: Le club hôte a bien été ajouté.
     updated: Le club hôte a bien été modifié.
     deleted: Le club hôte a bien été retiré.
-    delete.confirm: Retirer ce club hôte du taikai ?
+    delete.confirm: "Êtes-vous certain.e ?"
     delete.invalid_token: Jeton de sécurité invalide, la suppression a été annulée.
     delete.still_has_staff: "Ce club hôte ne peut pas être retiré : il est rattaché aux membres du staff suivants — %names%."
 
 participant:
+    title: Participants
     new: Ajouter un participant
-    edit: Modifier le participant
+    edit: Modifier un participant
+    destroy: Retirer un participant
     empty: Aucun participant enregistré.
     firstname: Prénom
     lastname: Nom
@@ -75,12 +154,14 @@ participant:
     created: Le participant a bien été ajouté.
     updated: Le participant a bien été modifié.
     deleted: Le participant a bien été supprimé.
-    delete.confirm: Supprimer ce participant ?
+    delete.confirm: "Êtes-vous certain.e ?"
     delete.invalid_token: Jeton de sécurité invalide, la suppression a été annulée.
-    import.title: Import Excel
-    import.file: Fichier
+    import.title: Importer la liste des participants
+    import.file: Fichier Excel CNKyudo
     import.help: Export « Kyudo - Interface de gestion » (.xlsx, .ods ou .csv).
     import.submit: Importer
+    import.placeholders.choose_a_file: Choisir un fichier
+    import.placeholders.no_file_uploaded: Aucun fichier chargé
     import.file_missing: Aucun fichier importé.
     import.invalid_token: Jeton de sécurité invalide, l'import a été annulé.
     import.done: "{1}Un participant a été importé.|]1,Inf[%count% participants ont été importés."
@@ -93,13 +174,19 @@ kyudojin:
 taikai:
     list: Liste des Taikai
     new: Ajouter un Taikai
-    edit: Modifier le Taikai
+    edit: Modification du Taikai
     overview: Vue d'ensemble de
     details: Informations
+    participants_overview.dojo: Club hôte
+    participants_overview.team: Équipe
+    participants_overview.name: Nom
     empty: Aucun taikai enregistré.
+    no_change_if_taikai_is_done: Un taikai à l'état terminé ne peut plus être modifié.
     created: Le taikai a bien été créé.
     updated: Le taikai a bien été modifié.
     deleted: Le taikai a bien été supprimé.
+    delete.confirm: "Êtes-vous certain.e ?"
+    destroy: Effacer
     shortname: Nom court
     shortname.help: Sigle explicite, sans espace, comprenant le nom du club ou de la commission territoriale.
     shortname.already_used: Ce nom court est déjà utilisé par un autre taikai.
@@ -120,7 +207,10 @@ taikai:
     num_targets: Nb de cibles/tireurs
     tachi_size: Taille des tachi
     distributed: À distance
+    distributed_local: Local
     distributed.help: Cochez pour autoriser plusieurs clubs hôtes situés dans des lieux différents.
+    title.total_num_arrows: "%count% flèches"
+    title.category: "Catégorie %category%"
     distributed.num_participating_dojos: Un taikai sur place ne peut avoir qu'un seul club hôte.
     participants: Participants
     host_clubs: Clubs hôtes
@@ -130,6 +220,51 @@ taikai:
     history: Historique
     marking_sheet: Feuille de marque
     results: Tableau des résultats
+    timeline.now: Maintenant
+    timeline.you_are_here: Vous êtes ici!
+
+    export:
+        title: Export Excel
+        infos: Informations
+        type: Type
+        summary: Résumé
+        staff:
+            title: Staff
+            lastname: Nom
+            firstname: Prénom
+            role: Rôle
+            participating_dojo: Club Org.
+        participants:
+            title: Participants
+            participating_dojo: Club Org.
+            index: "#"
+            display_name: Nom
+            club: Club
+            team: Équipe
+        results:
+            title:
+                individual: Résultats individuels
+                team: Résultats en équipes
+                matches: Résultats des matchs
+            rank: Rang
+            index: "#"
+            club: Club
+            participating_dojo: Club Org.
+            display_name: Nom
+            round: "Série %count%"
+            score: Score
+            team: Équipe
+            team_score: Total
+        journal:
+            title: Journal
+            time: Horodatage
+            user: Utilisateur
+            message: Message
+            category: Catégorie
+
+    event.category.state_transition: Changement d'état
+    event.category.tie_break: Tie-break
+    event.category.rectification: Rectification
 
     form.individual: Individuel
     form.team: En équipes
@@ -160,6 +295,21 @@ taikai:
         draw_not_done: "Impossible de passer à l'étape « Marquage » : le tirage au sort n'a pas été effectué pour tous les clubs hôtes."
         results_not_finalized: "Impossible de passer à l'étape « Tie-Break » : toutes les marques ne sont pas validées."
 
+    generate:
+        action: Générer la 2ᵉ partie
+        confirm: Générer le tableau à matchs à partir du classement par équipe ?
+        invalid_token: Jeton de sécurité invalide, veuillez réessayer.
+        wrong_form: Seul un taikai 2-en-1 peut générer une 2ᵉ partie.
+        wrong_bracket_size: La taille du tableau doit être 4 ou 8.
+        not_finalized: Tous les résultats doivent être finalisés avant de créer le tournoi à matchs.
+        not_enough_teams: "Il n'y a pas assez d'équipes pour créer un tournoi à matchs de %bracket_size% équipes."
+        not_enough_non_mixed_teams: "Il n'y a pas assez d'équipes non mixtes pour créer un tournoi à matchs de %bracket_size% équipes (%available% disponibles)."
+
+taikai_event:
+    state_transition:
+        forward: "%user% a passé '%taikai%' de l'état '%from%' à l'état '%to%'."
+        backward: "%user% a retourné '%taikai%' de l'état '%from%' à l'état '%to%'."
+
 draw:
     label: Tirage au sort
     done: Effectué
@@ -170,12 +320,41 @@ draw:
     confirm: Êtes-vous certain.e de vouloir effectuer le tirage au sort ?
     no_change_if_taikai_is_marking: Le tirage au sort n'est possible qu'à l'étape « Enregistrement ».
 
+rectification:
+    title: Rectification
+    edit_title: Rectification d'un résultat
+    back: Retour au Taikai
+    back_to_list: Retour à la liste des résultats
+    edit: Rectifier
+    index: ID
+    round: Série
+    participant: Participant
+    description: Description
+    description_template: "Série %round%, Flèche %index%"
+    value: Valeur
+    status: Statut
+    rectified: "Le résultat du tir %index% de la série %round% de %participant% a été rectifié à %result%."
+
+tie_break:
+    title: Tie-Break
+    individual: Tie-break individuels
+    team: Tie-break des équipes
+    intermediate_rank: Rang intermédiaire
+    display_name: Nom
+    rank: Rang final
+    empty: Aucun concurrent à classer.
+    success: Les rangs ont bien été mis à jour.
+    invalid_token: Jeton de sécurité invalide, veuillez réessayer.
+
 marking:
     title: Feuille de marque
     back_to_taikai: Retour au Taikai
+    back_to_match: Retour au match
     all_rounds: Toutes les séries
     round: Série
     order: Nb
+    club: Club
+    team: Équipe
     name: Nom
     input: Saisie
     score: Score
@@ -189,17 +368,24 @@ marking:
     status.unknown: Incertain
 
 leaderboard:
-    title: Tableau des résultats
+    title: Tableau des résultats intermédiaires
     rank: Rang
     name: Nom
     hits: Touchés
     points: Points
+    round: Série
+    score: Score
+    team_score: Total
+    all: Tous les clubs
     individual: Résultats individuels
     by_team: Résultats en équipe
-    by_host_club: Classement par club
     final_standings: Classement final
     public_view: Résultats publics
+    2in1: Résultats en équipe
+    show_individual: Afficher les résultats individuels
+    show_team: Afficher les résultats en équipes
     empty: Aucun résultat pour le moment.
+    no_participants_yet: Aucun participant enregistré.
 
 score:
     team_xor_participant: Un score porte sur un participant ou sur une équipe, pas les deux.
@@ -208,10 +394,94 @@ result:
     value.invalid_for_enteki: En enteki, chaque flèche doit porter une valeur parmi 0, 3, 5, 7, 9 ou 10.
 
 staff:
+    new: Ajouter un staff
+    edit: Modifier un staff
+    destroy: Effacer un staff
+    user: Compte utilisateur
+    user.help: Sélectionnez un compte pour reprendre automatiquement son identité.
+    firstname: Prénom
+    lastname: Nom
+    role: Rôle
+    display_name: Nom
+    participating_dojo: Club hôte
     user.required_for_role: Ce rôle doit être rattaché à un compte utilisateur.
     participating_dojo.required_for_role: Ce rôle doit être rattaché à un club hôte.
     at_least_one_admin: Le taikai doit conserver au moins un administrateur.
+    created: Le membre du staff a bien été ajouté.
+    updated: Le membre du staff a bien été modifié.
+    deleted: Le membre du staff a bien été retiré.
+    delete.confirm: "Êtes-vous certain.e ?"
+    delete.invalid_token: Jeton de sécurité invalide, la suppression a été annulée.
 
 match:
+    title: Tableau des matchs
+    back: Retour au Taikai
+    edit: Modifier un match
+    updated: Le match a bien été modifié.
+    level: Niveau
+    index: Numéro
+    winner: Vainqueur
+    team1: Équipe 1
+    team2: Équipe 2
+    marking_sheet: Feuille de marque
+    decide_winner: Désigner le vainqueur
+    decide_winner_confirm: Désigner le vainqueur d'après le score ?
+    invalid_token: Jeton de sécurité invalide, veuillez réessayer.
     no_taikai: Ce match n'est rattaché à aucun taikai.
     defined_results_for_target_match: Des marques ont déjà été saisies sur le match suivant, le vainqueur ne peut plus être modifié.
+    cant_change_teams_if_results_exist: "Impossible de changer l'équipe : des marques validées existent déjà pour ce match."
+
+scoreboard:
+    title: Affichage public
+    empty: Aucun tir en cours.
+
+tachi:
+    title: Suivi du shajo
+    round: Série
+    index: Tachi
+    finished: Terminé
+    not_finished: En cours
+    participant: Participant
+    results: Résultats
+    no_result: Pas encore de résultat.
+    no_participant: Aucun participant dans ce tachi.
+    empty: Aucun tachi pour le moment.
+
+team:
+    title: Équipes
+    new: Ajouter une équipe
+    edit: Modifier une équipe
+    destroy: Effacer une équipe
+    empty: Aucune équipe enregistrée.
+    index: Numéro
+    index.help: Laisser vide pour un choix par défaut.
+    index.already_used: Ce numéro est déjà attribué dans ce club hôte.
+    shortname: Nom court
+    shortname.already_used: Une équipe avec ce nom existe déjà dans ce club hôte.
+    mixed: Mixte
+    num_participants: Nb.
+    teamed: "%teamed% participants affectés sur %total%."
+    form_teams: Former les équipes
+    created: L'équipe a bien été ajoutée.
+    updated: L'équipe a bien été modifiée.
+    deleted: L'équipe a bien été supprimée.
+    delete.confirm: Supprimer cette équipe ? Ses participants seront également supprimés.
+    delete.invalid_token: Jeton de sécurité invalide, la suppression a été annulée.
+
+teaming:
+    title: Composition des équipes
+    unassigned: Non affecté
+    select_team: Choisir une équipe…
+    assign: Affecter
+    unassign: Retirer
+    add_team: Ajouter une équipe
+    drag_to_reorder: Glisser pour réordonner
+    clear_all: Effacer les équipes
+    clear_confirm: Effacer toutes les équipes ?
+    form_randomly: Former aléatoirement
+    empty_team_prefix: Le préfixe de nom d'équipe ne peut pas être vide.
+    empty_team_shortname: Le nom d'une équipe ne peut pas être vide.
+    taken_team_shortname: "Une équipe avec le nom « %shortname% » existe déjà."
+    placeholders:
+        team_shortname: Nom d'équipe
+        team_prefix: Préfixe

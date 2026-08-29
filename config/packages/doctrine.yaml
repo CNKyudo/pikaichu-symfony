@@ -2,6 +2,10 @@ doctrine:
     dbal:
         url: '%env(resolve:DATABASE_URL)%'
         profiling_collect_backtrace: '%kernel.debug%'
+        types:
+            # Le type `array` a été retiré de DBAL 4 ; `Gedmo\Loggable\Entity\LogEntry`
+            # le déclare encore par son nom littéral (voir MIGRATION.md).
+            array: App\Doctrine\LegacyArrayType
     orm:
         validate_xml_mapping: true
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware

@@ -1,0 +1,29 @@
+{% extends 'taikai/_layout.html.twig' %}
+
+{% block title %}{{ 'leaderboard.title'|trans }} · {{ taikai.shortname }}{% endblock %}
+
+{% block taikai_content %}
+<h1 class="title">{{ 'leaderboard.title'|trans }} — {{ taikai.shortname }}</h1>
+
+<p class="mb-3">
+    <a class="button is-light" href="{{ path('app_taikai_show', {id: taikai.id}) }}">{{ 'marking.back_to_taikai'|trans }}</a>
+    <a class="button is-light" href="{{ path('app_leaderboard_show', {taikaiId: taikai.id}) }}">
+        {{ 'leaderboard.individual'|trans }}
+    </a>
+</p>
+
+{% if taikai.distributed %}<h2 class="title is-4">{{ 'leaderboard.all'|trans }}</h2>{% endif %}
+{{ include('leaderboard/_team_table.html.twig', {groups: teams}) }}
+
+{% if taikai.distributed %}
+    {% for participatingDojo in taikai.participatingDojos %}
+        {% set groups = by_dojo[participatingDojo.id]|default([]) %}
+        <h2 class="title is-4 mt-5">{{ participatingDojo.displayName }}</h2>
+        {% if groups|length == 0 %}
+            <p>{{ 'leaderboard.no_participants_yet'|trans }}</p>
+        {% else %}
+            {{ include('leaderboard/_team_table.html.twig', {groups: groups}) }}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+{% endblock %}

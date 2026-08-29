@@ -9,7 +9,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\UniqueConstraint;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * Une équipe, rattachée à un club hôte.
@@ -19,6 +22,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[UniqueConstraint(name: 'teams_by_participating_dojo_index', columns: ['participating_dojo_id', 'index'])]
 #[UniqueConstraint(name: 'by_teams_shortname', columns: ['participating_dojo_id', 'shortname'])]
 #[ORM\HasLifecycleCallbacks]
+#[UniqueEntity(fields: ['participatingDojo', 'index'], message: 'team.index.already_used', errorPath: 'index', ignoreNull: true)]
+#[Gedmo\Loggable(logEntryClass: LogEntry::class)]
 class Team implements \Stringable
 {
     use TimestampableTrait;
@@ -34,10 +39,12 @@ class Team implements \Stringable
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
+    #[Gedmo\Versioned]
     private ?string $shortname = null;
 
     /** Ordre de passage issu du tirage au sort. */
     #[ORM\Column(name: '`index`', nullable: true)]
+    #[Gedmo\Versioned]
     private ?int $index = null;
 
     /**
@@ -45,12 +52,15 @@ class Team implements \Stringable
      * Ces équipes sont exclues de la phase finale du taikai.
      */
     #[ORM\Column(options: ['default' => false])]
+    #[Gedmo\Versioned]
     private bool $mixed = false;
 
     #[ORM\Column(name: 'intermediate_rank', nullable: true)]
+    #[Gedmo\Versioned]
     private ?int $intermediateRank = null;
 
     #[ORM\Column(nullable: true)]
+    #[Gedmo\Versioned]
     private ?int $rank = null;
 
     /** @var Collection<int, Participant> */
@@ -105,6 +115,29 @@ class Team implements \Stringable
     public function getDisplayName(): string
     {
         return (string) $this->shortname;
+    }
+
+    /**
+     * Rails compare les noms d'équipe insensiblement à la casse
+     * (`case_sensitive: false`) au sein d'un même club hôte ; l'index unique
+     * en base reste sensible à la casse et ne sert que de filet de sécurité.
+     */
+    #[Assert\Callback]
+    public function validateShortnameIsUnique(ExecutionContextInterface $context): void
+    {
+        if (null === $this->shortname || null === $this->participatingDojo) {
+            return;
+        }
+
+        foreach ($this->participatingDojo->getTeams() as $other) {
+            if ($other !== $this && null !== $other->shortname && mb_strtolower($other->shortname) === mb_strtolower($this->shortname)) {
+                $context->buildViolation('team.shortname.already_used')
+                    ->atPath('shortname')
+                    ->addViolation();
+
+                return;
+            }
+        }
     }
 
     public function getIndex(): ?int

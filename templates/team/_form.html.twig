@@ -1,0 +1,15 @@
+{{ form_start(form) }}
+{{ form_row(form.index) }}
+{{ form_row(form.shortname) }}
+{{ form_row(form.mixed) }}
+
+<div class="field is-grouped">
+    <div class="control"><button class="button has-background-light" type="submit">{{ 'action.save'|trans }}</button></div>
+    <div class="control">
+        <a class="button"
+           href="{{ path('app_participating_dojo_edit', {taikaiId: taikai.id, id: participatingDojo.id}) }}">
+            {{ 'action.back'|trans }}
+        </a>
+    </div>
+</div>
+{{ form_end(form) }}

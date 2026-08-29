@@ -8,6 +8,7 @@ use App\Repository\TaikaiMatchRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * Une rencontre entre deux équipes de la phase finale d'un tournoi « à matchs ».
@@ -23,6 +24,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: TaikaiMatchRepository::class)]
 #[ORM\Table(name: 'matches')]
 #[ORM\HasLifecycleCallbacks]
+#[Gedmo\Loggable(logEntryClass: LogEntry::class)]
 class TaikaiMatch implements \Stringable
 {
     use TimestampableTrait;
@@ -57,13 +59,16 @@ class TaikaiMatch implements \Stringable
     private ?Team $team2 = null;
 
     #[ORM\Column(name: '`index`', type: 'smallint')]
+    #[Gedmo\Versioned]
     private int $index = 1;
 
     #[ORM\Column(type: 'smallint')]
+    #[Gedmo\Versioned]
     private int $level = self::LEVEL_FINAL;
 
     /** Numéro de l'équipe gagnante (1 ou 2), null tant que le match n'est pas tranché. */
     #[ORM\Column(type: 'smallint', nullable: true)]
+    #[Gedmo\Versioned]
     private ?int $winner = null;
 
     /** @var Collection<int, Result> */
@@ -206,6 +211,23 @@ class TaikaiMatch implements \Stringable
     public function isDecided(): bool
     {
         return null !== $this->winner;
+    }
+
+    /**
+     * Le vainqueur peut-il être désigné automatiquement ? Reprend
+     * `match_is_decidable?` : toutes les flèches sont validées, pas encore de
+     * vainqueur, et les deux scores ne sont pas à égalité.
+     */
+    public function isDecidable(): bool
+    {
+        if (!$this->isFinalized() || $this->isDecided()) {
+            return false;
+        }
+
+        $score1 = $this->getScore(1)?->toScoreValue();
+        $score2 = $this->getScore(2)?->toScoreValue();
+
+        return null !== $score1 && null !== $score2 && !$score1->equals($score2);
     }
 
     /** Toutes les flèches du match sont-elles validées ? */

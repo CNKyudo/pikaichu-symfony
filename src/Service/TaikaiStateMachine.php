@@ -12,6 +12,7 @@ use App\Enum\StaffRoleCode;
 use App\Enum\TaikaiState;
 use App\Exception\TransitionNotAllowedException;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Machine à états du taikai.
@@ -39,6 +40,7 @@ final readonly class TaikaiStateMachine
         private EntityManagerInterface $entityManager,
         private ScoreInitializer $scoreInitializer,
         private LeaderboardService $leaderboardService,
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -98,10 +100,25 @@ final readonly class TaikaiStateMachine
         // rester fidèle aux callbacks `before_transition` de Statesman.
         $this->runBeforeTransition($taikai, $from, $to);
 
-        $taikai->addEvent(TaikaiEvent::stateTransition($taikai, $user, $from, $to));
+        $taikai->addEvent(TaikaiEvent::stateTransition($taikai, $user, $from, $to, $this->stateTransitionMessage($taikai, $user, $from, $to)));
         $this->recordTransition($taikai, $to);
 
         $this->entityManager->flush();
+    }
+
+    /** Phrase déjà traduite décrivant la transition, états inclus. */
+    private function stateTransitionMessage(Taikai $taikai, User $user, TaikaiState $from, TaikaiState $to): string
+    {
+        $key = $to->position() > $from->position()
+            ? 'taikai_event.state_transition.forward'
+            : 'taikai_event.state_transition.backward';
+
+        return $this->translator->trans($key, [
+            '%user%' => $user->getDisplayName(),
+            '%taikai%' => (string) $taikai->getShortname(),
+            '%from%' => $this->translator->trans($from->label()),
+            '%to%' => $this->translator->trans($to->label()),
+        ]);
     }
 
     /**

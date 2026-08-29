@@ -10,6 +10,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\UniqueConstraint;
+use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
@@ -25,6 +26,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 #[UniqueConstraint(name: 'by_participant_id', columns: ['participant_id', 'match_id'])]
 #[UniqueConstraint(name: 'by_team_id_match_id', columns: ['team_id', 'match_id'])]
 #[ORM\HasLifecycleCallbacks]
+#[Gedmo\Loggable(logEntryClass: LogEntry::class)]
 class Score implements \Stringable
 {
     use TimestampableTrait;
@@ -48,16 +50,20 @@ class Score implements \Stringable
 
     #[ORM\Column(options: ['default' => 0])]
     #[Assert\NotNull]
+    #[Gedmo\Versioned]
     private int $hits = 0;
 
     #[ORM\Column(options: ['default' => 0])]
     #[Assert\NotNull]
+    #[Gedmo\Versioned]
     private int $value = 0;
 
     #[ORM\Column(name: 'intermediate_hits', options: ['default' => 0])]
+    #[Gedmo\Versioned]
     private int $intermediateHits = 0;
 
     #[ORM\Column(name: 'intermediate_value', options: ['default' => 0])]
+    #[Gedmo\Versioned]
     private int $intermediateValue = 0;
 
     /** @var Collection<int, Result> */

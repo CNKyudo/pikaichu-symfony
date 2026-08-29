@@ -1,0 +1,67 @@
+{# Cellules de saisie d'un participant, reprises de `marking/_participant_results.html.erb`.
+   Le `<tr>` et les en-têtes de regroupement (club/équipe) sont à la charge de l'appelant. #}
+{% set match = match|default(null) %}
+{% set score = participant.getScore(match) %}
+{% if taikai.form and taikai.form.value == 'individual' %}
+    <td class="has-text-centered">{{ participant.index }}</td>
+{% endif %}
+<td class="has-text-left">{{ participant.index }} - {{ participant.displayName }}</td>
+
+<td class="has-text-centered">
+    {% if score and score.firstEmptyResult %}
+        <div class="buttons has-addons are-small" style="justify-content:center">
+            {% for status in ['hit', 'miss', 'unknown'] %}
+                <form method="post" style="display:inline"
+                      action="{{ path('app_marking_add', {taikaiId: taikai.id, participantId: participant.id}) }}">
+                    <input type="hidden" name="status" value="{{ status }}">
+                    {% if match %}<input type="hidden" name="matchId" value="{{ match.id }}">{% endif %}
+                    <button class="button is-small" type="submit" title="{{ ('marking.status.' ~ status)|trans }}">
+                        {{ status == 'hit' ? '◯' : (status == 'miss' ? '⨯' : '?') }}
+                    </button>
+                </form>
+            {% endfor %}
+        </div>
+    {% endif %}
+</td>
+
+{% for r in visibleRounds %}
+    {% set roundResults = score ? score.getResultsForRound(r) : [] %}
+    {% set allMarked = roundResults|length > 0 and roundResults|filter(res => not res.isMarked)|length == 0 %}
+    {% set hasUnknown = roundResults|filter(res => res.isUnknown)|length > 0 %}
+    {% set finalized = score and score.isRoundFinalized(r) %}
+    {% set hitCount = roundResults|filter(res => res.status and res.status.value == 'hit')|length %}
+
+    <td class="has-text-left">
+        {% for result in roundResults %}
+            {% if not result.isMarked %}
+                {# Pas encore saisi : un espace réservé, pas de point de remplissage. #}
+                <span class="icon is-small">&nbsp;</span>
+            {% elseif result.isFinal %}
+                <span class="button is-small is-light" style="padding-left: 3pt; padding-right: 3pt; margin-right: 1pt">{{ result.status.glyph }}</span>
+            {% else %}
+                {# Tant que la série n'est pas validée, un clic fait tourner la marque. #}
+                <form method="post" style="display:inline"
+                      action="{{ path('app_marking_rotate', {taikaiId: taikai.id, resultId: result.id}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('rotate' ~ result.id) }}">
+                    <button class="button is-small is-light is-link" type="submit"
+                            style="padding-left: 3pt; padding-right: 3pt; margin-right: 1pt">{{ result.status.glyph }}</button>
+                </form>
+            {% endif %}
+        {% endfor %}
+
+        {# La coche de validation n'apparaît qu'une fois la série complète et sans marque incertaine. #}
+        {% if allMarked and not hasUnknown and not finalized %}
+            <form method="post" style="display:inline"
+                  action="{{ path('app_marking_finalize', {taikaiId: taikai.id, participantId: participant.id, round: r}) }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('finalize' ~ participant.id ~ '-' ~ r) }}">
+                {% if match %}<input type="hidden" name="matchId" value="{{ match.id }}">{% endif %}
+                <button class="button is-small is-info ml-2" type="submit" title="{{ 'marking.validate_round'|trans }}">✓</button>
+            </form>
+        {% elseif finalized %}
+            <span class="tag is-success is-light ml-2">✓</span>
+        {% endif %}
+    </td>
+    <td class="has-text-weight-bold has-text-centered">{{ hitCount }}</td>
+{% endfor %}
+
+<td class="has-text-centered has-text-weight-semibold">{{ score ? score.intermediateHits : 0 }}</td>

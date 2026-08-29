@@ -7,6 +7,7 @@ namespace App\Entity;
 use App\Enum\StaffRoleCode;
 use App\Repository\StaffRoleRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * Rôle du staff. Les libellés sont traduits en base (colonnes JSON), ce qui reprend
@@ -16,6 +17,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'staff_roles')]
 #[ORM\UniqueConstraint(name: 'by_staff_roles_code', columns: ['code'])]
 #[ORM\HasLifecycleCallbacks]
+#[Gedmo\Loggable(logEntryClass: LogEntry::class)]
 class StaffRole implements \Stringable
 {
     use TimestampableTrait;
@@ -26,14 +28,17 @@ class StaffRole implements \Stringable
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true, unique: true, enumType: StaffRoleCode::class)]
+    #[Gedmo\Versioned]
     private ?StaffRoleCode $code = null;
 
     /** @var array<string, string> */
     #[ORM\Column(type: 'json', options: ['default' => '{}'])]
+    #[Gedmo\Versioned]
     private array $label = [];
 
     /** @var array<string, string> */
     #[ORM\Column(type: 'json', options: ['default' => '{}'])]
+    #[Gedmo\Versioned]
     private array $description = [];
 
     public function getId(): ?int

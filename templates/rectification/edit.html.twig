@@ -1,0 +1,46 @@
+{% extends 'taikai/_layout.html.twig' %}
+
+{% block title %}{{ 'rectification.title'|trans }} · {{ taikai.shortname }}{% endblock %}
+
+{% block taikai_content %}
+<p class="mb-3">
+    <a class="button is-light mr-5" href="{{ path('app_rectification_index', {taikaiId: taikai.id}) }}">
+        {{ 'rectification.back_to_list'|trans }}
+    </a>
+</p>
+
+<div class="card">
+    <header class="card-header">
+        <p class="card-header-title">{{ 'rectification.edit_title'|trans }}</p>
+    </header>
+    <div class="card-content">
+        <div class="field">
+            <label class="label">{{ 'rectification.participant'|trans }}</label>
+            <div class="control">
+                <input class="input" type="text" disabled
+                       value="{{ result.score.participant.displayName }} / {{ result.score.participant.club }}">
+            </div>
+        </div>
+        <div class="field">
+            <label class="label">{{ 'rectification.description'|trans }}</label>
+            <div class="control">
+                <input class="input" type="text" disabled
+                       value="{{ 'rectification.description_template'|trans({'%round%': result.round, '%index%': result.index}) }}">
+            </div>
+        </div>
+
+        {{ form_start(form) }}
+        {% if form.value is defined %}{{ form_row(form.value) }}{% endif %}
+        {% if form.status is defined %}{{ form_row(form.status) }}{% endif %}
+        <div class="field is-grouped">
+            <div class="control"><button class="button has-background-light" type="submit">{{ 'action.save'|trans }}</button></div>
+            <div class="control">
+                <a class="button" href="{{ path('app_rectification_index', {taikaiId: taikai.id}) }}">
+                    {{ 'action.back'|trans }}
+                </a>
+            </div>
+        </div>
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}

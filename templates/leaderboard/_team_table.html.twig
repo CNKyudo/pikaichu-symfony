@@ -1,0 +1,64 @@
+{# Classement par équipes détaillé flèche par flèche, repris de `leaderboard/_team.html.erb`. #}
+<table class="table is-narrow is-bordered is-striped has-text-centered">
+    <thead>
+    <tr>
+        <th rowspan="2">{{ 'leaderboard.rank'|trans }}</th>
+        <th rowspan="2" colspan="3">{{ 'leaderboard.name'|trans }}</th>
+        {% for i in 1..taikai.numRounds %}
+            <th colspan="{{ taikai.numArrows }}">{{ 'leaderboard.round'|trans }} {{ i }}</th>
+        {% endfor %}
+        <th rowspan="2">{{ 'leaderboard.score'|trans }}</th>
+        <th rowspan="2">{{ 'leaderboard.team_score'|trans }}</th>
+    </tr>
+    <tr>
+        {% for i in 1..taikai.totalNumArrows %}
+            <th>{{ i }}</th>
+        {% endfor %}
+    </tr>
+    </thead>
+    <tbody>
+    {% for group in groups %}
+        {% for team in group.members %}
+            {% set memberCount = group.members|reduce((carry, t) => carry + t.participants|length, 0) %}
+            {% for participant in team.participants %}
+                {% set score = participant.getScore() %}
+                <tr>
+                    {% if loop.parent.loop.first and loop.first %}
+                        <th rowspan="{{ memberCount }}" class="has-text-centered">{{ group.rank }}</th>
+                    {% endif %}
+                    {% if loop.first %}
+                        <td rowspan="{{ team.participants|length }}">{{ team.index }}</td>
+                        <td rowspan="{{ team.participants|length }}" class="has-text-left">
+                            {% if taikai.distributed and team.participatingDojo %}{{ team.participatingDojo.displayName }} - {% endif %}
+                            {{ team.shortname }}
+                        </td>
+                    {% endif %}
+                    <td class="has-text-left">{{ participant.displayName }}</td>
+                    {% for result in (score ? score.results : []) %}
+                        <td>{{ result.value is not null ? result.value : (result.status ? result.status.glyph : '') }}</td>
+                    {% endfor %}
+                    <td>
+                        {% if taikai.scoring.usesArrowValues %}
+                            {{ score ? score.value : 0 }}&nbsp;/&nbsp;{{ score ? score.hits : 0 }}
+                        {% else %}
+                            {{ score ? score.hits : 0 }}
+                        {% endif %}
+                    </td>
+                    {% if loop.parent.loop.first and loop.first %}
+                        {% set teamScore = group.score %}
+                        <th rowspan="{{ memberCount }}">
+                            {% if taikai.scoring.usesArrowValues %}
+                                {{ teamScore ? teamScore.value : (team.getScore() ? team.getScore().value : 0) }}&nbsp;/&nbsp;{{ teamScore ? teamScore.hits : (team.getScore() ? team.getScore().hits : 0) }}
+                            {% else %}
+                                {{ teamScore ? teamScore.hits : (team.getScore() ? team.getScore().hits : 0) }}
+                            {% endif %}
+                        </th>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        {% endfor %}
+    {% else %}
+        <tr><td colspan="{{ 5 + taikai.totalNumArrows }}" class="has-text-grey">{{ 'leaderboard.empty'|trans }}</td></tr>
+    {% endfor %}
+    </tbody>
+</table>

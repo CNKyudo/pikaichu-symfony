@@ -1,0 +1,72 @@
+{# Bulma et Font Awesome, comme l'application Rails d'origine, pour ne pas dérouter les utilisateurs.
+   Partagé entre `base.html.twig` et la mise en page publique du tableau des résultats. #}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
+<link rel="stylesheet" href="{{ asset('css/bulma-divider.min.css') }}">
+<link rel="stylesheet" href="{{ asset('css/bulma-timeline.min.css') }}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
+<style>
+    /* Palette Bulma 0.9.3 restaurée : Bulma 1.x change les couleurs par défaut
+       (primary/link/info/...), reprises telles quelles de l'application Rails. */
+    :root {
+        --bulma-primary-h: 171deg;
+        --bulma-primary-s: 100%;
+        --bulma-primary-l: 41%;
+
+        --bulma-link-h: 229deg;
+        --bulma-link-s: 53%;
+        --bulma-link-l: 53%;
+
+        --bulma-info-h: 207deg;
+        --bulma-info-s: 55%;
+        --bulma-info-l: 45%;
+
+        --bulma-success-h: 153deg;
+        --bulma-success-s: 53%;
+        --bulma-success-l: 53%;
+
+        --bulma-warning-h: 44deg;
+        --bulma-warning-s: 100%;
+        --bulma-warning-l: 77%;
+
+        --bulma-danger-h: 348deg;
+        --bulma-danger-s: 86%;
+        --bulma-danger-l: 61%;
+
+        --bulma-card-header-background-color: #EFF5FA;
+        --bulma-table-striped-row-even-background-color: hsl(0, 0%, 94%);
+
+        --bulma-family-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+        --bulma-family-secondary: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+        --bulma-family-code: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    }
+
+    /* Le mode sombre automatique de Bulma 1.x rend l'application illisible :
+       on force le thème clair, comme sur l'application Rails. */
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --bulma-scheme-brightness: light;
+            --bulma-scheme-main-l: 100%;
+            --bulma-scheme-main-bis-l: 98%;
+            --bulma-scheme-main-ter-l: 96%;
+            --bulma-background-l: 96%;
+            --bulma-border-weak-l: 93%;
+            --bulma-border-l: 86%;
+            --bulma-text-weak-l: 48%;
+            --bulma-text-strong-l: 21%;
+            --bulma-text-title-l: 14%;
+        }
+    }
+
+    /* Reprises de custom.css : la frise d'avancement n'est pas cliquable,
+       seuls les boutons « étape précédente/suivante » qui l'entourent le sont. */
+    .inactiveLink {
+        pointer-events: none;
+        cursor: default;
+    }
+
+    .team-title {
+        font-size: var(--bulma-size-medium, 1.25rem);
+        border-bottom: 1px solid var(--bulma-grey-light, hsl(221, 14%, 71%));
+        margin-bottom: var(--bulma-size-6, 1rem);
+    }
+</style>

@@ -8,7 +8,6 @@ use App\Entity\Participant;
 use App\Entity\ParticipatingDojo;
 use App\Entity\Taikai;
 use App\Form\ParticipantType;
-use App\Security\Voter\ParticipatingDojoVoter;
 use App\Service\ParticipantImporter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -33,6 +32,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_USER')]
 final class ParticipantController extends AbstractController
 {
+    use AssertsEntityOwnershipTrait;
+
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
     ) {
@@ -88,7 +89,7 @@ final class ParticipantController extends AbstractController
         Request $request,
     ): Response {
         $this->assertHostClub($taikai, $participatingDojo);
-        $this->assertBelongsToHostClub($participatingDojo, $participant);
+        $this->assertBelongsTo($participant->getParticipatingDojo(), $participatingDojo, 'Participant does not belong to this participating dojo');
 
         $form = $this->createForm(ParticipantType::class, $participant, [
             'taikai_form' => $taikai->getForm(),
@@ -123,7 +124,7 @@ final class ParticipantController extends AbstractController
         Request $request,
     ): RedirectResponse {
         $this->assertHostClub($taikai, $participatingDojo);
-        $this->assertBelongsToHostClub($participatingDojo, $participant);
+        $this->assertBelongsTo($participant->getParticipatingDojo(), $participatingDojo, 'Participant does not belong to this participating dojo');
 
         if (!$this->isCsrfTokenValid('delete'.$participant->getId(), (string) $request->request->get('_token'))) {
             $this->addFlash('error', 'participant.delete.invalid_token');
@@ -218,21 +219,5 @@ final class ParticipantController extends AbstractController
             'taikaiId' => $taikai->getId(),
             'id' => $participatingDojo->getId(),
         ]);
-    }
-
-    private function assertHostClub(Taikai $taikai, ParticipatingDojo $participatingDojo): void
-    {
-        if ($participatingDojo->getTaikai() !== $taikai) {
-            throw $this->createNotFoundException('Participating dojo does not belong to this taikai');
-        }
-
-        $this->denyAccessUnlessGranted(ParticipatingDojoVoter::EDIT, $participatingDojo);
-    }
-
-    private function assertBelongsToHostClub(ParticipatingDojo $participatingDojo, Participant $participant): void
-    {
-        if ($participant->getParticipatingDojo() !== $participatingDojo) {
-            throw $this->createNotFoundException('Participant does not belong to this participating dojo');
-        }
     }
 }

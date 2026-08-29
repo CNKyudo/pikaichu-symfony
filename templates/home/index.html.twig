@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ app_name }}{% endblock %}
+
+{% block body %}
+<div class="tile is-ancestor">
+    <div class="tile is-4 is-vertical is-parent">
+        <div class="tile is-child box">
+            <p class="title">{{ 'home.taikais'|trans }}</p>
+            <p>{{ 'home.taikais_summary'|trans({'%nb%': numTaikais}) }}</p>
+            <div class="buttons mt-4">
+                <a class="button" href="{{ path('app_taikai_index') }}">{{ 'home.manage_taikais'|trans }}</a>
+            </div>
+        </div>
+    </div>
+    <div class="tile is-4 is-parent">
+        <div class="tile is-child box">
+            <p class="title">{{ 'home.dojos'|trans }}</p>
+            <p>{{ 'home.dojos_summary'|trans({'%nb%': numDojos}) }}</p>
+            <div class="buttons mt-4">
+                <a class="button" href="{{ path('app_dojo_index') }}">{{ 'home.manage_dojos'|trans }}</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

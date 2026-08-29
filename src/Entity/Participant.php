@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\UniqueConstraint;
+use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -25,6 +26,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 // passage coexistent, PostgreSQL traitant les NULL comme distincts.
 #[UniqueEntity(fields: ['participatingDojo', 'kyudojin'], message: 'participant.kyudojin.already_registered', errorPath: 'kyudojin', ignoreNull: true)]
 #[UniqueEntity(fields: ['participatingDojo', 'index'], message: 'participant.index.already_used', errorPath: 'index', ignoreNull: true)]
+#[Gedmo\Loggable(logEntryClass: LogEntry::class)]
 class Participant implements \Stringable
 {
     use TimestampableTrait;
@@ -39,7 +41,7 @@ class Participant implements \Stringable
     private ?ParticipatingDojo $participatingDojo = null;
 
     #[ORM\ManyToOne(targetEntity: Team::class, inversedBy: 'participants')]
-    #[ORM\JoinColumn(name: 'team_id', nullable: true, onDelete: 'SET NULL')]
+    #[ORM\JoinColumn(name: 'team_id', nullable: true, onDelete: 'CASCADE')]
     private ?Team $team = null;
 
     #[ORM\ManyToOne(targetEntity: Kyudojin::class)]
@@ -48,29 +50,36 @@ class Participant implements \Stringable
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotBlank]
+    #[Gedmo\Versioned]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotBlank]
+    #[Gedmo\Versioned]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 255, options: ['default' => ''])]
+    #[Gedmo\Versioned]
     private string $club = '';
 
     /** Ordre de passage issu du tirage au sort, au sein du club hôte. */
     #[ORM\Column(name: '`index`', nullable: true)]
+    #[Gedmo\Versioned]
     private ?int $index = null;
 
     /** Ordre de passage au sein de l'équipe. */
     #[ORM\Column(name: 'index_in_team', nullable: true)]
+    #[Gedmo\Versioned]
     private ?int $indexInTeam = null;
 
     /** Rang calculé à l'entrée en tie-break. */
     #[ORM\Column(name: 'intermediate_rank', nullable: true)]
+    #[Gedmo\Versioned]
     private ?int $intermediateRank = null;
 
     /** Rang final, ajustable manuellement pendant le tie-break. */
     #[ORM\Column(nullable: true)]
+    #[Gedmo\Versioned]
     private ?int $rank = null;
 
     /** @var Collection<int, Score> */

@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ 'tachi.title'|trans }} · {{ app_name }}{% endblock %}
+{% block body %}
+    <nav class="breadcrumb has-succeeds-separator" aria-label="breadcrumbs">
+        <ul>
+            <li><a href="{{ path('app_taikai_show', {id: taikai.id}) }}">{{ taikai.shortname }}</a></li>
+            <li class="is-active"><a aria-current="page">{{ 'tachi.title'|trans }} — {{ participatingDojo.displayName }}</a></li>
+        </ul>
+    </nav>
+
+    {% for tachi in tachis %}
+        <div class="box mb-4">
+            <p class="has-text-weight-bold mb-2">
+                {{ 'tachi.round'|trans }} {{ tachi.round }} — {{ 'tachi.index'|trans }} {{ tachi.index }}
+                <span class="tag {{ tachi.finished ? 'is-success' : 'is-light' }} ml-2">
+                    {{ (tachi.finished ? 'tachi.finished' : 'tachi.not_finished')|trans }}
+                </span>
+            </p>
+            <table class="table is-narrow is-hoverable is-fullwidth">
+                <thead>
+                <tr>
+                    <th>{{ 'tachi.participant'|trans }}</th>
+                    <th>{{ 'tachi.results'|trans }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for participant in tachi.participants %}
+                    <tr>
+                        <td>{{ participant.displayName }}</td>
+                        <td>
+                            {% set score = participant.getScore(tachi.match) %}
+                            {% for result in score ? score.getResultsForRound(tachi.round) : [] %}
+                                <span class="is-size-5 mx-1">{{ result.status ? result.status.glyph : '·' }}</span>
+                            {% else %}
+                                <span class="has-text-grey">{{ 'tachi.no_result'|trans }}</span>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="2" class="has-text-grey">{{ 'tachi.no_participant'|trans }}</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="has-text-grey">{{ 'tachi.empty'|trans }}</p>
+    {% endfor %}
+{% endblock %}

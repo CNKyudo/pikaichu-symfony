@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Enum\ResultStatus;
+use App\Enum\TaikaiScoring;
 use App\Enum\TaikaiState;
 use App\Repository\TaikaiEventRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -18,6 +20,10 @@ use Doctrine\ORM\Mapping as ORM;
 class TaikaiEvent
 {
     public const string CATEGORY_STATE_TRANSITION = 'state_transition';
+
+    public const string CATEGORY_TIE_BREAK = 'tie_break';
+
+    public const string CATEGORY_RECTIFICATION = 'rectification';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -51,24 +57,92 @@ class TaikaiEvent
         $this->createdAt ??= new \DateTimeImmutable();
     }
 
-    /** Fabrique l'évènement enregistré à chaque changement d'état. */
+    /**
+     * Fabrique l'évènement enregistré à chaque changement d'état.
+     *
+     * @param string $message message déjà traduit (états inclus), construit par
+     *                        l'appelant qui a accès au traducteur — reprend le
+     *                        principe de Rails, où `I18n.t` produit directement la
+     *                        phrase finale au moment de la création de l'évènement
+     */
     public static function stateTransition(
         Taikai $taikai,
         User $user,
         TaikaiState $from,
         TaikaiState $to,
+        string $message,
     ): self {
         $event = new self();
         $event->taikai = $taikai;
         $event->user = $user;
         $event->category = self::CATEGORY_STATE_TRANSITION;
         $event->data = ['from' => $from->value, 'to' => $to->value];
+        $event->message = $message;
+
+        return $event;
+    }
+
+    /** Fabrique l'évènement enregistré à chaque ajustement manuel de rang. */
+    public static function tieBreak(Taikai $taikai, User $user, Participant|Team $rankable): self
+    {
+        $event = new self();
+        $event->taikai = $taikai;
+        $event->user = $user;
+        $event->category = self::CATEGORY_TIE_BREAK;
+        $event->data = [
+            'id' => $rankable->getId(),
+            'display_name' => $rankable->getDisplayName(),
+            'intermediate_rank' => $rankable->getIntermediateRank(),
+            'rank' => $rankable->getRank(),
+        ];
         $event->message = \sprintf(
-            "%s a passé '%s' de l'état '%s' à l'état '%s'.",
+            '%s a classé %s%s au rang %d (rang intermédiaire : %d).',
             $user->getDisplayName(),
-            (string) $taikai->getShortname(),
-            $from->value,
-            $to->value,
+            $rankable instanceof Team ? 'l\'équipe ' : '',
+            $rankable->getDisplayName(),
+            $rankable->getRank() ?? 0,
+            $rankable->getIntermediateRank() ?? 0,
+        );
+
+        return $event;
+    }
+
+    /** Fabrique l'évènement enregistré à chaque rectification d'une flèche. */
+    public static function rectification(
+        Taikai $taikai,
+        User $user,
+        Result $result,
+        ResultStatus $previousStatus,
+        ?int $previousValue,
+    ): self {
+        $event = new self();
+        $event->taikai = $taikai;
+        $event->user = $user;
+        $event->category = self::CATEGORY_RECTIFICATION;
+        $event->data = [
+            'id' => $result->getId(),
+            'round' => $result->getRound(),
+            'index' => $result->getIndex(),
+            'status' => $result->getStatus()?->value,
+            'previous_status' => $previousStatus->value,
+            'value' => $result->getValue(),
+            'previous_value' => $previousValue,
+        ];
+        $participant = $result->getScore()?->getParticipant()?->getDisplayName() ?? '?';
+        $from = TaikaiScoring::Enteki === $taikai->getScoring()
+            ? (string) ($previousValue ?? 0)
+            : $previousStatus->symbol();
+        $to = TaikaiScoring::Enteki === $taikai->getScoring()
+            ? (string) ($result->getValue() ?? 0)
+            : ($result->getStatus()?->symbol() ?? '?');
+
+        $event->message = \sprintf(
+            'La flèche %d de la série %d de %s a été rectifiée de « %s » à « %s ».',
+            $result->getIndex() ?? 0,
+            $result->getRound() ?? 0,
+            $participant,
+            $from,
+            $to,
         );
 
         return $event;

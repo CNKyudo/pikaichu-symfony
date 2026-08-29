@@ -6,6 +6,7 @@ namespace App\Entity;
 
 use App\Repository\DojoRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -17,6 +18,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\UniqueConstraint(name: 'by_shortname', columns: ['shortname'])]
 #[ORM\HasLifecycleCallbacks]
 #[UniqueEntity(fields: ['shortname'], message: 'dojo.shortname.already_used')]
+#[Gedmo\Loggable(logEntryClass: LogEntry::class)]
 class Dojo implements \Stringable
 {
     use TimestampableTrait;
@@ -29,17 +31,21 @@ class Dojo implements \Stringable
     #[ORM\Column(length: 255, nullable: true, unique: true)]
     #[Assert\NotBlank]
     #[Assert\Length(min: 3, max: 32)]
+    #[Gedmo\Versioned]
     private ?string $shortname = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotBlank]
+    #[Gedmo\Versioned]
     private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Gedmo\Versioned]
     private ?string $city = null;
 
     #[ORM\Column(name: 'country_code', length: 255, nullable: true)]
     #[Assert\NotBlank]
+    #[Gedmo\Versioned]
     private ?string $countryCode = null;
 
     public function getId(): ?int

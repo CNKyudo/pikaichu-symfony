@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ 'user.account.title'|trans }} · {{ app_name }}{% endblock %}
+{% block body %}
+    <div class="columns">
+        <div class="column is-one-third is-offset-2">
+            <div class="card">
+                <header class="card-header">
+                    <p class="card-header-title">{{ 'user.account.title'|trans }}</p>
+                </header>
+                <div class="card-content">
+                    {{ form_start(form) }}
+                    {{ form_row(form.firstname) }}
+                    {{ form_row(form.lastname) }}
+                    {{ form_row(form.emailAddress) }}
+                    {{ form_row(form.locale) }}
+
+                    <div class="field is-grouped">
+                        <div class="control"><button class="button is-primary" type="submit">{{ 'action.save'|trans }}</button></div>
+                        <div class="control">
+                            <a class="button is-light" href="{{ path('app_home') }}">{{ 'action.back'|trans }}</a>
+                        </div>
+                    </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

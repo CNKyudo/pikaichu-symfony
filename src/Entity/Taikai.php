@@ -12,6 +12,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -30,6 +31,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 #[ORM\Index(name: 'taikais_by_scoring', columns: ['scoring'])]
 #[ORM\HasLifecycleCallbacks]
 #[UniqueEntity(fields: ['shortname'], message: 'taikai.shortname.already_used')]
+#[Gedmo\Loggable(logEntryClass: LogEntry::class)]
 class Taikai implements \Stringable
 {
     use TimestampableTrait;
@@ -58,50 +60,62 @@ class Taikai implements \Stringable
         pattern: '/\A(?![0-9]+$)(?!-)[a-zA-Z0-9-]{1,63}(?<!-)\z/',
         message: 'taikai.shortname.invalid_format'
     )]
+    #[Gedmo\Versioned]
     private ?string $shortname = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotBlank]
+    #[Gedmo\Versioned]
     private ?string $name = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
+    #[Gedmo\Versioned]
     private ?string $description = null;
 
     #[ORM\Column(name: 'start_date', type: 'date_immutable', nullable: true)]
     #[Assert\NotNull]
+    #[Gedmo\Versioned]
     private ?\DateTimeImmutable $startDate = null;
 
     #[ORM\Column(name: 'end_date', type: 'date_immutable', nullable: true)]
     #[Assert\NotNull]
+    #[Gedmo\Versioned]
     private ?\DateTimeImmutable $endDate = null;
 
     #[ORM\Column(type: 'string', nullable: true, enumType: TaikaiForm::class)]
     #[Assert\NotNull]
+    #[Gedmo\Versioned]
     private ?TaikaiForm $form = null;
 
     #[ORM\Column(type: 'string', options: ['default' => 'kinteki'], enumType: TaikaiScoring::class)]
+    #[Gedmo\Versioned]
     private TaikaiScoring $scoring = TaikaiScoring::Kinteki;
 
     #[ORM\Column(name: 'total_num_arrows', type: 'smallint', options: ['default' => 12])]
     #[Assert\NotNull]
+    #[Gedmo\Versioned]
     private int $totalNumArrows = 12;
 
     #[ORM\Column(name: 'num_targets', type: 'smallint', options: ['default' => 6])]
     #[Assert\NotNull]
     #[Assert\Choice(choices: self::NUM_TARGETS)]
+    #[Gedmo\Versioned]
     private int $numTargets = 6;
 
     #[ORM\Column(name: 'tachi_size', type: 'smallint', options: ['default' => 3])]
     #[Assert\NotNull]
     #[Assert\Choice(choices: self::TACHI_SIZES)]
+    #[Gedmo\Versioned]
     private int $tachiSize = 3;
 
     /** Tournoi « à distance » : plusieurs clubs hôtes autorisés. */
     #[ORM\Column(options: ['default' => true])]
+    #[Gedmo\Versioned]
     private bool $distributed = true;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\Choice(choices: self::CATEGORY_VALUES)]
+    #[Gedmo\Versioned]
     private ?string $category = null;
 
     /** @var Collection<int, ParticipatingDojo> */

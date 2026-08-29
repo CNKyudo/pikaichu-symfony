@@ -44,3 +44,15 @@
     {% set attr = attr|merge({class: (attr.class|default('') ~ ' checkbox')|trim}) %}
     {{ parent() }}
 {% endblock %}
+
+{# Bulma attend la case et son libellé dans le même <label>, pas l'un au-dessus
+   de l'autre comme le fait form_row par défaut. #}
+{% block checkbox_row %}
+    <div class="field">
+        <label class="label"{% if id %} for="{{ id }}"{% endif %}>
+            {{ form_widget(form) }}
+            {{ block('form_label_content') }}
+        </label>
+        {{ form_errors(form) }}
+    </div>
+{% endblock %}
