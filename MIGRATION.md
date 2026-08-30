@@ -13,7 +13,7 @@ correspondant plutôt que de deviner.
 
 ### Socle — terminé
 
-- Stack Docker (PHP-FPM 8.5, nginx, PostgreSQL 16, Adminer), `Makefile`, outils
+- Stack Docker (PHP-FPM 8.4, nginx, PostgreSQL 16, Adminer), `Makefile`, outils
   qualité alignés sur ceux de l'équipe.
 - **18 entités Doctrine** couvrant l'intégralité du schéma Rails (dont
   `LogEntry`, propre à la piste d'audit — voir plus bas), migration initiale

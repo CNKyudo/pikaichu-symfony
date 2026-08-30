@@ -5,6 +5,7 @@ set -euo pipefail
 BASE_DIR="/var/www/pikaichu-symfony"
 RELEASES_DIR="$BASE_DIR/releases"
 PROD_LINK="$BASE_DIR/production"
+SHARED_DIR="$BASE_DIR/shared"
 
 # On récupère le hash du commit depuis l'argument
 if [ $# -lt 1 ]; then
@@ -26,11 +27,11 @@ else
   git reset --hard "origin/main"
 fi
 
-if [ -f "$PROD_LINK/.env.local" ]; then
-  cp "$PROD_LINK/.env.local" "$RELEASE_DIR/.env.local"
-  echo "✅ Copie du .env.local depuis la release active"
+if [ -f "$SHARED_DIR/.env.local" ]; then
+  cp "$SHARED_DIR/.env.local" "$RELEASE_DIR/.env.local"
+  echo "✅ Copie du .env.local depuis $SHARED_DIR"
 else
-  echo "⚠️ Aucun .env.local trouvé dans $PROD_LINK, pensez à le créer !"
+  echo "⚠️ Aucun .env.local trouvé dans $SHARED_DIR, pensez à le créer !"
 fi
 
 mkdir -p "$RELEASE_DIR/var/cache" "$RELEASE_DIR/var/log"

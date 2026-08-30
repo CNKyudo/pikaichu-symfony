@@ -10,7 +10,7 @@ return RectorConfig::configure()
         __DIR__.'/../src',
         __DIR__.'/../tests',
     ])
-    ->withPhpSets(php85: true)
+    ->withPhpSets(php84: true)
     ->withSets([
         SetList::DEAD_CODE,
         SetList::CODING_STYLE,

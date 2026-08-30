@@ -12,7 +12,7 @@ du portage et les correspondances Rails → Symfony.
 
 | | |
 |---|---|
-| PHP | 8.5 |
+| PHP | 8.4 |
 | Symfony | 8.1 |
 | Base de données | PostgreSQL 16 |
 | ORM | Doctrine ORM 3 |
