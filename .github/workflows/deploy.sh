@@ -34,18 +34,34 @@ else
   echo "⚠️ Aucun .env.local trouvé dans $SHARED_DIR, pensez à le créer !"
 fi
 
-mkdir -p "$RELEASE_DIR/var/cache" "$RELEASE_DIR/var/log"
+mkdir -p "$RELEASE_DIR/var/cache"
+
+# var/log est partagé entre releases (comme .env.local) : sinon prod.log
+# serait recréé vide à chaque déploiement puisque RELEASE_DIR change à
+# chaque fois.
+mkdir -p "$SHARED_DIR/var/log"
+ln -sfn "$SHARED_DIR/var/log" "$RELEASE_DIR/var/log"
 
 composer install --no-dev --classmap-authoritative --no-interaction --prefer-dist --no-scripts --no-progress
 
 echo "Permission management..."
 
-# Donner les droits de lecture/écriture/exécution (rwX) à www-data
-setfacl -R -m u:www-data:rwX "$RELEASE_DIR/var/cache" "$RELEASE_DIR/var/log"
-# Définir les ACL par défaut
-setfacl -dR -m u:www-data:rwX "$RELEASE_DIR/var/cache" "$RELEASE_DIR/var/log"
+# Deux utilisateurs écrivent dans var/cache et var/log à des moments
+# différents : pikaichu_user pendant CE déploiement (composer, cache:clear,
+# migrations), et www-data pendant les requêtes web servies entre deux
+# déploiements (logs Monolog, régénération de cache à chaud). Sans ACL par
+# défaut dans les DEUX sens, le déploiement suivant ne peut plus modifier ni
+# supprimer les fichiers que www-data aura créés entre-temps — la ligne
+# `-d` pour pikaichu_user est celle qui manquait et cause l'échec de
+# cache:clear signalé (fichiers appartenant à www-data, sans ACL de retour).
+# var/log étant un symlink vers SHARED_DIR/var/log, setfacl déréférence le
+# lien et applique les ACL sur le vrai dossier partagé.
+setfacl -R  -m u:www-data:rwX      "$RELEASE_DIR/var/cache" "$RELEASE_DIR/var/log"
+setfacl -dR -m u:www-data:rwX      "$RELEASE_DIR/var/cache" "$RELEASE_DIR/var/log"
+setfacl -R  -m u:pikaichu_user:rwX "$RELEASE_DIR/var/cache" "$RELEASE_DIR/var/log"
+setfacl -dR -m u:pikaichu_user:rwX "$RELEASE_DIR/var/cache" "$RELEASE_DIR/var/log"
 
-echo "✅ ACL configurées pour www-data sur var/cache et var/log"
+echo "✅ ACL bidirectionnelles configurées (www-data ⇄ pikaichu_user) sur var/cache et var/log"
 
 php bin/console cache:clear --env=prod
 php bin/console importmap:install --env=prod

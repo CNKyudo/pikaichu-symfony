@@ -40,11 +40,9 @@ when@prod:
                 buffer_size: 50
             nested:
                 type: stream
-                path: php://stderr
+                path: "%kernel.logs_dir%/%kernel.environment%.log"
                 level: debug
-                formatter: monolog.formatter.json
             deprecation:
                 type: stream
                 channels: [deprecation]
-                path: php://stderr
-                formatter: monolog.formatter.json
+                path: "%kernel.logs_dir%/%kernel.environment%.log"
