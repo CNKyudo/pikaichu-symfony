@@ -76,4 +76,4 @@ echo "✅ Lien symbolique mis à jour -> $PROD_LINK"
 ls -dt "$RELEASES_DIR"/* | tail -n +6 | xargs rm -rf || true
 echo "🧹 Anciennes releases nettoyées (garde les 5 dernières)."
 
-echo "🎉 Déploiement terminé avec succès !"
+echo "🎉🎉🎉 Déploiement terminé avec succès !"
