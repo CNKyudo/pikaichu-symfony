@@ -12,7 +12,7 @@
 
 - **All commands run inside Docker containers.** Use `docker compose exec php-fpm <cmd>` or the Makefile commands.
 - PostgreSQL 16 database. Container name: `database`, DB: `app`, user: `app`, password: `password`.
-- Symfony 8.1 + PHP 8.4 (aligned with the production target; the codebase avoids PHP 8.5-only syntax).
+- Symfony 8.1 + PHP 8.5 (aligned with the production target).
 - The application is served on http://localhost:8000, Adminer on http://localhost:8080.
 
 ## Makefile Commands
@@ -24,7 +24,7 @@
 - `make reset-database`: Drop, recreate, migrate and reload fixtures
 - `make test-functional`: Prep test DB (create, migrate), then run `tests/Functional/` with `--testdox`
 - `make test-unit`: Run `tests/Unit/`
-- `make rector`: Run Rector with PHP 8.4 + dead code + coding style presets
+- `make rector`: Run Rector with PHP 8.5 + dead code + coding style presets
 - `make csfixer`: Run php-cs-fixer (short array syntax, @Symfony + @PSR12)
 - `make phpstan`: Run PHPStan level 7 on `src/` and `tests/`
 - `make fix`: Run rector → php-cs-fixer → phpstan (in that order)

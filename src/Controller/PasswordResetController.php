@@ -36,7 +36,7 @@ final class PasswordResetController extends AbstractController
 {
     use ResetPasswordControllerTrait;
 
-    private const string SENDER = 'no-reply@pikaichu.test';
+    private const string SENDER = 'no-reply@kyudo.fr';
 
     public function __construct(
         private readonly ResetPasswordHelperInterface $resetPasswordHelper,

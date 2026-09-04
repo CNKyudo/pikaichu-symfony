@@ -23,7 +23,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 final readonly class EmailConfirmationService
 {
-    private const string SENDER = 'no-reply@pikaichu.test';
+    private const string SENDER = 'no-reply@kyudo.fr';
 
     public function __construct(
         private EntityManagerInterface $entityManager,
