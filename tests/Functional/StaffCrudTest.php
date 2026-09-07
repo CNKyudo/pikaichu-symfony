@@ -18,8 +18,9 @@ use App\Enum\TaikaiState;
 use App\Tests\DatabaseResetTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
@@ -310,7 +311,9 @@ final class StaffCrudTest extends WebTestCase
         $form = $crawler->filter('form[name="staff"]')->form();
 
         if (\array_key_exists('staff[user]', $fields)) {
-            $form['staff[user]']->disableValidation()->setValue($fields['staff[user]']);
+            $userField = $form->get('staff[user]');
+            self::assertInstanceOf(ChoiceFormField::class, $userField);
+            $userField->disableValidation()->setValue($fields['staff[user]']);
             unset($fields['staff[user]']);
         }
 
