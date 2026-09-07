@@ -36,8 +36,15 @@
     {{ parent() }}
 {% endblock %}
 
+{# Un champ en autocomplétion (ux-autocomplete/TomSelect) a déjà sa propre
+   flèche et son propre habillage : le wrapper `.select` de Bulma ajouterait
+   une seconde flèche superposée à la sienne. #}
 {% block choice_widget_collapsed %}
-    <div class="select is-fullwidth">{{ parent() }}</div>
+    {% if uses_autocomplete|default(false) %}
+        {{ parent() }}
+    {% else %}
+        <div class="select is-fullwidth">{{ parent() }}</div>
+    {% endif %}
 {% endblock %}
 
 {% block checkbox_widget %}

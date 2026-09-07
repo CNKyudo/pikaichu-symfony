@@ -33,6 +33,10 @@ final class ParticipantType extends AbstractType
                 'help' => 'participant.kyudojin.help',
                 'class' => Kyudojin::class,
                 'choice_label' => 'displayName',
+                'choice_attr' => static fn (Kyudojin $kyudojin): array => [
+                    'data-firstname' => $kyudojin->getFirstname(),
+                    'data-lastname' => $kyudojin->getLastname(),
+                ],
                 'placeholder' => '',
                 'required' => false,
             ])

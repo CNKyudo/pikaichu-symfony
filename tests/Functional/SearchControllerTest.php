@@ -100,11 +100,11 @@ final class SearchControllerTest extends WebTestCase
 
         $this->commitSeeding($this->entityManager);
 
-        $this->client->request('GET', '/taikais/'.$taikai->getId().'/staffs/available-users?q=a');
+        $this->client->request('GET', '/taikais/'.$taikai->getId().'/staffs/available-users?query=a');
 
         self::assertResponseIsSuccessful();
         $data = json_decode((string) $this->client->getResponse()->getContent(), true);
-        $ids = array_column($data, 'id');
+        $ids = array_column($data['results'], 'id');
         self::assertNotContains($alreadyStaffed->getId(), $ids);
         self::assertContains($available->getId(), $ids);
     }
@@ -123,11 +123,11 @@ final class SearchControllerTest extends WebTestCase
 
         $this->commitSeeding($this->entityManager);
 
-        $this->client->request('GET', '/taikais/'.$taikai->getId().'/staffs/available-users?q=actuel&staffId='.$staff->getId());
+        $this->client->request('GET', '/taikais/'.$taikai->getId().'/staffs/available-users?query=actuel&staffId='.$staff->getId());
 
         self::assertResponseIsSuccessful();
         $data = json_decode((string) $this->client->getResponse()->getContent(), true);
-        $ids = array_column($data, 'id');
+        $ids = array_column($data['results'], 'id');
         self::assertContains($user->getId(), $ids);
     }
 

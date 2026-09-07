@@ -1,7 +1,7 @@
-{{ form_start(form) }}
-{{ form_row(form.user) }}
-{{ form_row(form.firstname) }}
-{{ form_row(form.lastname) }}
+{{ form_start(form, {attr: {'data-controller': 'identity-autofill'}}) }}
+{{ form_row(form.user, {attr: {'data-identity-autofill-target': 'source', 'data-action': 'change->identity-autofill#fill'}}) }}
+{{ form_row(form.firstname, {attr: {'data-identity-autofill-target': 'firstname'}}) }}
+{{ form_row(form.lastname, {attr: {'data-identity-autofill-target': 'lastname'}}) }}
 {{ form_row(form.role) }}
 {{ form_row(form.participatingDojo) }}
 

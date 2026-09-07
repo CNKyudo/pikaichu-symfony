@@ -2,6 +2,7 @@ twig:
     file_name_pattern: '*.twig'
     form_themes:
         - 'form/bulma_layout.html.twig'
+        - '@Autocomplete/autocomplete_form_theme.html.twig'
     globals:
         app_name: 'Pikaichu'
 

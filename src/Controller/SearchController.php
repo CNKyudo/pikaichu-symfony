@@ -45,6 +45,10 @@ final class SearchController extends AbstractController
     /**
      * Comptes utilisateur pouvant rejoindre le staff du taikai : exclut ceux déjà
      * membres du staff, sauf celui actuellement affecté au membre en cours d'édition.
+     *
+     * Alimente le widget TomSelect de {@see \App\Form\Autocomplete\StaffUserAutocompleteType}
+     * : la réponse est enveloppée dans `results`, format attendu par le
+     * contrôleur Stimulus fourni par symfony/ux-autocomplete.
      */
     #[Route('/taikais/{taikaiId}/staffs/available-users', name: 'app_search_staff_users', requirements: ['taikaiId' => '\d+'], methods: ['GET'])]
     public function staffUsers(
@@ -52,7 +56,7 @@ final class SearchController extends AbstractController
         Request $request,
         UserRepository $users,
     ): JsonResponse {
-        $query = trim((string) $request->query->get('q', ''));
+        $query = trim((string) $request->query->get('query', ''));
         $editedStaffId = $request->query->get('staffId');
 
         $excludedUserIds = [];
@@ -72,10 +76,16 @@ final class SearchController extends AbstractController
             static fn (User $u): bool => !\in_array($u->getId(), $excludedUserIds, true),
         );
 
-        return $this->json(array_map(
-            static fn (User $u): array => ['id' => $u->getId(), 'label' => $u->getDisplayName(), 'email' => $u->getEmailAddress()],
+        return $this->json(['results' => array_map(
+            static fn (User $u): array => [
+                'id' => $u->getId(),
+                'label' => $u->getDisplayName(),
+                'email' => $u->getEmailAddress(),
+                'firstname' => $u->getFirstname(),
+                'lastname' => $u->getLastname(),
+            ],
             array_values($matches),
-        ));
+        )]);
     }
 
     /**

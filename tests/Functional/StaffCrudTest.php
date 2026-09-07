@@ -18,6 +18,7 @@ use App\Enum\TaikaiState;
 use App\Tests\DatabaseResetTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -97,12 +98,12 @@ final class StaffCrudTest extends WebTestCase
 
         $crawler = $this->client->request('GET', $this->newPath($taikai));
 
-        $this->client->submit($crawler->filter('form[name="staff"]')->form([
+        $this->submitStaffForm($crawler, [
             'staff[user]' => (string) $referee->getId(),
             'staff[firstname]' => 'Saisie',
             'staff[lastname]' => 'Ignoree',
             'staff[role]' => (string) $this->findRole(StaffRoleCode::Chairman)->getId(),
-        ]));
+        ]);
 
         self::assertResponseRedirects('/taikais/'.$taikai->getId().'/edit');
 
@@ -144,12 +145,12 @@ final class StaffCrudTest extends WebTestCase
 
         $crawler = $this->client->request('GET', $this->newPath($taikai));
 
-        $this->client->submit($crawler->filter('form[name="staff"]')->form([
+        $this->submitStaffForm($crawler, [
             'staff[user]' => (string) $referee->getId(),
             'staff[firstname]' => 'x',
             'staff[lastname]' => 'y',
             'staff[role]' => (string) $this->findRole(StaffRoleCode::DojoAdmin)->getId(),
-        ]));
+        ]);
 
         self::assertResponseStatusCodeSame(422);
         self::assertCount(1, $this->entityManager->getRepository(Staff::class)->findAll());
@@ -295,6 +296,27 @@ final class StaffCrudTest extends WebTestCase
         $this->client->request('GET', $this->newPath($taikai));
 
         self::assertResponseStatusCodeSame(403);
+    }
+
+    /**
+     * Soumet le formulaire de staff, en passant outre la validation de
+     * `staff[user]` : ce champ est désormais une recherche AJAX (TomSelect)
+     * dont le crawler ne connaît pas les <option> chargées côté client.
+     *
+     * @param array<string, string> $fields
+     */
+    private function submitStaffForm(Crawler $crawler, array $fields): void
+    {
+        $form = $crawler->filter('form[name="staff"]')->form();
+
+        if (\array_key_exists('staff[user]', $fields)) {
+            $form['staff[user]']->disableValidation()->setValue($fields['staff[user]']);
+            unset($fields['staff[user]']);
+        }
+
+        $form->setValues($fields);
+
+        $this->client->submit($form);
     }
 
     private function newPath(Taikai $taikai): string

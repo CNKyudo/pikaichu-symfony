@@ -8,45 +8,52 @@ use App\Entity\ParticipatingDojo;
 use App\Entity\Staff;
 use App\Entity\StaffRole;
 use App\Entity\Taikai;
-use App\Entity\User;
+use App\Form\Autocomplete\StaffUserAutocompleteType;
 use App\Repository\ParticipatingDojoRepository;
 use App\Repository\StaffRoleRepository;
-use App\Repository\UserRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Formulaire de création et de modification d'un membre du staff.
  *
- * Rails recherche l'utilisateur par autocomplétion (`search#users`) ; ce point
- * n'étant pas encore porté, on présente la liste complète des comptes. Comme
- * côté Rails, sélectionner un utilisateur écrase l'identité saisie à la main.
+ * Comme côté Rails, sélectionner un utilisateur écrase l'identité saisie à la
+ * main (voir `identity-autofill` côté JS) et le compte se recherche par
+ * autocomplétion (`search#users` côté Rails) plutôt que via un <select> listant
+ * tous les comptes, impraticable au-delà d'une centaine d'utilisateurs.
  *
  * @extends AbstractType<Staff>
  */
 final class StaffType extends AbstractType
 {
+    public function __construct(
+        private readonly UrlGeneratorInterface $urlGenerator,
+    ) {
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         /** @var Taikai $taikai */
         $taikai = $options['taikai'];
         /** @var string $locale */
         $locale = $options['locale'];
+        /** @var Staff $staff */
+        $staff = $builder->getData();
 
         $builder
-            ->add('user', EntityType::class, [
+            ->add('user', StaffUserAutocompleteType::class, [
                 'label' => 'staff.user',
                 'help' => 'staff.user.help',
-                'class' => User::class,
-                'choice_label' => 'displayName',
                 'placeholder' => '',
                 'required' => false,
-                'query_builder' => static fn (UserRepository $repository): \Doctrine\ORM\QueryBuilder => $repository->createQueryBuilder('u')
-                    ->orderBy('u.lastname', 'ASC')
-                    ->addOrderBy('u.firstname', 'ASC'),
+                'autocomplete_url' => $this->urlGenerator->generate('app_search_staff_users', array_filter([
+                    'taikaiId' => $taikai->getId(),
+                    'staffId' => $staff->getId(),
+                ])),
             ])
             ->add('firstname', TextType::class, [
                 'label' => 'staff.firstname',
