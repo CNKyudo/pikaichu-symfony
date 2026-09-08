@@ -11,6 +11,7 @@
             <th>{{ 'taikai.participants_overview.team'|trans }}</th>
         {% endif %}
         <th>{{ 'taikai.participants_overview.name'|trans }}</th>
+        <th></th>
     </tr>
     </thead>
     <tbody>
@@ -26,6 +27,7 @@
                         {{ participant.displayName }}
                         {% if participant.kyudojin %}<i class="far fa-id-badge"></i>{% endif %}
                     </td>
+                    <td>{{ include('taikai/_participants_overview_delete.html.twig', {taikai: taikai, participatingDojo: participatingDojo, participant: participant}) }}</td>
                 </tr>
             {% endfor %}
         {% endfor %}
@@ -42,6 +44,7 @@
                             <td rowspan="{{ team.participants|length }}">{{ team.shortname }}</td>
                         {% endif %}
                         <td>{{ participant.displayName }}{{ participant.club ? ' (' ~ participant.club ~ ')' : '' }}</td>
+                        <td>{{ include('taikai/_participants_overview_delete.html.twig', {taikai: taikai, participatingDojo: participatingDojo, participant: participant}) }}</td>
                     </tr>
                 {% endfor %}
             {% endfor %}
@@ -50,6 +53,7 @@
                     <td></td>
                     <td>-</td>
                     <td>{{ participant.displayName }}{{ participant.club ? ' (' ~ participant.club ~ ')' : '' }}</td>
+                    <td>{{ include('taikai/_participants_overview_delete.html.twig', {taikai: taikai, participatingDojo: participatingDojo, participant: participant}) }}</td>
                 </tr>
             {% endfor %}
         {% endfor %}

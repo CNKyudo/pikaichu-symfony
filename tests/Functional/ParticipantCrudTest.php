@@ -19,6 +19,8 @@ use App\Tests\DatabaseResetTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
@@ -87,7 +89,7 @@ final class ParticipantCrudTest extends WebTestCase
             'participant[club]' => 'nantes',
         ]));
 
-        self::assertResponseRedirects($this->hostClubPath($taikai, $participatingDojo));
+        self::assertResponseRedirects($this->participantsPath($taikai, $participatingDojo).'/new');
 
         $participant = $this->findParticipant();
         self::assertSame('Yumi', $participant->getFirstname());
@@ -127,14 +129,14 @@ final class ParticipantCrudTest extends WebTestCase
 
         $crawler = $this->client->request('GET', $this->participantsPath($taikai, $participatingDojo).'/new');
 
-        $this->client->submit($crawler->filter('form[name="participant"]')->form([
+        $this->submitParticipantForm($crawler, [
             'participant[kyudojin]' => (string) $kyudojin->getId(),
             'participant[firstname]' => 'Saisie',
             'participant[lastname]' => 'Ignoree',
             'participant[club]' => 'ignore',
-        ]));
+        ]);
 
-        self::assertResponseRedirects($this->hostClubPath($taikai, $participatingDojo));
+        self::assertResponseRedirects($this->participantsPath($taikai, $participatingDojo).'/new');
 
         $participant = $this->findParticipant();
         self::assertSame('Haruki', $participant->getFirstname());
@@ -155,11 +157,11 @@ final class ParticipantCrudTest extends WebTestCase
 
         $crawler = $this->client->request('GET', $this->participantsPath($taikai, $participatingDojo).'/new');
 
-        $this->client->submit($crawler->filter('form[name="participant"]')->form([
+        $this->submitParticipantForm($crawler, [
             'participant[kyudojin]' => (string) $kyudojin->getId(),
             'participant[firstname]' => 'Haruki',
             'participant[lastname]' => 'Sato',
-        ]));
+        ]);
 
         self::assertResponseStatusCodeSame(422);
         self::assertCount(1, $this->entityManager->getRepository(Participant::class)->findAll());
@@ -222,6 +224,30 @@ final class ParticipantCrudTest extends WebTestCase
         $this->client->request('GET', $this->participantsPath($taikai, $participatingDojo).'/new');
 
         self::assertResponseStatusCodeSame(403);
+    }
+
+    /**
+     * Soumet le formulaire de participant, en passant outre la validation de
+     * `participant[kyudojin]` : ce champ est désormais une recherche AJAX
+     * (TomSelect) dont le crawler ne connaît pas les <option> chargées côté
+     * client.
+     *
+     * @param array<string, string> $fields
+     */
+    private function submitParticipantForm(Crawler $crawler, array $fields): void
+    {
+        $form = $crawler->filter('form[name="participant"]')->form();
+
+        if (\array_key_exists('participant[kyudojin]', $fields)) {
+            $kyudojinField = $form->get('participant[kyudojin]');
+            self::assertInstanceOf(ChoiceFormField::class, $kyudojinField);
+            $kyudojinField->disableValidation()->setValue($fields['participant[kyudojin]']);
+            unset($fields['participant[kyudojin]']);
+        }
+
+        $form->setValues($fields);
+
+        $this->client->submit($form);
     }
 
     private function participantsPath(Taikai $taikai, ParticipatingDojo $participatingDojo): string
