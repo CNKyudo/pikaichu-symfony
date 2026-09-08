@@ -109,9 +109,9 @@ class Taikai implements \Stringable
     private int $tachiSize = 3;
 
     /** Tournoi « à distance » : plusieurs clubs hôtes autorisés. */
-    #[ORM\Column(options: ['default' => true])]
+    #[ORM\Column(options: ['default' => false])]
     #[Gedmo\Versioned]
-    private bool $distributed = true;
+    private bool $distributed = false;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\Choice(choices: self::CATEGORY_VALUES)]
