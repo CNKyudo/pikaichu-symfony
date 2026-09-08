@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\DataFixtures;
 
 use App\Entity\Dojo;
+use App\Entity\Kyudojin;
 use App\Entity\Participant;
 use App\Entity\ParticipatingDojo;
 use App\Entity\Staff;
@@ -38,6 +39,17 @@ final class AppFixtures extends Fixture implements DependentFixtureInterface, Fi
         ['Akira', 'Tanaka'], ['Yuki', 'Sato'], ['Hana', 'Suzuki'], ['Kenji', 'Takahashi'],
         ['Mei', 'Watanabe'], ['Ren', 'Ito'], ['Sora', 'Kobayashi'], ['Aoi', 'Yamamoto'],
         ['Haruto', 'Nakamura'], ['Rin', 'Kato'], ['Sota', 'Yoshida'], ['Yui', 'Yamada'],
+    ];
+
+    /**
+     * Licenciés du référentiel fédéral, distincts des participants saisis
+     * ad hoc dans {@see self::ARCHER_NAMES} : alimente l'autocomplétion du
+     * champ « Licencié » du formulaire participant.
+     */
+    private const array KYUDOJIN_NAMES = [
+        ['Haruki', 'Yamaguchi'], ['Emi', 'Fujiwara'], ['Daiki', 'Matsumoto'], ['Nanami', 'Inoue'],
+        ['Riku', 'Kimura'], ['Sakura', 'Hayashi'], ['Yuto', 'Saito'], ['Momoka', 'Shimizu'],
+        ['Kaito', 'Yamashita'], ['Airi', 'Mori'], ['Ryo', 'Abe'], ['Hina', 'Ikeda'],
     ];
 
     /**
@@ -87,6 +99,12 @@ final class AppFixtures extends Fixture implements DependentFixtureInterface, Fi
         ];
         foreach ($dojos as $dojo) {
             $manager->persist($dojo);
+        }
+
+        $dojoShortnames = array_keys($dojos);
+        foreach (self::KYUDOJIN_NAMES as $i => [$firstname, $lastname]) {
+            $club = $dojoShortnames[$i % \count($dojoShortnames)];
+            $manager->persist($this->createKyudojin(\sprintf('L%04d', $i + 1), $firstname, $lastname, $club));
         }
 
         $manager->flush();
@@ -366,6 +384,16 @@ final class AppFixtures extends Fixture implements DependentFixtureInterface, Fi
         $user->setPassword($this->passwordHasher->hashPassword($user, 'password123'));
 
         return $user;
+    }
+
+    private function createKyudojin(string $licenseId, string $firstname, string $lastname, string $federationClub): Kyudojin
+    {
+        return new Kyudojin()
+            ->setLicenseId($licenseId)
+            ->setFirstname($firstname)
+            ->setLastname($lastname)
+            ->setFederationClub($federationClub)
+            ->setFederationCountryCode('FR');
     }
 
     private function createDojo(string $shortname, string $name, string $city): Dojo

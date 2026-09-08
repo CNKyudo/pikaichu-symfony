@@ -65,12 +65,14 @@ final class SearchControllerTest extends WebTestCase
 
         $this->commitSeeding($this->entityManager);
 
-        $this->client->request('GET', '/kyudojins/available?q=sato');
+        $this->client->request('GET', '/kyudojins/available?query=sato');
 
         self::assertResponseIsSuccessful();
         $data = json_decode((string) $this->client->getResponse()->getContent(), true);
-        self::assertCount(1, $data);
-        self::assertSame('Haruki Sato', $data[0]['label']);
+        self::assertCount(1, $data['results']);
+        self::assertSame('Haruki Sato', $data['results'][0]['label']);
+        self::assertSame('Haruki', $data['results'][0]['firstname']);
+        self::assertSame('Sato', $data['results'][0]['lastname']);
     }
 
     public function testKyudojinsSearchRequiresAuthentication(): void
@@ -80,7 +82,7 @@ final class SearchControllerTest extends WebTestCase
         static::ensureKernelShutdown();
 
         $anonymousClient = static::createClient();
-        $anonymousClient->request('GET', '/kyudojins/available?q=sato');
+        $anonymousClient->request('GET', '/kyudojins/available?query=sato');
 
         self::assertResponseRedirects('/login');
     }

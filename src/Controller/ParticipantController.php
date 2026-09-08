@@ -65,7 +65,10 @@ final class ParticipantController extends AbstractController
 
             $this->addFlash('success', 'participant.created');
 
-            return $this->redirectToHostClub($taikai, $participatingDojo);
+            return $this->redirectToRoute('app_participant_new', [
+                'taikaiId' => $taikai->getId(),
+                'participatingDojoId' => $participatingDojo->getId(),
+            ]);
         }
 
         // Détaché si rien n'est écrit, pour ne pas fausser le comptage des

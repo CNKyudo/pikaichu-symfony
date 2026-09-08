@@ -4,41 +4,42 @@ declare(strict_types=1);
 
 namespace App\Form;
 
-use App\Entity\Kyudojin;
 use App\Entity\Participant;
 use App\Enum\TaikaiForm;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use App\Form\Autocomplete\KyudojinAutocompleteType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Formulaire de saisie manuelle d'un participant.
  *
- * Rails recherche le licencié par autocomplétion (`search#kyudojins`) ; ce point
- * n'étant pas encore porté, on présente la liste des licenciés connus. Comme
- * côté Rails, sélectionner un licencié écrase l'identité saisie à la main.
+ * Le licencié se recherche par autocomplétion (`search#kyudojins` côté
+ * Rails), plutôt que via un <select> listant tout le référentiel fédéral.
+ * Comme côté Rails, sélectionner un licencié écrase l'identité saisie à la
+ * main (voir `identity-autofill` côté JS).
  *
  * @extends AbstractType<Participant>
  */
 final class ParticipantType extends AbstractType
 {
+    public function __construct(
+        private readonly UrlGeneratorInterface $urlGenerator,
+    ) {
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('kyudojin', EntityType::class, [
+            ->add('kyudojin', KyudojinAutocompleteType::class, [
                 'label' => 'participant.kyudojin',
                 'help' => 'participant.kyudojin.help',
-                'class' => Kyudojin::class,
-                'choice_label' => 'displayName',
-                'choice_attr' => static fn (Kyudojin $kyudojin): array => [
-                    'data-firstname' => $kyudojin->getFirstname(),
-                    'data-lastname' => $kyudojin->getLastname(),
-                ],
                 'placeholder' => '',
                 'required' => false,
+                'autocomplete_url' => $this->urlGenerator->generate('app_search_kyudojins'),
             ])
             ->add('firstname', TextType::class, [
                 'label' => 'participant.firstname',

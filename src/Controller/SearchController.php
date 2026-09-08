@@ -30,16 +30,28 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_USER')]
 final class SearchController extends AbstractController
 {
-    /** Licenciés du référentiel fédéral, tous taikais confondus. */
+    /**
+     * Licenciés du référentiel fédéral, tous taikais confondus.
+     *
+     * Alimente le widget TomSelect de {@see \App\Form\Autocomplete\KyudojinAutocompleteType}
+     * : la réponse est enveloppée dans `results`, format attendu par le
+     * contrôleur Stimulus fourni par symfony/ux-autocomplete.
+     */
     #[Route('/kyudojins/available', name: 'app_search_kyudojins', methods: ['GET'])]
     public function kyudojins(Request $request, KyudojinRepository $kyudojins): JsonResponse
     {
-        $query = trim((string) $request->query->get('q', ''));
+        $query = trim((string) $request->query->get('query', ''));
 
-        return $this->json(array_map(
-            static fn (Kyudojin $k): array => ['id' => $k->getId(), 'label' => $k->getDisplayName(), 'club' => $k->getFederationClub()],
+        return $this->json(['results' => array_map(
+            static fn (Kyudojin $k): array => [
+                'id' => $k->getId(),
+                'label' => $k->getDisplayName(),
+                'club' => $k->getFederationClub(),
+                'firstname' => $k->getFirstname(),
+                'lastname' => $k->getLastname(),
+            ],
             $kyudojins->search($query),
-        ));
+        )]);
     }
 
     /**
