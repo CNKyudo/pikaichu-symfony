@@ -9,9 +9,9 @@
         <th>{{ 'dojo.country_code'|trans }}</th>
         <th>{{ 'participating_dojo.num_participants'|trans }}</th>
         <th class="has-text-right">
-            {% if is_granted('TAIKAI_EDIT', taikai) %}
+            {% if is_granted('TAIKAI_EDIT', taikai) and canAddHost %}
                 <a class="button is-small has-background-light"
-                   href="{{ canAddHost ? path('app_participating_dojo_new', {taikaiId: taikai.id}) : '#' }}"
+                   href="{{ path('app_participating_dojo_new', {taikaiId: taikai.id}) }}"
                    title="{{ 'participating_dojo.new'|trans }}">
                     <span class="icon is-small"><i class="fas fa-plus"></i></span>
                     <span>{{ 'action.add'|trans }}</span>
