@@ -15,8 +15,8 @@
                       action="{{ path('app_marking_add', {taikaiId: taikai.id, participantId: participant.id}) }}">
                     <input type="hidden" name="status" value="{{ status }}">
                     {% if match %}<input type="hidden" name="matchId" value="{{ match.id }}">{% endif %}
-                    <button class="button is-small" type="submit" title="{{ ('marking.status.' ~ status)|trans }}">
-                        {{ status == 'hit' ? '◯' : (status == 'miss' ? '⨯' : '?') }}
+                    <button class="button is-small result-glyph" type="submit" title="{{ ('marking.status.' ~ status)|trans }}">
+                        {{ status == 'hit' ? '◯' : (status == 'miss' ? '✕' : '?') }}
                     </button>
                 </form>
             {% endfor %}
@@ -37,13 +37,13 @@
                 {# Pas encore saisi : un espace réservé, pas de point de remplissage. #}
                 <span class="icon is-small">&nbsp;</span>
             {% elseif result.isFinal %}
-                <span class="button is-small is-light" style="padding-left: 3pt; padding-right: 3pt; margin-right: 1pt">{{ result.status.glyph }}</span>
+                <span class="button is-small is-light result-glyph" style="padding-left: 3pt; padding-right: 3pt; margin-right: 1pt">{{ result.status.glyph }}</span>
             {% else %}
                 {# Tant que la série n'est pas validée, un clic fait tourner la marque. #}
                 <form method="post" style="display:inline"
                       action="{{ path('app_marking_rotate', {taikaiId: taikai.id, resultId: result.id}) }}">
                     <input type="hidden" name="_token" value="{{ csrf_token('rotate' ~ result.id) }}">
-                    <button class="button is-small is-light is-link" type="submit"
+                    <button class="button is-small is-light is-link result-glyph" type="submit"
                             style="padding-left: 3pt; padding-right: 3pt; margin-right: 1pt">{{ result.status.glyph }}</button>
                 </form>
             {% endif %}

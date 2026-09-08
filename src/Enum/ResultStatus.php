@@ -17,8 +17,8 @@ enum ResultStatus: string
     public function symbol(): string
     {
         return match ($this) {
-            self::Hit => 'O',
-            self::Miss => 'X',
+            self::Hit => '◯',
+            self::Miss => '✕',
             self::Unknown => '?',
         };
     }
@@ -27,7 +27,7 @@ enum ResultStatus: string
     {
         return match ($this) {
             self::Hit => '◯',
-            self::Miss => '⨯',
+            self::Miss => '✕',
             self::Unknown => '?',
         };
     }
