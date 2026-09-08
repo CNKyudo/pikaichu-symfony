@@ -147,8 +147,9 @@ participant:
     licensed: Licensed
     index: Shooting order
     index.help: Filled in by the draw; can be adjusted by hand if needed.
-    kyudojin: Licensee
-    kyudojin.help: Pick a licensee to reuse their identity automatically.
+    kyudojin: Search in the federation database
+    or: Or
+    kyudojin.help: Type part of a name or first name to search in the federation database. If you select a licensee registered in the federation, it is unnecessary to fill in the fields below.
     kyudojin.already_registered: This licensee is already registered in this host dojo.
     index.already_used: This shooting order is already taken in this host dojo.
     created: The participant has been added.

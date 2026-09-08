@@ -147,8 +147,9 @@ participant:
     licensed: Licencié
     index: Ordre de passage
     index.help: Renseigné par le tirage au sort ; modifiable à la main si besoin.
-    kyudojin: Licencié
-    kyudojin.help: Sélectionnez un licencié pour reprendre automatiquement son identité.
+    kyudojin: Recherche dans la base de la fédération
+    or: Ou
+    kyudojin.help: Tapez une partie de nom ou de prénom pour effectuer une recherche dans la base de la fédération. Si vous sélectionnez un.e kyudojin inscrit à la fédération il est inutile de remplir les champs ci-dessous.
     kyudojin.already_registered: Ce licencié est déjà inscrit dans ce club hôte.
     index.already_used: Cet ordre de passage est déjà attribué dans ce club hôte.
     created: Le participant a bien été ajouté.
