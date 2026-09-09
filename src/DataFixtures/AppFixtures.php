@@ -139,6 +139,8 @@ final class AppFixtures extends Fixture implements DependentFixtureInterface, Fi
         Dojo $dojoB,
     ): void {
         $taikai = $this->createTaikai($shortname, 'Inscriptions ouvertes, tirage au sort partiel', TaikaiForm::Individual);
+        $taikai->setDistributed(true);
+
         $this->staffRequiredRoles($taikai, $admin, $chairman, $referee);
 
         $hostA = $this->addHostDojo($taikai, $dojoA, 'AKVM');
@@ -270,6 +272,7 @@ final class AppFixtures extends Fixture implements DependentFixtureInterface, Fi
         Dojo $dojoB,
     ): void {
         $taikai = $this->createTaikai($shortname, 'Tournoi par équipes, inscriptions ouvertes', TaikaiForm::Team);
+        $taikai->setDistributed(true);
         $this->staffRequiredRoles($taikai, $admin, $chairman, $referee);
 
         $hostA = $this->addHostDojo($taikai, $dojoA, 'KKP');
