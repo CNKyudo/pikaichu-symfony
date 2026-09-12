@@ -83,6 +83,16 @@
                                 </div>
                             </form>
                         </div>
+                        <div class="control">
+                            <form method="post"
+                                  action="{{ path('app_participant_delete', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id, id: participant.id}) }}"
+                                  onsubmit="return confirm('{{ 'participant.delete.confirm'|trans|e('js') }}')">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ participant.id) }}">
+                                <button class="button is-small" type="submit" title="{{ 'participant.destroy'|trans }}">
+                                    <span class="icon is-small"><i class="fas fa-trash"></i></span>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 {% else %}
                     <p class="has-text-grey">{{ 'team.empty'|trans }}</p>
