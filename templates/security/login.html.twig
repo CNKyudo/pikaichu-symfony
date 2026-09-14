@@ -11,6 +11,14 @@
             {% if error %}
                 <div class="notification is-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
             {% endif %}
+            
+            <div class="notification is-info">
+            <strong>Mise à jour technique</strong>
+            <p>
+                Merci de <strong>renouveler votre mot de passe</strong> si vous ne l’avez pas fait depuis le 14 septembre,
+                afin d’assurer le bon fonctionnement de votre compte.
+            </p>
+            </div>
 
             <form method="post" class="mt-5">
                 <div class="field">
