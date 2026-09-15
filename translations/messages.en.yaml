@@ -7,6 +7,9 @@ nav:
     logout: Sign out
     register: Sign up
     account: My account
+    ui:
+        classic: Classic
+        beta: Beta
 
 action:
     save: Save
