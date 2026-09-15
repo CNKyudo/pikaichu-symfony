@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ app.request.locale|default('fr') }}">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -15,7 +16,7 @@
             <img src="{{ asset('logo_fr.jpg') }}" alt="Comité National De Kyudo">
         </a>
         <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false"
-           data-navbar-target="burger" data-action="click->navbar#toggle">
+        data-navbar-target="burger" data-action="click->navbar#toggle">
             <span aria-hidden="true"></span>
             <span aria-hidden="true"></span>
             <span aria-hidden="true"></span>
@@ -24,16 +25,14 @@
     <div class="navbar-menu" data-navbar-target="menu">
         <div class="navbar-start">
             <a class="navbar-item" href="{{ path('app_taikai_index') }}">
-                <span class="icon is-medium mr-2" style="white-space:nowrap">大会</span>
+                <span class="icon is-medium" style="white-space:nowrap">大会</span>
                 <span>{{ 'nav.taikais'|trans }}</span>
             </a>
             <a class="navbar-item" href="{{ path('app_dojo_index') }}">
-                <span class="icon is-medium mr-2" style="white-space:nowrap">道場</span>
+                <span class="icon is-medium" style="white-space:nowrap">道場</span>
                 <span>{{ 'nav.dojos'|trans }}</span>
             </a>
         </div>
-
-
         <div class="navbar-end">
             {% if app.session.get('ui', 'classic') == 'beta' %}
                 <a class="navbar-item" href="{{ path('ui_switch', { mode: 'classic' }) }}"

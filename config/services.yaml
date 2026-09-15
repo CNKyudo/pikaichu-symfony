@@ -16,6 +16,14 @@ services:
             - '../src/Exception/'
             - '../src/Kernel.php'
 
+    # Chargeur Twig pour les templates d’interface (classique vs beta).
+    App\Twig\UiTemplateLoader:
+        arguments:
+            $inner: '@twig.loader.native_filesystem'
+        tags:
+            - { name: twig.loader, priority: 100 }
+
+
     # Piste d'audit (voir MIGRATION.md) : équivalent du gem `audited` côté Rails.
     # `LoggableListener` implémente `EventSubscriber`, mais le bridge Doctrine de
     # Symfony n'étend plus le tag `doctrine.event_subscriber` en un tag par
