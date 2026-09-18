@@ -23,18 +23,26 @@ final readonly class LocaleSubscriber implements EventSubscriberInterface
     {
         return [
             KernelEvents::REQUEST => [
-                ['onKernelRequest', 0],
+                ['onKernelRequest', -20],
             ],
         ];
     }
 
     public function onKernelRequest(RequestEvent $event): void
     {
+        if (!$event->isMainRequest()) {
+            return;
+        }
+
         $request = $event->getRequest();
 
         $user = $this->security->getUser();
 
         if (!$user instanceof User) {
+            return;
+        }
+
+        if (!$user->getLocale()) {
             return;
         }
 
