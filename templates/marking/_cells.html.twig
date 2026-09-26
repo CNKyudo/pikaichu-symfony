@@ -141,7 +141,7 @@
 
 <td class="has-text-centered has-text-weight-semibold">
     {% if taikai.scoring.usesArrowValues() %}
-            {{ score ? score.intermediateValue : 0}}
+            {{ score ? score.intermediateValue : 0}} / {{ score ? score.intermediateHits : 0 }}
     {% else %}
             {{ score ? score.intermediateHits : 0 }}
     {% endif %}
