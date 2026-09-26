@@ -10,6 +10,7 @@ use App\Form\ParticipatingDojoType;
 use App\Security\Voter\ParticipatingDojoVoter;
 use App\Security\Voter\TaikaiVoter;
 use App\Service\DrawService;
+use App\Service\UiMode;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -37,7 +38,7 @@ final class ParticipatingDojoController extends AbstractController
     }
 
     #[Route('/new', name: 'app_participating_dojo_new', methods: ['GET', 'POST'])]
-    public function new(#[MapEntity(id: 'taikaiId')] Taikai $taikai, Request $request): Response
+    public function new(#[MapEntity(id: 'taikaiId')] Taikai $taikai, Request $request, UiMode $uiMode): Response
     {
         $this->denyAccessUnlessGranted(TaikaiVoter::EDIT, $taikai);
 
@@ -52,6 +53,10 @@ final class ParticipatingDojoController extends AbstractController
             $this->entityManager->flush();
 
             $this->addFlash('success', 'participating_dojo.created');
+
+            if ($uiMode->isBeta()) {
+                return $this->redirectToRoute('app_taikai_show', ['id' => $taikai->getId(), 'tab' => 'clubs']);
+            }
 
             return $this->redirectToRoute('app_taikai_edit', ['id' => $taikai->getId()]);
         }
@@ -73,6 +78,7 @@ final class ParticipatingDojoController extends AbstractController
         #[MapEntity(id: 'taikaiId')] Taikai $taikai,
         #[MapEntity(id: 'id')] ParticipatingDojo $participatingDojo,
         Request $request,
+        UiMode $uiMode,
     ): Response {
         $this->assertBelongsTo($participatingDojo->getTaikai(), $taikai, 'Participating dojo does not belong to this taikai');
         $this->denyAccessUnlessGranted(ParticipatingDojoVoter::EDIT, $participatingDojo);
@@ -84,6 +90,10 @@ final class ParticipatingDojoController extends AbstractController
             $this->entityManager->flush();
 
             $this->addFlash('success', 'participating_dojo.updated');
+
+            if ($uiMode->isBeta()) {
+                return $this->redirectToRoute('app_taikai_show', ['id' => $taikai->getId(), 'tab' => 'clubs']);
+            }
 
             return $this->redirectToRoute('app_taikai_edit', ['id' => $taikai->getId()]);
         }
@@ -100,12 +110,20 @@ final class ParticipatingDojoController extends AbstractController
         #[MapEntity(id: 'taikaiId')] Taikai $taikai,
         #[MapEntity(id: 'id')] ParticipatingDojo $participatingDojo,
         Request $request,
+        UiMode $uiMode,
     ): RedirectResponse {
         $this->assertBelongsTo($participatingDojo->getTaikai(), $taikai, 'Participating dojo does not belong to this taikai');
         $this->denyAccessUnlessGranted(ParticipatingDojoVoter::DELETE, $participatingDojo);
 
         if (!$this->isCsrfTokenValid('delete'.$participatingDojo->getId(), (string) $request->request->get('_token'))) {
             $this->addFlash('error', 'participating_dojo.delete.invalid_token');
+
+            if ($uiMode->isBeta()) {
+                return $this->redirectToRoute('app_taikai_show', [
+                    'id' => $taikai->getId(),
+                    'tab' => 'clubs',
+                ]);
+            }
 
             return $this->redirectToRoute('app_taikai_edit', ['id' => $taikai->getId()]);
         }
@@ -123,6 +141,13 @@ final class ParticipatingDojoController extends AbstractController
                 'parameters' => ['%names%' => implode(', ', $names)],
             ]);
 
+            if ($uiMode->isBeta()) {
+                return $this->redirectToRoute('app_taikai_show', [
+                    'id' => $taikai->getId(),
+                    'tab' => 'clubs',
+                ]);
+            }
+
             return $this->redirectToRoute('app_taikai_edit', ['id' => $taikai->getId()]);
         }
 
@@ -130,6 +155,13 @@ final class ParticipatingDojoController extends AbstractController
         $this->entityManager->flush();
 
         $this->addFlash('success', 'participating_dojo.deleted');
+
+        if ($uiMode->isBeta()) {
+            return $this->redirectToRoute('app_taikai_show', [
+                'id' => $taikai->getId(),
+                'tab' => 'clubs',
+            ]);
+        }
 
         return $this->redirectToRoute('app_taikai_edit', ['id' => $taikai->getId()]);
     }

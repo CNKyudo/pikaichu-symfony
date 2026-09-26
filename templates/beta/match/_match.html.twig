@@ -1,0 +1,61 @@
+{% macro score(score, enteki) %}
+    {%- if enteki -%}
+        {{ score ? score.value ~ ' / ' ~ score.hits : '0 / 0' }}
+    {%- else -%}
+        {{ score ? score.hits : '0' }}
+    {%- endif -%}
+{% endmacro %}
+{% set enteki = taikai.scoring.value == 'enteki' %}
+<div class="box has-background-light p-2">
+    <table class="table is-fullwidth is-narrow">
+        <tbody>
+        <tr{% if match.isWinner(1) %} style="border-left: 3pt solid #3273dc;"{% endif %}>
+            <td>{{ match.team1 ? match.team1.shortname ~ ' (' ~ match.team1.index ~ ')' : '-' }}</td>
+            <td class="is-vcentered">
+                {% if match.team1 %}
+                    {% for participant in match.team1.participants %}
+                        <span class="tag has-background-info-light">{{ participant.displayName }}</span>
+                    {% endfor %}
+                {% endif %}
+            </td>
+            <td><strong>{{ _self.score(match.getScore(1), enteki) }}</strong></td>
+            <td rowspan="2" style="border-bottom: 0px">
+                <a class="button has-background-light is-small pb-1 pt-1"
+                   href="{{ path('app_match_edit', {taikaiId: taikai.id, id: match.id}) }}"
+                   title="{{ 'match.edit'|trans }}">
+                    <span class="icon is-small"><i class="fas fa-pen"></i></span>
+                </a>
+                {% if match.isAssigned %}
+                    <a class="button has-background-light is-small mt-1"
+                       href="{{ path('app_marking_show_match', {taikaiId: taikai.id, matchId: match.id}) }}"
+                       title="{{ 'match.marking_sheet'|trans }}">
+                        <span class="icon is-small"><i class="far fa-dot-circle"></i></span>
+                    </a>
+                {% endif %}
+                {% if match.isDecidable %}
+                    <form method="post"
+                          action="{{ path('app_match_select_winner', {taikaiId: taikai.id, id: match.id}) }}"
+                          onsubmit="return confirm('{{ 'match.decide_winner_confirm'|trans|e('js') }}')">
+                        <input type="hidden" name="_token" value="{{ csrf_token('match' ~ match.id) }}">
+                        <button class="button has-background-light is-small mt-1" type="submit"
+                                title="{{ 'match.decide_winner'|trans }}">
+                            <span class="icon is-small"><i class="fas fa-balance-scale"></i></span>
+                        </button>
+                    </form>
+                {% endif %}
+            </td>
+        </tr>
+        <tr{% if match.isWinner(2) %} style="border-left: 3pt solid #3273dc;"{% endif %}>
+            <td>{{ match.team2 ? match.team2.shortname ~ ' (' ~ match.team2.index ~ ')' : '-' }}</td>
+            <td>
+                {% if match.team2 %}
+                    {% for participant in match.team2.participants %}
+                        <span class="tag has-background-info-light">{{ participant.displayName }}</span>
+                    {% endfor %}
+                {% endif %}
+            </td>
+            <td class="is-vcentered"><strong>{{ _self.score(match.getScore(2), enteki) }}</strong></td>
+        </tr>
+        </tbody>
+    </table>
+</div>

@@ -9,6 +9,7 @@ use App\Entity\Taikai;
 use App\Enum\StaffRoleCode;
 use App\Form\StaffType;
 use App\Security\Voter\TaikaiVoter;
+use App\Service\UiMode;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -39,7 +40,7 @@ final class StaffController extends AbstractController
     }
 
     #[Route('/new', name: 'app_staff_new', methods: ['GET', 'POST'])]
-    public function new(#[MapEntity(id: 'taikaiId')] Taikai $taikai, Request $request): Response
+    public function new(#[MapEntity(id: 'taikaiId')] Taikai $taikai, Request $request, UiMode $uiMode): Response
     {
         $this->denyAccessUnlessGranted(TaikaiVoter::EDIT, $taikai);
 
@@ -62,6 +63,10 @@ final class StaffController extends AbstractController
 
             $this->addFlash('success', 'staff.created');
 
+            if ($uiMode->isBeta()) {
+                return $this->redirectToRoute('app_taikai_show', ['id' => $taikai->getId(), 'tab' => 'staffs']);
+            }
+
             return $this->redirectToRoute('app_taikai_edit', ['id' => $taikai->getId()]);
         }
 
@@ -82,6 +87,7 @@ final class StaffController extends AbstractController
         #[MapEntity(id: 'taikaiId')] Taikai $taikai,
         #[MapEntity(id: 'id')] Staff $staff,
         Request $request,
+        UiMode $uiMode,
     ): Response {
         $this->denyAccessUnlessGranted(TaikaiVoter::EDIT, $taikai);
         $this->assertBelongsTo($staff->getTaikai(), $taikai, 'Staff does not belong to this taikai');
@@ -101,6 +107,10 @@ final class StaffController extends AbstractController
 
             $this->addFlash('success', 'staff.updated');
 
+            if ($uiMode->isBeta()) {
+                return $this->redirectToRoute('app_taikai_show', ['id' => $taikai->getId(), 'tab' => 'staffs']);
+            }
+
             return $this->redirectToRoute('app_taikai_edit', ['id' => $taikai->getId()]);
         }
 
@@ -116,12 +126,20 @@ final class StaffController extends AbstractController
         #[MapEntity(id: 'taikaiId')] Taikai $taikai,
         #[MapEntity(id: 'id')] Staff $staff,
         Request $request,
+        UiMode $uiMode,
     ): RedirectResponse {
         $this->denyAccessUnlessGranted(TaikaiVoter::EDIT, $taikai);
         $this->assertBelongsTo($staff->getTaikai(), $taikai, 'Staff does not belong to this taikai');
 
         if (!$this->isCsrfTokenValid('delete'.$staff->getId(), (string) $request->request->get('_token'))) {
             $this->addFlash('error', 'staff.delete.invalid_token');
+
+            if ($uiMode->isBeta()) {
+                return $this->redirectToRoute('app_taikai_show', [
+                    'id' => $taikai->getId(),
+                    'tab' => 'staffs',
+                ]);
+            }
 
             return $this->redirectToRoute('app_taikai_edit', ['id' => $taikai->getId()]);
         }
@@ -133,6 +151,13 @@ final class StaffController extends AbstractController
         ) {
             $this->addFlash('error', 'staff.at_least_one_admin');
 
+            if ($uiMode->isBeta()) {
+                return $this->redirectToRoute('app_taikai_show', [
+                    'id' => $taikai->getId(),
+                    'tab' => 'staffs',
+                ]);
+            }
+
             return $this->redirectToRoute('app_taikai_edit', ['id' => $taikai->getId()]);
         }
 
@@ -140,6 +165,13 @@ final class StaffController extends AbstractController
         $this->entityManager->flush();
 
         $this->addFlash('success', 'staff.deleted');
+
+        if ($uiMode->isBeta()) {
+            return $this->redirectToRoute('app_taikai_show', [
+                'id' => $taikai->getId(),
+                'tab' => 'staffs',
+            ]);
+        }
 
         return $this->redirectToRoute('app_taikai_edit', ['id' => $taikai->getId()]);
     }

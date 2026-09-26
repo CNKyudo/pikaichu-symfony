@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'taikai.list'|trans }} · {{ app_name }}{% endblock %}
+
+{% block body %}
+<h1 class="title">{{ 'taikai.list'|trans }}</h1>
+
+<table class="table is-fullwidth">
+    <thead>
+    <tr class="has-text-centered">
+        <th>{{ 'taikai.name'|trans }}</th>
+        <th>{{ 'taikai.dates'|trans }}</th>
+        <th>&nbsp;</th>
+        <th class="has-text-right">
+            <a class="button is-small has-background-light" href="{{ path('app_taikai_new') }}" title="{{ 'taikai.new'|trans }}">
+                <span class="icon is-small"><i class="fas fa-plus"></i></span>
+                <span>{{ 'action.add'|trans }}</span>
+            </a>
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for taikai in pagination %}
+        <tr>
+            <td><a href="{{ path('app_taikai_show', {id: taikai.id}) }}">{{ taikai.name }}</a></td>
+            <td>
+                {{ taikai.startDate ? taikai.startDate|date('d/m/y') : '' }}
+                - {{ taikai.endDate ? taikai.endDate|date('d/m/y') : '' }}
+            </td>
+            <td>
+                <div class="tags has-addons">
+                    <span class="tag is-warning">{{ taikai.currentState.label|trans }}</span>
+                    <span class="tag is-dark">{{ taikai.form ? taikai.form.label|trans : '' }}</span>
+                    <span class="tag is-link">{{ taikai.scoring.label|trans }}</span>
+                    {% if taikai.category %}
+                        <span class="tag is-success">{{ taikai.category }}</span>
+                    {% endif %}
+                    <span class="tag is-info">{{ (taikai.distributed ? 'taikai.distributed' : 'taikai.distributed_local')|trans }}</span>
+                    <span class="tag is-primary">{{ taikai.participants|length }}</span>
+                </div>
+            </td>
+            <td class="has-text-right">
+                {{ include('taikai/_icons.html.twig', {taikai: taikai, size: 'is-small'}) }}
+            </td>
+        </tr>
+    {% else %}
+        <tr><td colspan="4" class="has-text-centered has-text-grey">{{ 'taikai.empty'|trans }}</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<div class="is-flex is-justify-content-center">{{ knp_pagination_render(pagination) }}</div>
+{% endblock %}

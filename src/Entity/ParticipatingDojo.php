@@ -167,7 +167,9 @@ class ParticipatingDojo implements \Stringable
 
     public function removeParticipant(Participant $participant): static
     {
-        $this->participants->removeElement($participant);
+        if ($this->participants->removeElement($participant)) {
+            $participant->setParticipatingDojo(null);
+        }
 
         return $this;
     }

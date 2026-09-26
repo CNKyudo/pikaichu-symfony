@@ -1,0 +1,33 @@
+{{ form_start(form) }}
+<div class="form-container {{ size|default('') }}">
+
+<div class="form-row">
+    <div class="form-question">
+        {{ form_label(form.dojo) }}
+    </div>
+    <div class="form-answer">
+        {{ form_widget(form.dojo) }}
+        {{ form_errors(form.dojo) }}
+    </div>
+</div>
+
+<div class="form-row">
+    <div class="form-question">
+        {{ form_label(form.displayName) }}
+    </div>
+    <div class="form-answer">
+        {{ form_widget(form.displayName) }}
+        {{ form_errors(form.displayName) }}
+        {{ form_help(form.displayName) }}
+    </div>
+</div>
+
+<div class="field is-grouped">
+    <div class="control"><button class="button has-background-light" type="submit">{{ 'action.save'|trans }}</button></div>
+    <div class="control">
+        <a class="button" href="{{ path('app_taikai_show', {id: taikai.id, tab: 'participating-dojos'}) }}">{{ 'action.back'|trans }}</a>
+    </div>
+</div>
+
+</div>
+{{ form_end(form) }}

@@ -1,0 +1,46 @@
+{# Participants d'une équipe, réordonnables par glisser-déposer.
+   Reprise de `participants/_list_in_team.html.erb`. #}
+<table class="table is-narrow is-hoverable is-fullwidth">
+    <thead>
+    <tr class="has-text-centered">
+        <th>{{ 'participant.firstname'|trans }}</th>
+        <th>{{ 'participant.lastname'|trans }}</th>
+        <th>{{ 'participant.club'|trans }}</th>
+        <th></th>
+        <th class="has-text-right">
+            <a class="button is-small has-background-light"
+               href="{{ path('app_participant_new', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id}) }}"
+               title="{{ 'participant.new'|trans }}">
+                <span class="icon is-small"><i class="fas fa-plus"></i></span>
+                <span>{{ 'action.add'|trans }}</span>
+            </a>
+        </th>
+    </tr>
+    </thead>
+    <tbody data-controller="reorder"
+           data-reorder-url-value="{{ path('app_team_participant_reorder', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id, id: team.id, participantId: 0}) }}">
+    {% for participant in team.participants %}
+        <tr data-reorder-id="{{ participant.id }}" data-reorder-token="{{ csrf_token('reorder' ~ participant.id) }}">
+            <td data-reorder-handle>{{ participant.firstname }}</td>
+            <td>{{ participant.lastname }}</td>
+            <td>{{ participant.club }}</td>
+            <td>{% if participant.kyudojin %}<i class="far fa-id-badge"></i>{% endif %}</td>
+            <td>
+                <a class="button is-small has-background-light"
+                   href="{{ path('app_participant_edit', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id, id: participant.id}) }}"
+                   title="{{ 'participant.edit'|trans }}">
+                    <span class="icon is-small"><i class="fas fa-pen"></i></span>
+                </a>
+                <form method="post" style="display:inline"
+                      action="{{ path('app_participant_delete', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id, id: participant.id}) }}"
+                      onsubmit="return confirm('{{ 'participant.delete.confirm'|trans|e('js') }}')">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ participant.id) }}">
+                    <button class="button is-small has-background-light" type="submit" title="{{ 'participant.destroy'|trans }}">
+                        <span class="icon is-small"><i class="fas fa-trash"></i></span>
+                    </button>
+                </form>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

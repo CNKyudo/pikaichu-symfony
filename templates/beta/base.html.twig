@@ -7,7 +7,9 @@
     <title>{% block title %}{{ app_name }}{% endblock %}</title>
 
     {{ include('_head_assets.html.twig') }}
-    {% block stylesheets %}{% endblock %}
+    {% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/beta.css') }}">
+    {% endblock %}
 </head>
 <body>
 <nav class="navbar has-background-info-light" role="navigation" aria-label="main navigation" data-controller="navbar">
@@ -47,11 +49,11 @@
             {% endif %}
             {% if app.user %}
                 <a class="navbar-item" href="{{ asset('docs/guide.pdf') }}" target="_blank">
-                    <span class="icon is-medium"><i class="fas fa-compass"></i></span>
+                    <span class="icon is-medium" ><i class="fas fa-compass"></i></span>
                     <span>{{ 'nav.guide'|trans }}</span>
                 </a>
                 <a class="navbar-item" href="{{ asset('docs/tutorial.pdf') }}" target="_blank">
-                    <span class="icon is-medium"><i class="fas fa-circle-question"></i></span>
+                    <span class="icon is-medium" ><i class="fas fa-circle-question"></i></span>
                     <span>{{ 'nav.tutorial'|trans }}</span>
                 </a>
                 <a class="navbar-item" href="{{ path('app_account_edit') }}">{{ 'nav.account'|trans }}</a>

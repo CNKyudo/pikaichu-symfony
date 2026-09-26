@@ -1,0 +1,20 @@
+{% extends 'taikai/_layout.html.twig' %}
+{% block title %}{{ 'staff.new'|trans }} · {{ app_name }}{% endblock %}
+{% block taikai_content %}
+<div class="columns">
+    <div class="column is-one-third is-offset-2">
+        <div class="card">
+            <div class="card-content">
+                <nav class="breadcrumb has-succeeds-separator" aria-label="breadcrumbs">
+                    <ul>
+                        <li><a href="{{ path('app_taikai_edit', {id: taikai.id}) }}">{{ taikai.shortname }}</a></li>
+                        <li class="is-active"><a aria-current="page">{{ 'action.add'|trans }}</a></li>
+                    </ul>
+                </nav>
+                <p class="title">{{ 'staff.new'|trans }}</p>
+                {{ include('staff/_form.html.twig') }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -9,6 +9,7 @@ use App\Entity\ParticipatingDojo;
 use App\Entity\Taikai;
 use App\Form\ParticipantType;
 use App\Service\ParticipantImporter;
+use App\Service\UiMode;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -90,6 +91,7 @@ final class ParticipantController extends AbstractController
         #[MapEntity(id: 'participatingDojoId')] ParticipatingDojo $participatingDojo,
         #[MapEntity(id: 'id')] Participant $participant,
         Request $request,
+        UiMode $uiMode,
     ): Response {
         $this->assertHostClub($taikai, $participatingDojo);
         $this->assertBelongsTo($participant->getParticipatingDojo(), $participatingDojo, 'Participant does not belong to this participating dojo');
@@ -108,6 +110,13 @@ final class ParticipantController extends AbstractController
 
             $this->addFlash('success', 'participant.updated');
 
+            if ($uiMode->isBeta()) {
+                return $this->redirectToRoute('app_taikai_show', [
+                    'id' => $taikai->getId(),
+                    'tab' => 'participants',
+                ]);
+            }
+
             return $this->redirectToHostClub($taikai, $participatingDojo);
         }
 
@@ -125,12 +134,20 @@ final class ParticipantController extends AbstractController
         #[MapEntity(id: 'participatingDojoId')] ParticipatingDojo $participatingDojo,
         #[MapEntity(id: 'id')] Participant $participant,
         Request $request,
+        UiMode $uiMode,
     ): RedirectResponse {
         $this->assertHostClub($taikai, $participatingDojo);
         $this->assertBelongsTo($participant->getParticipatingDojo(), $participatingDojo, 'Participant does not belong to this participating dojo');
 
         if (!$this->isCsrfTokenValid('delete'.$participant->getId(), (string) $request->request->get('_token'))) {
             $this->addFlash('error', 'participant.delete.invalid_token');
+
+            if ($uiMode->isBeta()) {
+                return $this->redirectToRoute('app_taikai_show', [
+                    'id' => $taikai->getId(),
+                    'tab' => 'participants',
+                ]);
+            }
 
             return $this->redirectToHostClub($taikai, $participatingDojo);
         }
@@ -139,6 +156,13 @@ final class ParticipantController extends AbstractController
         $this->entityManager->flush();
 
         $this->addFlash('success', 'participant.deleted');
+
+        if ($uiMode->isBeta()) {
+            return $this->redirectToRoute('app_taikai_show', [
+                'id' => $taikai->getId(),
+                'tab' => 'participants',
+            ]);
+        }
 
         return $this->redirectToHostClub($taikai, $participatingDojo);
     }
@@ -152,11 +176,19 @@ final class ParticipantController extends AbstractController
         #[MapEntity(id: 'participatingDojoId')] ParticipatingDojo $participatingDojo,
         Request $request,
         ParticipantImporter $importer,
+        UiMode $uiMode,
     ): RedirectResponse {
         $this->assertHostClub($taikai, $participatingDojo);
 
         if (!$this->isCsrfTokenValid('import'.$participatingDojo->getId(), (string) $request->request->get('_token'))) {
             $this->addFlash('error', 'participant.import.invalid_token');
+
+            if ($uiMode->isBeta()) {
+                return $this->redirectToRoute('app_taikai_show', [
+                    'id' => $taikai->getId(),
+                    'tab' => 'participants',
+                ]);
+            }
 
             return $this->redirectToHostClub($taikai, $participatingDojo);
         }
@@ -164,6 +196,13 @@ final class ParticipantController extends AbstractController
         $file = $request->files->get('excel');
         if (!$file instanceof UploadedFile) {
             $this->addFlash('error', 'participant.import.file_missing');
+
+            if ($uiMode->isBeta()) {
+                return $this->redirectToRoute('app_taikai_show', [
+                    'id' => $taikai->getId(),
+                    'tab' => 'participants',
+                ]);
+            }
 
             return $this->redirectToHostClub($taikai, $participatingDojo);
         }
@@ -194,6 +233,13 @@ final class ParticipantController extends AbstractController
                     '%names%' => implode(', ', $report->failed),
                     '%count%' => \count($report->failed),
                 ],
+            ]);
+        }
+
+        if ($uiMode->isBeta()) {
+            return $this->redirectToRoute('app_taikai_show', [
+                'id' => $taikai->getId(),
+                'tab' => 'participants',
             ]);
         }
 

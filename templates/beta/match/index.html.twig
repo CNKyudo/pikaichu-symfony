@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ 'match.title'|trans }} · {{ app_name }}{% endblock %}
+{% block body %}
+    <h1 class="title">{{ 'match.title'|trans }} — {{ taikai.shortname }}</h1>
+
+    <p class="mb-4">
+        <a class="button is-light" href="{{ path('app_taikai_show', {id: taikai.id}) }}">{{ 'match.back'|trans }}</a>
+    </p>
+
+    {# Niveaux : 3 = quarts de finale, 2 = demi-finales, 1 = finales (voir TaikaiMatch). #}
+    <div class="columns is-vcentered">
+        {% if byLevel[3] is defined %}
+            <div class="column is-one-third">
+                {% for match in byLevel[3] %}
+                    {{ include('match/_match.html.twig', {taikai: taikai, match: match}) }}
+                {% endfor %}
+            </div>
+        {% endif %}
+        <div class="column is-one-third">
+            {% if byLevel[2] is defined %}
+                {% for match in byLevel[2] %}
+                    {{ include('match/_match.html.twig', {taikai: taikai, match: match}) }}
+                    {% if loop.first %}<div class="mt-6 mb-6">&nbsp;</div>{% endif %}
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div class="column is-one-third">
+            <div class="mt-6 mb-6">&nbsp;</div>
+            {% if byLevel[1] is defined %}
+                {% for match in byLevel[1] %}
+                    {{ include('match/_match.html.twig', {taikai: taikai, match: match}) }}
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

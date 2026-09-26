@@ -75,12 +75,12 @@ class Taikai implements \Stringable
     #[ORM\Column(name: 'start_date', type: 'date_immutable', nullable: true)]
     #[Assert\NotNull]
     #[Gedmo\Versioned]
-    private ?\DateTimeImmutable $startDate = null;
+    private ?\DateTimeImmutable $startDate;
 
     #[ORM\Column(name: 'end_date', type: 'date_immutable', nullable: true)]
     #[Assert\NotNull]
     #[Gedmo\Versioned]
-    private ?\DateTimeImmutable $endDate = null;
+    private ?\DateTimeImmutable $endDate;
 
     #[ORM\Column(type: 'string', nullable: true, enumType: TaikaiForm::class)]
     #[Assert\NotNull]
@@ -148,6 +148,8 @@ class Taikai implements \Stringable
         $this->matches = new ArrayCollection();
         $this->transitions = new ArrayCollection();
         $this->events = new ArrayCollection();
+        $this->startDate = new \DateTimeImmutable('today');
+        $this->endDate = new \DateTimeImmutable('today');
     }
 
     public function getId(): ?int
