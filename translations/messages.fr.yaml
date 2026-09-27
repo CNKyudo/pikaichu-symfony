@@ -181,6 +181,8 @@ taikai:
     edit: Modification du Taikai
     overview: Vue d'ensemble de
     details: Informations
+    participant: Participant
+    team: Équipe
     participants_overview.dojo: Club hôte
     participants_overview.team: Équipe
     participants_overview.name: Nom

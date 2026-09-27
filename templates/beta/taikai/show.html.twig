@@ -60,7 +60,7 @@
     <div id="participants" class="tab-content {{ activeTab != 'participants' ? 'is-hidden' }}">
         <div class="card">
             <div class="card-content">
-                {{ include('taikai/_participants_overview.html.twig') }}
+                {{ include('participant/_overview.html.twig', {taikai: taikai}) }}
             </div>
         </div>
     </div>

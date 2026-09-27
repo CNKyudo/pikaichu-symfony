@@ -181,6 +181,8 @@ taikai:
     edit: Edit Taikai
     overview: Overview of
     details: Details
+    participant: Participant
+    team: Team
     participants_overview.dojo: Host club
     participants_overview.team: Team
     participants_overview.name: Name

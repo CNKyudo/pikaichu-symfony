@@ -1,0 +1,88 @@
+
+{% 
+    set beforeRegistration = taikai.isState(constant('App\\Enum\\TaikaiState::New'))
+    or taikai.isState(constant('App\\Enum\\TaikaiState::Registration'))
+%}
+
+<table class="table is-narrow is-hoverable is-fullwidth is-size-6">
+    <thead>
+    <tr class="has-text-centered">
+        {% if taikai.form and taikai.form.value == 'individual' %}
+            <th>{{ 'team.index'|trans }}</th>
+        {% else %}
+            <th>{{ 'team.index'|trans }}</th>
+            <th>{{ 'taikai.participants_overview.team'|trans }}</th>
+        {% endif %}
+        <th>{{ 'participant.firstname'|trans }}</th>
+        <th>{{ 'participant.lastname'|trans }}</th>
+        <th></th> <!--- if participant.kyudojin --->
+        <th>{{ 'participant.club'|trans }}</th>
+        <th>{{ 'action.actions'|trans }}</th>
+        <th>{{ 'taikai.participants_overview.dojo'|trans }}</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for participatingDojo in taikai.participatingDojos %}
+        {% if participatingDojo.participants|length == 0 %}
+            <tr>
+                {% if taikai.form and taikai.form.value == 'individual' %}
+                    <td colspan="6" class="has-text-centered has-text-grey">{{ 'participant.empty'|trans }}</td>
+                {% else %}
+                    <td colspan="7" class="has-text-centered has-text-grey">{{ 'participant.empty'|trans }}</td>
+                {% endif %}
+                <td>
+                    {{ include('participating_dojo/_partial_action.html.twig', {taikai: taikai, participatingDojo: participatingDojo, beforeRegistration: beforeRegistration}) }}
+                    {# <ul>
+                        <li>
+                            {{ participatingDojo.displayName }}
+                            {% if is_granted('PARTICIPATING_DOJO_EDIT', participatingDojo) and beforeRegistration %}
+                                <a class="button is-small has-background-light"
+                                href="{{ path('app_participant_new', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id}) }}"
+                                title="{{ 'participant.new'|trans }} ({{ participatingDojo.displayName }})">
+                                    <span class="icon is-small"><i class="fas fa-plus"></i></span>
+                                    <span>{{ 'taikai.participant'|trans }}</span>
+                                </a>
+                            {% endif %}
+                        </li>
+                        <li>
+                            {% if is_granted('PARTICIPATING_DOJO_EDIT', participatingDojo) and beforeRegistration %}
+                            {{ include('participant/_import_excel.html.twig', {taikai: taikai, participatingDojo: participatingDojo, size: 'is-small'}) }}
+                            {% endif %}
+                        </li>
+                    </ul> #}
+                </td>
+            </tr>
+
+        {% else %}
+
+            {% for team in participatingDojo.teams %}
+                {% for participant in team.participants %}
+                    <tr>
+                        {% if taikai.form and taikai.form.value == 'individual' %}
+                            <td>{{ participant.index }}</td>
+                        {% else %}
+                            {% if loop.first %}
+                                <td rowspan="{{ team.participants|length }}">{{ team.index }}</td>
+                                <td rowspan="{{ team.participants|length }}">{{ team.shortname }}</td>
+                            {% endif %}
+                        {% endif %}
+                        {{ include('participant/_partial_display.html.twig', {taikai: taikai, participatingDojo: participatingDojo, participant: participant, beforeRegistration: beforeRegistration}) }}
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+            {% for participant in participatingDojo.unteamedParticipants %}
+                <tr>
+                    {% if taikai.form and taikai.form.value == 'individual' %}
+                        <td>{{ participant.index }}</td>
+                    {% else %}
+                        <td>-</td>
+                        <td>-</td>
+                    {% endif %}
+                    {{ include('participant/_partial_display.html.twig', {taikai: taikai, participatingDojo: participatingDojo, participant: participant, beforeRegistration: beforeRegistration}) }}
+                </tr>
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+    </tbody>
+</table>
+
