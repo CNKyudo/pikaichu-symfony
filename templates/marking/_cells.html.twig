@@ -10,16 +10,66 @@
 <td class="has-text-centered">
     {% if score and score.firstEmptyResult %}
         <div class="buttons has-addons are-small" style="justify-content:center">
-            {% for status in ['hit', 'miss', 'unknown'] %}
-                <form method="post" style="display:inline"
-                      action="{{ path('app_marking_add', {taikaiId: taikai.id, participantId: participant.id}) }}">
-                    <input type="hidden" name="status" value="{{ status }}">
-                    {% if match %}<input type="hidden" name="matchId" value="{{ match.id }}">{% endif %}
-                    <button class="button is-small result-glyph" type="submit" title="{{ ('marking.status.' ~ status)|trans }}">
-                        {{ status == 'hit' ? '◯' : (status == 'miss' ? '✕' : '?') }}
-                    </button>
+            {% if taikai.scoring.usesArrowValues() %}
+                {# Enteki: numeric value + status #}
+                {% for value in [0, 3, 5, 7, 9, 10] %}
+                    <form method="post"
+                        style="display:inline"
+                        action="{{ path('app_marking_add', {
+                            taikaiId: taikai.id,
+                            participantId: participant.id
+                        }) }}">
+
+                        <input type="hidden" name="status" value="hit">
+                        <input type="hidden" name="value" value="{{ value }}">
+
+                        {% if match %}
+                            <input type="hidden" name="matchId" value="{{ match.id }}">
+                        {% endif %}
+
+                        <button class="button is-small result-glyph" type="submit" title="{{ ('marking.status.' ~ value)|trans }}" > {{ value }} </button>
+                    </form>
+                {% endfor %}
+
+                {# Unknown arrow #}
+                <form method="post"
+                    style="display:inline"
+                    action="{{ path('app_marking_add', {
+                        taikaiId: taikai.id,
+                        participantId: participant.id
+                    }) }}">
+
+                    <input type="hidden" name="status" value="unknown">
+
+                    {% if match %}
+                        <input type="hidden" name="matchId" value="{{ match.id }}">
+                    {% endif %}
+
+                    <button class="button is-small result-glyph" type="submit" title="{{ 'marking.status.unknown'|trans }}" > ? </button>
                 </form>
-            {% endfor %}
+
+            {% else %}
+                {# Kinteki: hit / miss / unknown #}
+                {% for status in ['hit', 'miss', 'unknown'] %}
+                    <form method="post"
+                        style="display:inline"
+                        action="{{ path('app_marking_add', {
+                            taikaiId: taikai.id,
+                            participantId: participant.id
+                        }) }}">
+
+                        <input type="hidden" name="status" value="{{ status }}">
+
+                        {% if match %}
+                            <input type="hidden" name="matchId" value="{{ match.id }}">
+                        {% endif %}
+
+                        <button class="button is-small result-glyph" type="submit" title="{{ ('marking.status.' ~ status)|trans }}" >
+                            {{ status == 'hit' ? '◯' : (status == 'miss' ? '✕' : '?') }}
+                        </button>
+                    </form>
+                {% endfor %}
+            {% endif %}
         </div>
     {% endif %}
 </td>
@@ -30,6 +80,13 @@
     {% set hasUnknown = roundResults|filter(res => res.isUnknown)|length > 0 %}
     {% set finalized = score and score.isRoundFinalized(r) %}
     {% set hitCount = roundResults|filter(res => res.status and res.status.value == 'hit')|length %}
+    {% set valueCount = 0 %}
+    {% for res in roundResults %}
+        {% if res.status and res.status.value == 'hit' and res.value is not null %}
+            {% set valueCount = valueCount + res.value %}
+        {% endif %}
+    {% endfor %}
+
 
     <td class="has-text-left">
         {% for result in roundResults %}
@@ -37,14 +94,26 @@
                 {# Pas encore saisi : un espace réservé, pas de point de remplissage. #}
                 <span class="icon is-small">&nbsp;</span>
             {% elseif result.isFinal %}
-                <span class="button is-small is-light result-glyph" style="padding-left: 3pt; padding-right: 3pt; margin-right: 1pt">{{ result.status.glyph }}</span>
+                <span class="button is-small is-light result-glyph" style="padding-left: 3pt; padding-right: 3pt; margin-right: 1pt">
+                    {% if result.value is not null %}
+                        {{ result.value }}
+                    {% else %}
+                        {{ result.status.glyph }}
+                    {% endif %}
+                </span>
             {% else %}
                 {# Tant que la série n'est pas validée, un clic fait tourner la marque. #}
                 <form method="post" style="display:inline"
                       action="{{ path('app_marking_rotate', {taikaiId: taikai.id, resultId: result.id}) }}">
                     <input type="hidden" name="_token" value="{{ csrf_token('rotate' ~ result.id) }}">
                     <button class="button is-small is-light is-link result-glyph" type="submit"
-                            style="padding-left: 3pt; padding-right: 3pt; margin-right: 1pt">{{ result.status.glyph }}</button>
+                            style="padding-left: 3pt; padding-right: 3pt; margin-right: 1pt">
+                        {% if result.value is not null %}
+                            {{ result.value }}
+                        {% else %}
+                            {{ result.status.glyph }}
+                        {% endif %}
+                    </button>
                 </form>
             {% endif %}
         {% endfor %}
@@ -61,7 +130,19 @@
             <span class="tag is-success is-light ml-2">✓</span>
         {% endif %}
     </td>
-    <td class="has-text-weight-bold has-text-centered">{{ hitCount }}</td>
+    <td class="has-text-weight-bold has-text-centered">
+        {% if taikai.scoring.usesArrowValues() %}
+                {{ valueCount }}
+        {% else %}
+                {{ hitCount }}
+        {% endif %}
+    </td>
 {% endfor %}
 
-<td class="has-text-centered has-text-weight-semibold">{{ score ? score.intermediateHits : 0 }}</td>
+<td class="has-text-centered has-text-weight-semibold">
+    {% if taikai.scoring.usesArrowValues() %}
+            {{ score ? score.intermediateValue : 0}} / {{ score ? score.intermediateHits : 0 }}
+    {% else %}
+            {{ score ? score.intermediateHits : 0 }}
+    {% endif %}
+</td>

@@ -96,6 +96,7 @@ final class AppFixtures extends Fixture implements DependentFixtureInterface, Fi
             'KKP' => $this->createDojo('KKP', 'Kyudo Kai Paris', 'Paris'),
             'DNK' => $this->createDojo('DNK', 'Dojo Nice Kyudo', 'Nice'),
             'LKC' => $this->createDojo('LKC', 'Lyon Kyudo Club', 'Lyon'),
+            'MJS' => $this->createDojo('MJS', 'Meiji Jingu Shrine', 'Tokyo'),
         ];
         foreach ($dojos as $dojo) {
             $manager->persist($dojo);
@@ -112,6 +113,7 @@ final class AppFixtures extends Fixture implements DependentFixtureInterface, Fi
         $this->createNewTaikai('DTN-nouveau', $admin, $dojos['KTLG']);
         $this->createRegistrationTaikai('DTN-inscription', $admin, $chairman, $referee, $dojos['AKVM'], $dojos['KKP']);
         $this->createMarkingTaikai('DTN-marquage', $admin, $chairman, $referee, $dojos['DNK']);
+        $this->createEntekiMarkingTaikai('DTN-marquage-enteki', $admin, $chairman, $referee, $dojos['MJS']);
         $this->createTieBreakTaikai('DTN-egalite', $admin, $chairman, $referee, $dojos['LKC']);
         $this->createDoneTaikai('DTN-termine', $admin, $chairman, $referee, $dojos['KTLG']);
         $this->createTeamRegistrationTaikai('DTN-equipes', $admin, $chairman, $referee, $dojos['KKP'], $dojos['DNK']);
@@ -188,6 +190,48 @@ final class AppFixtures extends Fixture implements DependentFixtureInterface, Fi
         // Série 2 : seul le premier participant a commencé, sans valider.
         $this->markingService->addResult($participants[0], ResultStatus::Hit);
         $this->markingService->addResult($participants[0], ResultStatus::Miss);
+    }
+
+    /** Étape « Marquage » pour les tournois Enteki : une série entièrement validée, une seconde en cours. */
+    private function createEntekiMarkingTaikai(
+        string $shortname,
+        User $admin,
+        User $chairman,
+        User $referee,
+        Dojo $dojo,
+    ): void {
+        $taikai = $this->createTaikai($shortname, 'Marquage Enteki en cours', TaikaiForm::Individual, TaikaiScoring::Enteki);
+
+        $this->staffRequiredRoles($taikai, $admin, $chairman, $referee);
+
+        $host = $this->addHostDojo($taikai, $dojo, 'MJS');
+        $participants = $this->addArchers($host, 4);
+
+        $this->entityManager->flush();
+
+        $this->stateMachine->transitionTo($taikai, TaikaiState::Registration, $admin);
+        $this->drawService->draw($host);
+        $this->stateMachine->transitionTo($taikai, TaikaiState::Marking, $admin);
+
+        $values = [0, 3, 5, 7, 9, 10];
+        // Série 1 : entièrement tirée et validée pour tout le monde.
+        $round = 1;
+        foreach ($participants as $participantIndex => $participant) {
+            for ($arrow = 0; $arrow < $taikai->getNumArrows(); ++$arrow) {
+                $value = $values[($arrow + $participantIndex) % \count($values)];
+
+                $this->markingService->addResult($participant, ResultStatus::Hit, $value);
+            }
+
+            $this->markingService->finalizeRound($participant, $round);
+        }
+
+        // Série 2 : seul le troisième participant a commencé, sans valider.
+        for ($arrow = 0; $arrow < 2; ++$arrow) {
+            $value = $values[$arrow];
+
+            $this->markingService->addResult($participants[2], ResultStatus::Hit, $value);
+        }
     }
 
     /** Étape « Tie-break » : tous ex æquo, à départager depuis l'écran dédié. */
@@ -286,8 +330,12 @@ final class AppFixtures extends Fixture implements DependentFixtureInterface, Fi
         $this->entityManager->flush();
     }
 
-    private function createTaikai(string $shortname, string $description, TaikaiForm $form): Taikai
-    {
+    private function createTaikai(
+        string $shortname,
+        string $description,
+        TaikaiForm $form,
+        TaikaiScoring $scoring = TaikaiScoring::Kinteki,
+    ): Taikai {
         $taikai = new Taikai();
         $taikai->setShortname($shortname)
             ->setName('Taikai '.$shortname)
@@ -295,7 +343,7 @@ final class AppFixtures extends Fixture implements DependentFixtureInterface, Fi
             ->setStartDate(new \DateTimeImmutable('today'))
             ->setEndDate(new \DateTimeImmutable('today'))
             ->setForm($form)
-            ->setScoring(TaikaiScoring::Kinteki)
+            ->setScoring($scoring)
             ->setTotalNumArrows(12)
             ->setNumTargets(6)
             ->setTachiSize(3)

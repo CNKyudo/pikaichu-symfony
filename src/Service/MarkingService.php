@@ -13,6 +13,7 @@ use App\Entity\TaikaiEvent;
 use App\Entity\TaikaiMatch;
 use App\Entity\User;
 use App\Enum\ResultStatus;
+use App\Enum\TaikaiScoring;
 use App\Exception\MarkingException;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -80,14 +81,31 @@ final readonly class MarkingService
             throw MarkingException::noEmptyResult();
         }
 
-        // « Incertain » ne fait partie du cycle que tant qu'il reste des flèches à tirer.
-        $allMarked = null === $score->getFirstEmptyResult();
-        $result->rotateStatus($allMarked);
+        $taikai = $score->getTaikai();
+
+        switch ($taikai->getScoring()) {
+            case TaikaiScoring::Kinteki:
+                $this->rotateKintekiResult($result, $score);
+                break;
+
+            case TaikaiScoring::Enteki:
+                $result->rotateValue();
+                break;
+        }
+
 
         $this->recalculate($score);
         $this->entityManager->flush();
 
         return $result;
+    }
+
+    private function rotateKintekiResult(Result $result, Score $score): void
+    {
+        // « Incertain » ne fait partie du cycle que tant qu'il reste des flèches à tirer.
+        $allMarked = null === $score->getFirstEmptyResult();
+
+        $result->rotateStatus($allMarked);
     }
 
     /**
