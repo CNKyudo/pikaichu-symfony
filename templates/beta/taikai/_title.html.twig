@@ -1,0 +1,16 @@
+{# Bandeau d'identification du taikai, affiché sur tous les écrans de gestion. #}
+<nav class="level">
+    <div class="level-item has-text-centered">
+        <p class="subtitle is-5">
+            <b>{{ taikai.shortname }}</b>
+            &#8212; {{ taikai.startDate ? taikai.startDate|date('d/m/Y') : '' }} - {{ taikai.endDate ? taikai.endDate|date('d/m/Y') : '' }}
+            &#8212; {{ taikai.scoring.label|trans }}
+            &#8212; {{ taikai.form ? taikai.form.label|trans : '' }}
+            &#8212; {{ (taikai.distributed ? 'taikai.distributed' : 'taikai.distributed_local')|trans }}
+            &#8212; {{ 'taikai.title.total_num_arrows'|trans({'%count%': taikai.totalNumArrows}) }}
+            {% if taikai.category %}
+                &#8212; {{ 'taikai.title.category'|trans({'%category%': taikai.category}) }}
+            {% endif %}
+        </p>
+    </div>
+</nav>

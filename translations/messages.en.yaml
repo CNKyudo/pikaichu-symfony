@@ -7,6 +7,9 @@ nav:
     logout: Sign out
     register: Sign up
     account: My account
+    ui:
+        classic: Classic
+        beta: Beta
 
 action:
     save: Save
@@ -408,6 +411,7 @@ staff:
     user.required_for_role: This role must be attached to a user account.
     participating_dojo.required_for_role: This role must be attached to a host dojo.
     at_least_one_admin: The taikai must keep at least one administrator.
+    rule: The staff must include at least a Chairman, a Shajo Referee and a Target Referee.
     created: The staff member has been added.
     updated: The staff member has been updated.
     deleted: The staff member has been removed.

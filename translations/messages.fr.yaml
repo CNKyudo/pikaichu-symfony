@@ -7,7 +7,10 @@ nav:
     logout: Déconnexion
     register: Inscription
     account: Mon compte
-
+    ui:
+        classic: Classique
+        beta: Beta
+        
 action:
     save: Sauvegarder
     back: Retour
@@ -408,6 +411,7 @@ staff:
     user.required_for_role: Ce rôle doit être rattaché à un compte utilisateur.
     participating_dojo.required_for_role: Ce rôle doit être rattaché à un club hôte.
     at_least_one_admin: Le taikai doit conserver au moins un administrateur.
+    rule: Le staff doit disposer au minimum d'un Directeur de tournoi, d'un Juge de Shajo et d'un Juge de Cible.
     created: Le membre du staff a bien été ajouté.
     updated: Le membre du staff a bien été modifié.
     deleted: Le membre du staff a bien été retiré.

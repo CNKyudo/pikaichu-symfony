@@ -116,6 +116,19 @@ final class ParticipantCrudTest extends WebTestCase
         self::assertCount(0, $this->entityManager->getRepository(Participant::class)->findAll());
     }
 
+    public function testRemovingParticipantClearsItsParticipatingDojoAssociation(): void
+    {
+        [, $participatingDojo] = $this->createContext();
+        $participant = new Participant();
+
+        $participatingDojo->addParticipant($participant);
+        self::assertSame($participatingDojo, $participant->getParticipatingDojo());
+
+        $participatingDojo->removeParticipant($participant);
+
+        self::assertNull($participant->getParticipatingDojo());
+    }
+
     /**
      * Rails recopie l'identité du licencié sélectionné : le prénom, le nom et le
      * club saisis à la main sont écrasés.

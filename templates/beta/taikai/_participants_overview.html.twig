@@ -1,0 +1,49 @@
+{# Vue d'ensemble des participants groupés par club hôte. #}
+{% if taikai.form and taikai.form.value == 'individual' %}
+    {{ include('taikai/_participants_individual.html.twig', {taikai: taikai}) }}
+{% else %}
+    <table class="table is-narrow">
+        <thead>
+        <tr class="has-text-centered">
+            <th>{{ 'taikai.participants_overview.dojo'|trans }}</th>
+            {% if taikai.form and taikai.form.value == 'individual' %}
+                <th>{{ 'team.index'|trans }}</th>
+            {% else %}
+                <th>{{ 'team.index'|trans }}</th>
+                <th>{{ 'taikai.participants_overview.team'|trans }}</th>
+            {% endif %}
+            <th>{{ 'taikai.participants_overview.name'|trans }}</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+
+        {% for participatingDojo in taikai.participatingDojos %}
+            {% for team in participatingDojo.teams %}
+                {% for participant in team.participants %}
+                    <tr>
+                        {% if loop.parent.loop.first and loop.first %}
+                            <td rowspan="{{ participatingDojo.participants|length }}">{{ participatingDojo.displayName }}</td>
+                        {% endif %}
+                        {% if loop.first %}
+                            <td rowspan="{{ team.participants|length }}">{{ team.index }}</td>
+                            <td rowspan="{{ team.participants|length }}">{{ team.shortname }}</td>
+                        {% endif %}
+                        <td>{{ participant.displayName }}{{ participant.club ? ' (' ~ participant.club ~ ')' : '' }}</td>
+                        <td>{{ include('taikai/_participants_overview_delete.html.twig', {taikai: taikai, participatingDojo: participatingDojo, participant: participant}) }}</td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+            {% for participant in participatingDojo.unteamedParticipants %}
+                <tr>
+                    <td></td>
+                    <td>-</td>
+                    <td>{{ participant.displayName }}{{ participant.club ? ' (' ~ participant.club ~ ')' : '' }}</td>
+                    <td>{{ include('taikai/_participants_overview_delete.html.twig', {taikai: taikai, participatingDojo: participatingDojo, participant: participant}) }}</td>
+                </tr>
+            {% endfor %}
+        {% endfor %}
+ 
+        </tbody>
+    </table>
+{% endif %}

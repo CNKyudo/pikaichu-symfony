@@ -1,0 +1,87 @@
+{% extends 'taikai/_layout.html.twig' %}
+
+{% block title %}{{ taikai.shortname }} · {{ app_name }}{% endblock %}
+
+{% block taikai_content %}
+{% set activeTab = app.request.query.get('tab', 'participants') %}
+<div data-controller="tabs">
+
+    <div class="tabs is-centered">
+        <ul>
+             <li class="{{ activeTab == 'details' ? 'is-active' }}">
+                <a data-tab="details" data-action="click->tabs#select">
+                    {{ 'taikai.details'|trans }}
+                </a>
+            </li>
+
+            <li class="{{ activeTab == 'participants' ? 'is-active' }}">
+                <a data-tab="participants" data-action="click->tabs#select">
+                    {{ 'taikai.participants'|trans }}
+                </a>
+            </li>
+
+            <li class="{{ activeTab == 'clubs' ? 'is-active' }}">
+                <a data-tab="clubs" data-action="click->tabs#select">
+                    {{ 'taikai.host_clubs'|trans }}
+                </a>
+            </li>
+
+            <li class="{{ activeTab == 'staffs' ? 'is-active' }}">
+                <a data-tab="staffs" data-action="click->tabs#select">
+                    {{ 'taikai.staff'|trans }}
+                </a>
+            </li>
+        </ul>
+        {{ include('taikai/_icons.html.twig', {taikai: taikai, size: 'is-small'}) }}
+    </div>
+
+    <div id="details" class="tab-content {{ activeTab != 'details' ? 'is-hidden' }}">
+        <div class="card">
+            <div class="card-content">
+                {% set size = 'is-small' %}
+                {% if is_granted('TAIKAI_EDIT', taikai) %}
+                    <a class="button {{ size }} has-background-light ml-3" href="{{ path('app_taikai_edit', {id: taikai.id}) }}" title="{{ 'action.edit'|trans }}">
+                        <span class="icon {{ size }}"><i class="fas fa-pen"></i></span>
+                    </a>
+                    <form method="post" action="{{ path('app_taikai_delete', {id: taikai.id}) }}" style="display:inline"
+                        onsubmit="return confirm('{{ 'taikai.delete.confirm'|trans|e('js') }}');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ taikai.id) }}">
+                        <button class="button {{ size }} has-background-light" type="submit" title="{{ 'taikai.destroy'|trans }}">
+                            <span class="icon {{ size }}"><i class="fas fa-trash"></i></span>
+                        </button>
+                    </form>
+                {% endif %}
+
+                {{ include('taikai/_taikai_overview.html.twig') }}
+            </div>
+        </div>
+    </div> 
+
+    <div id="participants" class="tab-content {{ activeTab != 'participants' ? 'is-hidden' }}">
+        <div class="card">
+            <div class="card-content">
+                {{ include('taikai/_participants_overview.html.twig') }}
+            </div>
+        </div>
+    </div>
+
+    <div id="clubs" class="tab-content {{ activeTab != 'clubs' ? 'is-hidden' }}">
+        <div class="card">
+            <div class="card-content">
+                {{ include('participating_dojo/_list.html.twig') }}
+            </div>
+        </div>
+    </div>
+
+    <div id="staffs" class="tab-content {{ activeTab != 'staffs' ? 'is-hidden' }}">
+        <div class="card">
+            <div class="card-content">
+                <p class="has-text-grey mb-3">{{ 'staff.rule'|trans }}</p>
+                {{ include('staff/_list.html.twig') }}
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ include('taikai/_timeline.html.twig') }}
+{% endblock %}

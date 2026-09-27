@@ -1,0 +1,14 @@
+{{ form_start(form, {attr: {'data-controller': 'identity-autofill'}}) }}
+{{ form_row(form.user, {attr: {'data-identity-autofill-target': 'source', 'data-action': 'change->identity-autofill#fill'}}) }}
+{{ form_row(form.firstname, {attr: {'data-identity-autofill-target': 'firstname'}}) }}
+{{ form_row(form.lastname, {attr: {'data-identity-autofill-target': 'lastname'}}) }}
+{{ form_row(form.role) }}
+{{ form_row(form.participatingDojo) }}
+
+<div class="field is-grouped">
+    <div class="control"><button class="button has-background-light" type="submit">{{ 'action.save'|trans }}</button></div>
+    <div class="control">
+        <a class="button" href="{{ path('app_taikai_show', {id: taikai.id, tab: 'staffs'}) }}">{{ 'action.back'|trans }}</a>
+    </div>
+</div>
+{{ form_end(form) }}

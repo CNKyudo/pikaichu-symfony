@@ -101,7 +101,7 @@ class Participant implements \Stringable
         return $this->participatingDojo;
     }
 
-    public function setParticipatingDojo(ParticipatingDojo $participatingDojo): static
+    public function setParticipatingDojo(?ParticipatingDojo $participatingDojo): static
     {
         $this->participatingDojo = $participatingDojo;
 

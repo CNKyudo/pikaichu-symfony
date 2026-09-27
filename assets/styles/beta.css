@@ -1,0 +1,49 @@
+.result-glyph {
+    font-size: 1rem;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.form-separator {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 1.5rem 0;
+    color: #ccc;
+}
+
+.form-separator::before,
+.form-separator::after {
+    content: "";
+    flex: 1;
+    border-top: 1px solid #ccc;
+}
+
+.form-separator span {
+    color: #ccc;
+}
+
+.navbar-item .icon {
+    margin-right: -0.5rem;
+}
+
+.tabs li.is-active a {
+    font-weight: bold;
+    color: #363636;
+}
+
+.form-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 15px;
+}
+
+.form-question {
+    width: 200px;
+    font-weight: 600;
+}
+
+.form-answer {
+    flex: 1;
+}

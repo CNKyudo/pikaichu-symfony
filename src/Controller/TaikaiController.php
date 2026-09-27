@@ -20,6 +20,7 @@ use App\Service\MatchService;
 use App\Service\TaikaiExportService;
 use App\Service\TaikaiGenerationService;
 use App\Service\TaikaiStateMachine;
+use App\Service\UiMode;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -97,10 +98,26 @@ final class TaikaiController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_taikai_show', requirements: ['id' => '\d+'], methods: ['GET'])]
-    public function show(Taikai $taikai): Response
+    public function show(Request $request, Taikai $taikai, UiMode $uiMode): Response
+    {
+        if ($uiMode->isBeta()) {
+            return $this->render('beta/taikai/show.html.twig', [
+                'taikai' => $taikai,
+                'tab' => $request->query->get('tab', 'participants'),
+            ]);
+        }
+
+        return $this->render('taikai/show.html.twig', [
+            'taikai' => $taikai,
+        ]);
+    }
+
+    #[Route('/{id}', name: 'app_taikai_show_beta', requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function show_beta(Request $request, Taikai $taikai): Response
     {
         return $this->render('taikai/show.html.twig', [
             'taikai' => $taikai,
+            'tab' => $request->query->get('tab', 'participants'),
         ]);
     }
 

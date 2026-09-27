@@ -1,0 +1,12 @@
+{# Gabarit commun aux écrans de gestion d'un taikai (bandeau + frise
+   d'avancement), repris de la layout Rails `taikai` (`layout "taikai"`),
+   appliquée à `taikais#show/edit`, `staffs`, `participating_dojos`,
+   `teams`, `teaming`, `participants`, `rectification` et `leaderboard`. #}
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {{ include('taikai/_title.html.twig') }}
+    {{ include('taikai/_state_bar.html.twig') }}
+    <hr>
+    {% block taikai_content %}{% endblock %}
+{% endblock %}

@@ -1,0 +1,70 @@
+<div class="columns">
+    <div class="column">
+        <strong>{{ 'taikai.shortname'|trans }}</strong>
+        <p>{{ taikai.shortname }}</p>
+    </div>
+
+    <div class="column">
+        <strong>{{ 'taikai.name'|trans }}</strong>
+        <p>{{ taikai.name }}</p>
+    </div>
+</div>
+
+<div class="field">
+    <strong>{{ 'taikai.description'|trans }}</strong>
+    <p>{{ taikai.description|nl2br }}</p>
+</div>
+
+<div class="columns">
+    <div class="column">
+        <strong>{{ 'taikai.start_date'|trans }}</strong>
+        <p>{{ taikai.startDate ? taikai.startDate|date('d/m/Y') : '' }}</p>
+    </div>
+
+    <div class="column">
+        <strong>{{ 'taikai.end_date'|trans }}</strong>
+        <p>{{ taikai.endDate ? taikai.endDate|date('d/m/Y') : '' }}</p>
+    </div>
+</div>
+
+<div class="columns">
+    <div class="column">
+        <strong>{{ 'taikai.scoring'|trans }}</strong>
+        <p>{{ taikai.scoring ? taikai.scoring.label() : '' }}</p>
+    </div>
+
+    <div class="column">
+        <strong>{{ 'taikai.form'|trans }}</strong>
+        <p>{{ taikai.form ? taikai.form.label() : '' }}</p>
+    </div>
+</div>
+
+<div class="columns">
+    <div class="column">
+        <strong>{{ 'taikai.total_num_arrows'|trans }}</strong>
+        <p>{{ taikai.totalNumArrows }}</p>
+    </div>
+
+    <div class="column">
+        <strong>{{ 'taikai.num_targets'|trans }}</strong>
+        <p>{{ taikai.numTargets }}</p>
+    </div>
+</div>
+
+<div class="columns">
+    <div class="column">
+        <strong>{{ 'taikai.tachi_size'|trans }}</strong>
+        <p>{{ taikai.tachiSize }}</p>
+    </div>
+
+    <div class="column">
+        <strong>{{ 'taikai.category'|trans }}</strong>
+        <p>{{ taikai.category }}</p>
+    </div>
+</div>
+
+<div class="field">
+    <strong>{{ 'taikai.distributed'|trans }}</strong>
+    <p>{{ taikai.distributed ? 'Oui' : 'Non' }}</p>
+</div>
+
