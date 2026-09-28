@@ -54,7 +54,9 @@
             </tr>
 
         {% else %}
-
+            
+            {% set firstRow = true %}
+            {% set rowCount = participatingDojo.participants|length %}
             {% for team in participatingDojo.teams %}
                 {% for participant in team.participants %}
                     <tr>
@@ -67,6 +69,12 @@
                             {% endif %}
                         {% endif %}
                         {{ include('participant/_partial_display.html.twig', {taikai: taikai, participatingDojo: participatingDojo, participant: participant, beforeRegistration: beforeRegistration}) }}
+                        {% if firstRow %}
+                            <td rowspan="{{ rowCount }}">
+                                {{ include('participating_dojo/_partial_action.html.twig', {taikai: taikai, participatingDojo: participatingDojo, beforeRegistration: beforeRegistration}) }}
+                                </td>
+                            {% set firstRow = false %}
+                        {% endif %}
                     </tr>
                 {% endfor %}
             {% endfor %}
@@ -79,6 +87,12 @@
                         <td>-</td>
                     {% endif %}
                     {{ include('participant/_partial_display.html.twig', {taikai: taikai, participatingDojo: participatingDojo, participant: participant, beforeRegistration: beforeRegistration}) }}
+                    {% if firstRow %}
+                        <td rowspan="{{ rowCount }}">
+                            {{ include('participating_dojo/_partial_action.html.twig', {taikai: taikai, participatingDojo: participatingDojo, beforeRegistration: beforeRegistration}) }}
+                            </td>
+                        {% set firstRow = false %}
+                    {% endif %}
                 </tr>
             {% endfor %}
 
