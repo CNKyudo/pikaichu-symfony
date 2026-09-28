@@ -1,10 +1,27 @@
 
+{% set canAddHost = taikai.distributed or taikai.participatingDojos|length == 0 %}
 {% 
     set beforeRegistration = taikai.isState(constant('App\\Enum\\TaikaiState::New'))
     or taikai.isState(constant('App\\Enum\\TaikaiState::Registration'))
 %}
 
-<table class="table is-narrow is-hoverable is-fullwidth is-size-6">
+{% if taikai.participatingDojos|length == 0 %}
+
+    <div class="has-text-centered">
+        {{ 'participant.empty'|trans }}
+        {% if beforeRegistration and is_granted('TAIKAI_EDIT', taikai) and canAddHost %}
+            <a class="button is-small has-background-light"
+                href="{{ path('app_participating_dojo_new', {taikaiId: taikai.id}) }}"
+                title="{{ 'participating_dojo.new'|trans }}">
+                <span class="icon is-small"><i class="fas fa-plus"></i></span>
+                <span>{{ 'taikai.team'|trans }}</span>
+            </a>
+        {% endif %}
+    </div>
+
+{% else %}
+
+<table class="participants-overview-table table is-narrow is-hoverable is-fullwidth">
     <thead>
     <tr class="has-text-centered">
         {% if taikai.form and taikai.form.value == 'individual' %}
@@ -24,6 +41,7 @@
     <tbody>
     {% for participatingDojo in taikai.participatingDojos %}
         {% if participatingDojo.participants|length == 0 %}
+
             <tr>
                 {% if taikai.form and taikai.form.value == 'individual' %}
                     <td colspan="6" class="has-text-centered has-text-grey">{{ 'participant.empty'|trans }}</td>
@@ -32,24 +50,6 @@
                 {% endif %}
                 <td>
                     {{ include('participating_dojo/_partial_action.html.twig', {taikai: taikai, participatingDojo: participatingDojo, beforeRegistration: beforeRegistration}) }}
-                    {# <ul>
-                        <li>
-                            {{ participatingDojo.displayName }}
-                            {% if is_granted('PARTICIPATING_DOJO_EDIT', participatingDojo) and beforeRegistration %}
-                                <a class="button is-small has-background-light"
-                                href="{{ path('app_participant_new', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id}) }}"
-                                title="{{ 'participant.new'|trans }} ({{ participatingDojo.displayName }})">
-                                    <span class="icon is-small"><i class="fas fa-plus"></i></span>
-                                    <span>{{ 'taikai.participant'|trans }}</span>
-                                </a>
-                            {% endif %}
-                        </li>
-                        <li>
-                            {% if is_granted('PARTICIPATING_DOJO_EDIT', participatingDojo) and beforeRegistration %}
-                            {{ include('participant/_import_excel.html.twig', {taikai: taikai, participatingDojo: participatingDojo, size: 'is-small'}) }}
-                            {% endif %}
-                        </li>
-                    </ul> #}
                 </td>
             </tr>
 
@@ -81,8 +81,10 @@
                     {{ include('participant/_partial_display.html.twig', {taikai: taikai, participatingDojo: participatingDojo, participant: participant, beforeRegistration: beforeRegistration}) }}
                 </tr>
             {% endfor %}
+
         {% endif %}
     {% endfor %}
     </tbody>
 </table>
 
+{% endif %}

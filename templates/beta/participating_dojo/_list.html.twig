@@ -1,7 +1,8 @@
 {% set canAddHost = taikai.distributed or taikai.participatingDojos|length == 0 %}
-{% set isRegistration = taikai.isState(
-    constant('App\\Enum\\TaikaiState::Registration')
-) %}
+{% 
+    set beforeRegistration = taikai.isState(constant('App\\Enum\\TaikaiState::New'))
+    or taikai.isState(constant('App\\Enum\\TaikaiState::Registration'))
+%}
 
 <table class="table is-narrow is-hoverable is-fullwidth">
     <thead>
@@ -31,7 +32,7 @@
             <td>{{ participatingDojo.participants|length }}</td>
             <td class="has-text-right">
                 {% if is_granted('PARTICIPATING_DOJO_EDIT', participatingDojo) %}
-                    {% if isRegistration %}
+                    {% if beforeRegistration %}
                         <form method="post" style="display:inline"
                             action="{{ path('app_participating_dojo_draw', {taikaiId: taikai.id, id: participatingDojo.id}) }}"
                             onsubmit="return confirm('{{ 'draw.confirm'|trans|e('js') }}')">
@@ -47,7 +48,7 @@
                         <span class="icon is-small"><i class="fas fa-pen"></i></span>
                     </a>
                 {% endif %}
-                {% if is_granted('PARTICIPATING_DOJO_DELETE', participatingDojo) and isRegistration %}
+                {% if is_granted('PARTICIPATING_DOJO_DELETE', participatingDojo) and beforeRegistration %}
                     <form method="post" style="display:inline"
                           action="{{ path('app_participating_dojo_delete', {taikaiId: taikai.id, id: participatingDojo.id}) }}"
                           onsubmit="return confirm('{{ 'participating_dojo.delete.confirm'|trans|e('js') }}')">

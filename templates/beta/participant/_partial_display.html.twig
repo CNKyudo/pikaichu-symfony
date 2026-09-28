@@ -22,7 +22,9 @@
     {% endif %}
 </td>
 {% if loop.first %}
-    <td rowspan="{{ participatingDojo.participants|length }}">
-        {{ include('participating_dojo/_partial_action.html.twig', {taikai: taikai, participatingDojo: participatingDojo, beforeRegistration: beforeRegistration}) }}
-    </td>
+    {% if participatingDojo.unteamedParticipants|length == 0 or participant in participatingDojo.unteamedParticipants %}
+        <td rowspan="{{ participatingDojo.participants|length }}">
+            {{ include('participating_dojo/_partial_action.html.twig', {taikai: taikai, participatingDojo: participatingDojo, beforeRegistration: beforeRegistration}) }}
+        </td>
+    {% endif %}
 {% endif %}

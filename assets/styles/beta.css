@@ -47,3 +47,9 @@
 .form-answer {
     flex: 1;
 }
+
+.participants-overview-table th:last-child,
+.participants-overview-table td:last-child {
+    width: 30%;
+    white-space: normal;
+}
