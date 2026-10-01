@@ -1,0 +1,21 @@
+{% set teamedCount = participatingDojo.participants|filter(p => p.team is not null)|length %}
+
+{% if participatingDojo.participants|length > 0 %}
+    {{ 'team.teamed'|trans({'%teamed%': teamedCount, '%total%': participatingDojo.participants|length}) }}
+{% endif %}
+
+<a class="button is-small has-background-light {{ size|default('') }}"
+    href="{{ path('app_team_new', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id}) }}"
+    title="{{ 'team.new'|trans }}">
+    <span class="icon is-small"><i class="fas fa-plus"></i></span>
+    <span>{{ 'taikai.team'|trans }}</span>
+</a>
+
+<a class="button has-background-light {{ size|default('') }}"
+    href="{{ path('app_teaming_edit', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id}) }}"
+    title="{{ 'team.form_teams'|trans }}">
+    <span class="icon is-small"><i class="fas fa-list-ol"></i></span>
+    <span>{{ 'team.form_teams'|trans }}</span>
+</a>
+
+

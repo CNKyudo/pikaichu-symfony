@@ -10,6 +10,7 @@ use App\Entity\Taikai;
 use App\Entity\Team;
 use App\Form\TeamType;
 use App\Service\TeamingService;
+use App\Service\UiMode;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -48,6 +49,7 @@ final class TeamController extends AbstractController
         #[MapEntity(id: 'taikaiId')] Taikai $taikai,
         #[MapEntity(id: 'participatingDojoId')] ParticipatingDojo $participatingDojo,
         Request $request,
+        UiMode $uiMode,
     ): Response {
         $this->assertHostClub($taikai, $participatingDojo);
 
@@ -62,6 +64,13 @@ final class TeamController extends AbstractController
             $this->entityManager->flush();
 
             $this->addFlash('success', 'team.created');
+
+            if ($uiMode->isBeta()) {
+                return $this->redirectToRoute('app_teaming_edit', [
+                    'taikaiId' => $taikai->getId(),
+                    'participatingDojoId' => $participatingDojo->getId(),
+                ]);
+            }
 
             return $this->redirectToHostClub($taikai, $participatingDojo);
         }
@@ -83,6 +92,7 @@ final class TeamController extends AbstractController
         #[MapEntity(id: 'participatingDojoId')] ParticipatingDojo $participatingDojo,
         #[MapEntity(id: 'id')] Team $team,
         Request $request,
+        UiMode $uiMode,
     ): Response {
         $this->assertHostClub($taikai, $participatingDojo);
         $this->assertBelongsTo($team->getParticipatingDojo(), $participatingDojo, 'Team does not belong to this participating dojo');
@@ -94,6 +104,13 @@ final class TeamController extends AbstractController
             $this->entityManager->flush();
 
             $this->addFlash('success', 'team.updated');
+
+            if ($uiMode->isBeta()) {
+                return $this->redirectToRoute('app_teaming_edit', [
+                    'taikaiId' => $taikai->getId(),
+                    'participatingDojoId' => $participatingDojo->getId(),
+                ]);
+            }
 
             return $this->redirectToHostClub($taikai, $participatingDojo);
         }
@@ -116,12 +133,20 @@ final class TeamController extends AbstractController
         #[MapEntity(id: 'participatingDojoId')] ParticipatingDojo $participatingDojo,
         #[MapEntity(id: 'id')] Team $team,
         Request $request,
+        UiMode $uiMode,
     ): RedirectResponse {
         $this->assertHostClub($taikai, $participatingDojo);
         $this->assertBelongsTo($team->getParticipatingDojo(), $participatingDojo, 'Team does not belong to this participating dojo');
 
         if (!$this->isCsrfTokenValid('delete'.$team->getId(), (string) $request->request->get('_token'))) {
             $this->addFlash('error', 'team.delete.invalid_token');
+
+            if ($uiMode->isBeta()) {
+                return $this->redirectToRoute('app_teaming_edit', [
+                    'taikaiId' => $taikai->getId(),
+                    'participatingDojoId' => $participatingDojo->getId(),
+                ]);
+            }
 
             return $this->redirectToHostClub($taikai, $participatingDojo);
         }
@@ -130,6 +155,13 @@ final class TeamController extends AbstractController
         $this->entityManager->flush();
 
         $this->addFlash('success', 'team.deleted');
+
+        if ($uiMode->isBeta()) {
+            return $this->redirectToRoute('app_teaming_edit', [
+                'taikaiId' => $taikai->getId(),
+                'participatingDojoId' => $participatingDojo->getId(),
+            ]);
+        }
 
         return $this->redirectToHostClub($taikai, $participatingDojo);
     }
