@@ -1,4 +1,6 @@
 {% set teamedCount = participatingDojo.participants|filter(p => p.team is not null)|length %}
+{% set isPreparation = taikai.isState(constant('App\\Enum\\TaikaiState::New')) %}
+    
 <nav class="level">
     <div class="level-left">
         <div class="level-item">
@@ -26,12 +28,14 @@
         <th>{{ 'team.shortname'|trans }}</th>
         <th>{{ 'team.num_participants'|trans }}</th>
         <th class="has-text-right">
-            <a class="button is-small has-background-light"
-               href="{{ path('app_team_new', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id}) }}"
-               title="{{ 'team.new'|trans }}">
-                <span class="icon is-small"><i class="fas fa-plus"></i></span>
-                <span>{{ 'action.add'|trans }}</span>
-            </a>
+            {% if is_granted('TAIKAI_EDIT', taikai) and isPreparation %}
+                <a class="button is-small has-background-light"
+                href="{{ path('app_team_new', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id}) }}"
+                title="{{ 'team.new'|trans }}">
+                    <span class="icon is-small"><i class="fas fa-plus"></i></span>
+                    <span>{{ 'action.add'|trans }}</span>
+                </a>
+            {% endif %}
         </th>
     </tr>
     </thead>

@@ -183,6 +183,7 @@ taikai:
     details: Informations
     participant: Participant
     team: Équipe
+    teams: Équipes
     participants_overview.dojo: Club hôte
     participants_overview.team: Équipe
     participants_overview.name: Nom

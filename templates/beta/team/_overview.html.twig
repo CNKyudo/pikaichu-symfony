@@ -1,0 +1,130 @@
+
+{% set canAddHost = taikai.distributed or taikai.participatingDojos|length == 0 %}
+{% 
+    set beforeRegistration = taikai.isState(constant('App\\Enum\\TaikaiState::New'))
+    or taikai.isState(constant('App\\Enum\\TaikaiState::Registration'))
+%}
+
+{% if taikai.participatingDojos|length == 0 %}
+
+    <div class="has-text-centered">
+        {{ 'participant.empty'|trans }}
+        {% if beforeRegistration and is_granted('TAIKAI_EDIT', taikai) and canAddHost %}
+            <a class="button is-small has-background-light"
+                href="{{ path('app_participating_dojo_new', {taikaiId: taikai.id}) }}"
+                title="{{ 'participating_dojo.new'|trans }}">
+                <span class="icon is-small"><i class="fas fa-plus"></i></span>
+                <span>{{ 'taikai.team'|trans }}</span>
+            </a>
+        {% endif %}
+    </div>
+
+{% else %}
+
+<table class="table is-narrow is-hoverable is-fullwidth">
+    <thead>
+    <tr class="has-text-centered">
+        <th>{{ 'team.index'|trans }}</th>
+        <th>{{ 'taikai.participants_overview.team'|trans }}</th>
+        <th>{{ 'action.actions'|trans }}</th>
+        <th>{{ 'participant.firstname'|trans }}</th>
+        <th>{{ 'participant.lastname'|trans }}</th>
+        <th></th> <!--- if participant.kyudojin --->
+        <th>{{ 'participant.club'|trans }}</th>
+
+        <th>{{ 'taikai.participants_overview.dojo'|trans }}</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for participatingDojo in taikai.participatingDojos %}
+        {% if participatingDojo.participants|length == 0 %}
+
+            <tr>
+                {% if taikai.form and taikai.form.value == 'individual' %}
+                    <td colspan="6" class="has-text-centered has-text-grey">{{ 'participant.empty'|trans }}</td>
+                {% else %}
+                    <td colspan="7" class="has-text-centered has-text-grey">{{ 'participant.empty'|trans }}</td>
+                {% endif %}
+                <td>
+                    {{ include('participating_dojo/_partial_action.html.twig', {taikai: taikai, participatingDojo: participatingDojo, beforeRegistration: beforeRegistration}) }}
+                </td>
+            </tr>
+
+        {% else %}
+            
+            {% set firstRow = true %}
+            {% set rowCount = participatingDojo.participants|length %}
+            {% for team in participatingDojo.teams %}
+                {% for participant in team.participants %}
+                    <tr>
+                        {% if loop.first %}
+                            <td rowspan="{{ team.participants|length }}">{{ team.index }}</td>
+                            <td rowspan="{{ team.participants|length }}">
+                                {{ team.shortname }}
+                                {% if team.mixed %}
+                                <i class="fas fa-people-group"></i>
+                                {% endif %}
+                            </td>
+                            <td rowspan="{{ team.participants|length }}">
+                                <!-- Edit team --> 
+                                <a class="button is-small has-background-light"
+                                href="{{ path('app_team_edit', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id, id: team.id}) }}"
+                                title="{{ 'team.edit'|trans }}">
+                                    <span class="icon is-small"><i class="fas fa-pen"></i></span>
+                                </a>
+                                <!-- Delete team -->
+                                {% if is_granted('TAIKAI_EDIT', taikai) and beforeRegistration %}
+                                <form method="post" style="display:inline"
+                                    action="{{ path('app_team_delete', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id, id: team.id}) }}"
+                                    onsubmit="return confirm('{{ 'team.delete.confirm'|trans|e('js') }}')">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ team.id) }}">
+                                    <button class="button is-small has-background-light" type="submit" title="{{ 'team.destroy'|trans }}">
+                                        <span class="icon is-small"><i class="fas fa-trash"></i></span>
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </td>
+                        {% endif %}
+                        <td>{{ participant.firstname }}</td>
+                        <td>{{ participant.lastname }}</td>
+                        <td>{% if participant.kyudojin %}<i class="far fa-id-badge"></i>{% endif %}</td>
+                        <td>{{ participant.club }}</td>
+
+                        {% if firstRow %}
+                            <td rowspan="{{ rowCount }}"> 
+                            <p>{{ participatingDojo.displayName }}</p>
+                                {% if beforeRegistration %}
+                                    <div class="mb-1">
+                                        {{ include('team/_partial_make.html.twig', {taikai: taikai, participatingDojo: participatingDojo, size: 'is-small'}) }}
+                                    </div>
+                                {% endif %}
+                            </td>
+                            {% set firstRow = false %}
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+            {% for participant in participatingDojo.unteamedParticipants %}
+                <tr>
+                    <td></td>
+                    <td>--</td>
+                    <td></td>
+                    <td>{{ participant.firstname }}</td>
+                    <td>{{ participant.lastname }}</td>
+                    <td>{% if participant.kyudojin %}<i class="far fa-id-badge"></i>{% endif %}</td>
+                    <td>{{ participant.club }}</td>
+                    {% if firstRow %}
+                        <td rowspan="{{ rowCount }}">
+                            <p>{{ participatingDojo.displayName }}</p>
+                        </td>
+                        {% set firstRow = false %}
+                    {% endif %}
+                </tr>
+            {% endfor %}
+
+        {% endif %}
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endif %}

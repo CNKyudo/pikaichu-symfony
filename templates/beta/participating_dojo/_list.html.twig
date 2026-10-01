@@ -1,8 +1,5 @@
 {% set canAddHost = taikai.distributed or taikai.participatingDojos|length == 0 %}
-{% 
-    set beforeRegistration = taikai.isState(constant('App\\Enum\\TaikaiState::New'))
-    or taikai.isState(constant('App\\Enum\\TaikaiState::Registration'))
-%}
+{% set isPreparation = taikai.isState(constant('App\\Enum\\TaikaiState::New')) %}
 
 <table class="table is-narrow is-hoverable is-fullwidth">
     <thead>
@@ -12,7 +9,7 @@
         <th>{{ 'dojo.country_code'|trans }}</th>
         <th>{{ 'participating_dojo.num_participants'|trans }}</th>
         <th class="has-text-right">
-            {% if is_granted('TAIKAI_EDIT', taikai) and canAddHost %}
+            {% if is_granted('TAIKAI_EDIT', taikai) and canAddHost and isPreparation %}
                 <a class="button is-small has-background-light"
                    href="{{ path('app_participating_dojo_new', {taikaiId: taikai.id}) }}"
                    title="{{ 'participating_dojo.new'|trans }}">
@@ -31,24 +28,14 @@
             <td>{{ participatingDojo.dojo and participatingDojo.dojo.countryCode ? participatingDojo.dojo.countryCode|country_name : '' }}</td>
             <td>{{ participatingDojo.participants|length }}</td>
             <td class="has-text-right">
-                {% if is_granted('PARTICIPATING_DOJO_EDIT', participatingDojo) %}
-                    {% if beforeRegistration %}
-                        <form method="post" style="display:inline"
-                            action="{{ path('app_participating_dojo_draw', {taikaiId: taikai.id, id: participatingDojo.id}) }}"
-                            onsubmit="return confirm('{{ 'draw.confirm'|trans|e('js') }}')">
-                            <input type="hidden" name="_token" value="{{ csrf_token('draw' ~ participatingDojo.id) }}">
-                            <button class="button is-small has-background-light" type="submit" title="{{ 'draw.label'|trans }}">
-                                <span class="icon is-small"><i class="fas fa-dice"></i></span>
-                            </button>
-                        </form>
-                    {% endif %}
+                {% if is_granted('PARTICIPATING_DOJO_EDIT', participatingDojo) and isPreparation %}
                     <a class="button is-small has-background-light"
                        href="{{ path('app_participating_dojo_edit', {taikaiId: taikai.id, id: participatingDojo.id}) }}"
                        title="{{ 'participating_dojo.edit'|trans }}">
                         <span class="icon is-small"><i class="fas fa-pen"></i></span>
                     </a>
                 {% endif %}
-                {% if is_granted('PARTICIPATING_DOJO_DELETE', participatingDojo) and beforeRegistration %}
+                {% if is_granted('PARTICIPATING_DOJO_DELETE', participatingDojo) and isPreparation %}
                     <form method="post" style="display:inline"
                           action="{{ path('app_participating_dojo_delete', {taikaiId: taikai.id, id: participatingDojo.id}) }}"
                           onsubmit="return confirm('{{ 'participating_dojo.delete.confirm'|trans|e('js') }}')">

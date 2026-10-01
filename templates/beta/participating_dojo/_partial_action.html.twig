@@ -1,41 +1,42 @@
-<ul>
-    <li>
-        <div class="mb-1">
-            {{ participatingDojo.displayName }}
-            {% if is_granted('TAIKAI_EDIT', taikai) and beforeRegistration %}
-            <!-- Draw participants -->
-            <form method="post" style="display:inline"
-                action="{{ path('app_participating_dojo_draw', {taikaiId: taikai.id, id: participatingDojo.id}) }}"
-                onsubmit="return confirm('{{ 'draw.confirm'|trans|e('js') }}')">
-                <input type="hidden" name="_token" value="{{ csrf_token('draw' ~ participatingDojo.id) }}">
-                <button class="button is-small has-background-light" type="submit" title="{{ 'draw.label'|trans }}">
-                    <span class="icon is-small"><i class="fas fa-dice"></i></span>
-                </button>
-            </form>
-            <!-- Add participant -->
-            <a class="button is-small has-background-light"
-            href="{{ path('app_participant_new', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id}) }}"
-            title="{{ 'participant.new'|trans }} ({{ participatingDojo.displayName }})">
-                <span class="icon is-small"><i class="fas fa-plus"></i></span>
-                <span>{{ 'taikai.participant'|trans }}</span>
-            </a>
-            {% endif %}
-        </div>
-    </li>
-    {% if is_granted('TAIKAI_EDIT', taikai) and beforeRegistration %}
-    <li>
-        <!-- Import Excel -->
-        <div class="mb-1">
-            {{ include('participant/_import_excel.html.twig', {taikai: taikai, participatingDojo: participatingDojo, size: 'is-small'}) }}
-        </div>  
-    </li>
-    <li>
+{% set isPreparation = taikai.isState(constant('App\\Enum\\TaikaiState::New')) %}
+{% set isRegistration = taikai.isState(constant('App\\Enum\\TaikaiState::Registration')) %}
 
-        {% if not (taikai.form and taikai.form.value == 'individual') %} 
+<ul>
+    {% if isPreparation %}
+        <li>
             <div class="mb-1">
-                {{ include('team/_partial_make.html.twig', {taikai: taikai, participatingDojo: participatingDojo, size: 'is-small'}) }}
+                {{ participatingDojo.displayName }}
+                {% if is_granted('TAIKAI_EDIT', taikai) and beforeRegistration %}
+
+                <!-- Add participant -->
+                <a class="button is-small has-background-light"
+                href="{{ path('app_participant_new', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id}) }}"
+                title="{{ 'participant.new'|trans }} ({{ participatingDojo.displayName }})">
+                    <span class="icon is-small"><i class="fas fa-plus"></i></span>
+                    <span>{{ 'taikai.participant'|trans }}</span>
+                </a>
+                {% endif %}
             </div>
+        </li>
+        {% if is_granted('TAIKAI_EDIT', taikai) and beforeRegistration %}
+        <li>
+            <!-- Import Excel -->
+            <div class="mb-1">
+                {{ include('participant/_import_excel.html.twig', {taikai: taikai, participatingDojo: participatingDojo, size: 'is-small'}) }}
+            </div>  
+        </li>
         {% endif %}
-    </li>
+    {% elseif isRegistration %}
+        {{ participatingDojo.displayName }}
+        <!-- Draw participants -->
+        <form method="post" style="display:inline"
+            action="{{ path('app_participating_dojo_draw', {taikaiId: taikai.id, id: participatingDojo.id}) }}"
+            onsubmit="return confirm('{{ 'draw.confirm'|trans|e('js') }}')">
+            <input type="hidden" name="_token" value="{{ csrf_token('draw' ~ participatingDojo.id) }}">
+            <button class="button is-small has-background-light" type="submit" title="{{ 'draw.label'|trans }}">
+                <span class="icon is-small"><i class="fas fa-dice"></i></span>
+                <span>{{ 'draw.label'|trans }}</span>
+            </button>
+        </form>
     {% endif %}
 </ul>
