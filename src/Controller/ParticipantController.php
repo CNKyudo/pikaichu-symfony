@@ -198,14 +198,9 @@ final class ParticipantController extends AbstractController
             $this->addFlash('error', 'participant.import.file_missing');
 
             if ($uiMode->isBeta()) {
-                $referer = $request->headers->get('referer');
-
-                if (null !== $referer) {
-                    return $this->redirect($referer);
-                }
-
                 return $this->redirectToRoute('app_taikai_show', [
                     'id' => $taikai->getId(),
+                    'tab' => 'participants',
                 ]);
             }
 
