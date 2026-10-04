@@ -104,11 +104,11 @@ final class TeamController extends AbstractController
             $this->entityManager->flush();
 
             $this->addFlash('success', 'team.updated');
-
+            
             if ($uiMode->isBeta()) {
-                return $this->redirectToRoute('app_teaming_edit', [
-                    'taikaiId' => $taikai->getId(),
-                    'participatingDojoId' => $participatingDojo->getId(),
+                return $this->redirectToRoute('app_taikai_show', [
+                    'id' => $taikai->getId(),
+                    'tab' => 'teams',
                 ]);
             }
 

@@ -1,0 +1,18 @@
+{# Edit team #} 
+<a class="button is-small has-background-light"
+href="{{ path('app_team_edit', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id, id: team.id}) }}"
+title="{{ 'team.edit'|trans }}">
+    <span class="icon is-small"><i class="fas fa-pen"></i></span>
+</a>
+
+{# Delete team #}
+{% if is_granted('TAIKAI_EDIT', taikai) %}
+<form method="post" style="display:inline"
+    action="{{ path('app_team_delete', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id, id: team.id}) }}"
+    onsubmit="return confirm('{{ 'team.delete.confirm'|trans|e('js') }}')">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ team.id) }}">
+    <button class="button is-small has-background-light" type="submit" title="{{ 'team.destroy'|trans }}">
+        <span class="icon is-small"><i class="fas fa-trash"></i></span>
+    </button>
+</form>
+{% endif %}
