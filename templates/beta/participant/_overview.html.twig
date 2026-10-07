@@ -1,5 +1,6 @@
 
 {% set canAddHost = taikai.distributed or taikai.participatingDojos|length == 0 %}
+{% set isRegistration = taikai.isState(constant('App\\Enum\\TaikaiState::Registration')) %}
 {% 
     set beforeRegistration = taikai.isState(constant('App\\Enum\\TaikaiState::New'))
     or taikai.isState(constant('App\\Enum\\TaikaiState::Registration'))
@@ -38,8 +39,9 @@
         <th>{{ 'taikai.participants_overview.dojo'|trans }}</th>
     </tr>
     </thead>
-    <tbody>
+
     {% for participatingDojo in taikai.participatingDojos %}
+    <tbody >
         {% if participatingDojo.participants|length == 0 %}
 
             <tr>
@@ -54,12 +56,17 @@
             </tr>
 
         {% else %}
-            
             {% set firstRow = true %}
             {% set rowCount = participatingDojo.participants|length %}
             {% for team in participatingDojo.teams %}
                 {% for participant in team.participants %}
+                    {% if isRegistration %}
+                    <tr data-controller="color-toggle"
+                        data-action="click->color-toggle#toggle"
+                        class="is-clickable">
+                    {% else %}
                     <tr>
+                    {% endif %}
                         {% if taikai.form and taikai.form.value == 'individual' %}
                             <td>{{ participant.index }}</td>
                         {% else %}
@@ -70,7 +77,7 @@
                         {% endif %}
                         {{ include('participant/_partial_display.html.twig', {taikai: taikai, participatingDojo: participatingDojo, participant: participant, beforeRegistration: beforeRegistration}) }}
                         {% if firstRow %}
-                            <td rowspan="{{ rowCount }}">
+                            <td rowspan="{{ rowCount }}" class="shared-cell">
                                 {{ include('participating_dojo/_partial_action.html.twig', {taikai: taikai, participatingDojo: participatingDojo, beforeRegistration: beforeRegistration}) }}
                                 </td>
                             {% set firstRow = false %}
@@ -79,7 +86,13 @@
                 {% endfor %}
             {% endfor %}
             {% for participant in participatingDojo.unteamedParticipants %}
-                <tr>
+                {% if isRegistration %}
+                    <tr data-controller="color-toggle"
+                        data-action="click->color-toggle#toggle"
+                        class="is-clickable">
+                    {% else %}
+                    <tr>
+                    {% endif %}
                     {% if taikai.form and taikai.form.value == 'individual' %}
                         <td>{{ participant.index }}</td>
                     {% else %}
@@ -88,7 +101,7 @@
                     {% endif %}
                     {{ include('participant/_partial_display.html.twig', {taikai: taikai, participatingDojo: participatingDojo, participant: participant, beforeRegistration: beforeRegistration}) }}
                     {% if firstRow %}
-                        <td rowspan="{{ rowCount }}">
+                        <td rowspan="{{ rowCount }}" class="shared-cell">
                             {{ include('participating_dojo/_partial_action.html.twig', {taikai: taikai, participatingDojo: participatingDojo, beforeRegistration: beforeRegistration}) }}
                             </td>
                         {% set firstRow = false %}
@@ -97,8 +110,8 @@
             {% endfor %}
 
         {% endif %}
-    {% endfor %}
     </tbody>
+    {% endfor %}
 </table>
 
 {% endif %}
