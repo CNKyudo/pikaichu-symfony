@@ -6,7 +6,7 @@ title="{{ 'team.edit'|trans }}">
 </a>
 
 {# Delete team #}
-{% if is_granted('TAIKAI_EDIT', taikai) %}
+{% if beforeRegistration %}
 <form method="post" style="display:inline"
     action="{{ path('app_team_delete', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id, id: team.id}) }}"
     onsubmit="return confirm('{{ 'team.delete.confirm'|trans|e('js') }}')">

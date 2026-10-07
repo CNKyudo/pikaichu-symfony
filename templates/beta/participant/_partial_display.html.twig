@@ -2,6 +2,7 @@
 <td>{{ participant.lastname }}</td>
 <td>{% if participant.kyudojin %}<i class="far fa-id-badge"></i>{% endif %}</td>
 <td>{{ participant.club }}</td>
+{% if is_granted('TAIKAI_EDIT', taikai) %}
 <td>
     <!-- Edit participant -->
     <a class="button is-small has-background-light"
@@ -9,8 +10,9 @@
     title="{{ 'participant.edit'|trans }}">
         <span class="icon is-small"><i class="fas fa-pen"></i></span>
     </a>
+    
     <!-- Delete participant -->
-    {% if is_granted('TAIKAI_EDIT', taikai) and beforeRegistration %}
+    {% if beforeRegistration %}
     <form method="post" style="display:inline"
         action="{{ path('app_participant_delete', {taikaiId: taikai.id, participatingDojoId: participatingDojo.id, id: participant.id}) }}"
         onsubmit="return confirm('{{ 'participant.delete.confirm'|trans|e('js') }}')">
@@ -21,3 +23,4 @@
     </form>
     {% endif %}
 </td>
+{% endif %}

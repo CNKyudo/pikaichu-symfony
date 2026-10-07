@@ -35,7 +35,9 @@
         <th>{{ 'participant.lastname'|trans }}</th>
         <th></th> <!--- if participant.kyudojin --->
         <th>{{ 'participant.club'|trans }}</th>
+        {% if is_granted('TAIKAI_EDIT', taikai) %}
         <th>{{ 'action.actions'|trans }}</th>
+        {% endif %}
         <th>{{ 'taikai.participants_overview.dojo'|trans }}</th>
     </tr>
     </thead>

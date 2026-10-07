@@ -2,10 +2,7 @@
 {% set canAddHost = taikai.distributed or taikai.participatingDojos|length == 0 %}
 {% set isPreparation = taikai.isState(constant('App\\Enum\\TaikaiState::New')) %}
 {% set isRegistration = taikai.isState(constant('App\\Enum\\TaikaiState::Registration')) %}
-{% 
-    set beforeRegistration = taikai.isState(constant('App\\Enum\\TaikaiState::New'))
-    or taikai.isState(constant('App\\Enum\\TaikaiState::Registration'))
-%}
+{% set beforeRegistration = isPreparation or isRegistration %}
 
 {% if taikai.participatingDojos|length == 0 %}
 
@@ -29,7 +26,9 @@
         <th>{{ 'team.index'|trans }}</th>
         <th>{{ 'taikai.participants_overview.team'|trans }}</th>
         <th>{{ 'taikai.participants'|trans }}</th>
+        {% if is_granted('TAIKAI_EDIT', taikai)%}
         <th>{{ 'action.actions'|trans }}</th>
+        {% endif %}
         <th>{{ 'taikai.participants_overview.dojo'|trans }}</th>
     </tr>
     </thead>
@@ -60,9 +59,11 @@
                         <span class="has-text-grey">{{ 'participant.empty'|trans }}</span>
                     {% endif %}
                 </td>
+                {% if is_granted('TAIKAI_EDIT', taikai)%}
                 <td> 
-                    {{ include('team/_partial_action.html.twig', {taikai: taikai, participatingDojo: participatingDojo, team: team}) }}
+                    {{ include('team/_partial_action.html.twig', {taikai: taikai, participatingDojo: participatingDojo, team: team, beforeRegistration: beforeRegistration}) }}
                 </td>
+                {% endif %}
                 {% if firstRow %}
                     <td rowspan="{{ rowCount }}">
                         {{ team.participatingDojo }} 
@@ -75,7 +76,9 @@
                                 {{ 'teaming.unassigned'|trans }}
                             </p>
                         {% endif %}
-                        {{ include('participating_dojo/_partial_teaming.html.twig', {taikai: taikai, participatingDojo: participatingDojo}) }}
+                        {% if is_granted('TAIKAI_EDIT', taikai) and beforeRegistration %}
+                            {{ include('participating_dojo/_partial_teaming.html.twig', {taikai: taikai, participatingDojo: participatingDojo}) }}
+                        {% endif %}
                         </td>
                     {% set firstRow = false %}
                 {% endif %}
