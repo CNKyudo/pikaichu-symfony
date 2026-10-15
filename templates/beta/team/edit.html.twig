@@ -1,0 +1,22 @@
+{% extends 'taikai/_layout.html.twig' %}
+{% block title %}{{ 'team.edit'|trans }} · {{ app_name }}{% endblock %}
+{% block taikai_content %}
+<div class="columns">
+    <div class="column is-one-third is-offset-2">
+        <div class="card">
+            <header class="card-header"><p class="card-header-title">{{ 'team.edit'|trans }}</p></header>
+            <div class="card-content">
+                {{ include('team/_form.html.twig') }}
+            </div>
+        </div>
+    </div>
+    <div class="column is-two-fifths">
+        <div class="card">
+            <header class="card-header"><p class="card-header-title">{{ 'participant.title'|trans }}</p></header>
+            <div class="card-content">
+                {{ include('participant/_list_in_team.html.twig') }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

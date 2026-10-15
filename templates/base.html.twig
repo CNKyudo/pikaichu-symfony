@@ -36,13 +36,11 @@
 
         <div class="navbar-end">
             {% if app.session.get('ui', 'classic') == 'beta' %}
-                <a class="navbar-item" href="{{ path('ui_switch', { mode: 'classic' }) }}"
-                class="button is-small">
+                <a class="navbar-item" href="{{ path('ui_switch', { mode: 'classic' }) }}">
                     {{ 'nav.ui.classic'|trans }}
                 </a>
             {% else %}
-                <a class="navbar-item" href="{{ path('ui_switch', { mode: 'beta' }) }}"
-                class="button is-small is-warning">
+                <a class="navbar-item" href="{{ path('ui_switch', { mode: 'beta' }) }}">
                     {{ 'nav.ui.beta'|trans }}
                 </a>
             {% endif %}

@@ -1,0 +1,93 @@
+
+{% set canAddHost = taikai.distributed or taikai.participatingDojos|length == 0 %}
+{% set isPreparation = taikai.isState(constant('App\\Enum\\TaikaiState::New')) %}
+{% set isRegistration = taikai.isState(constant('App\\Enum\\TaikaiState::Registration')) %}
+{% set beforeRegistration = isPreparation or isRegistration %}
+
+{% if taikai.participatingDojos|length == 0 %}
+
+    <div class="has-text-centered">
+        {{ 'participant.empty'|trans }}
+        {% if beforeRegistration and is_granted('TAIKAI_EDIT', taikai) and canAddHost %}
+            <a class="button is-small has-background-light"
+                href="{{ path('app_participating_dojo_new', {taikaiId: taikai.id}) }}"
+                title="{{ 'participating_dojo.new'|trans }}">
+                <span class="icon is-small"><i class="fas fa-plus"></i></span>
+                <span>{{ 'taikai.team'|trans }}</span>
+            </a>
+        {% endif %}
+    </div>
+
+{% else %}
+
+<table class="table is-narrow is-hoverable is-fullwidth">
+    <thead>
+    <tr class="has-text-centered">
+        <th>{{ 'team.index'|trans }}</th>
+        <th>{{ 'taikai.participants_overview.team'|trans }}</th>
+        <th>{{ 'taikai.participants'|trans }}</th>
+        {% if is_granted('TAIKAI_EDIT', taikai)%}
+        <th>{{ 'action.actions'|trans }}</th>
+        {% endif %}
+        <th>{{ 'taikai.participants_overview.dojo'|trans }}</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for participatingDojo in taikai.participatingDojos %}
+    
+        {% set firstRow = true %}
+        {% set rowCount = participatingDojo.teams|length %}
+           
+        {% if participatingDojo.teams|length == 0 %}
+            <tr>
+                <td colspan="8" class="has-text-centered has-text-grey">{{ 'team.empty'|trans }}</td>
+            </tr>
+        {% else %}
+            {% for team in participatingDojo.teams %}
+            <tr>
+                <td> {{ team.id }} </td>
+                <td> 
+                    {{ team.shortname }}
+                    {% if team.mixed %}
+                        <i class="fas fa-people-group"></i>
+                    {% endif %}    
+                </td>
+                <td> 
+                    {% if team.participants|length > 0 %}
+                        {{ team.participants|map(p => p.displayName)|join(', ') }}
+                    {% else %}
+                        <span class="has-text-grey">{{ 'participant.empty'|trans }}</span>
+                    {% endif %}
+                </td>
+                {% if is_granted('TAIKAI_EDIT', taikai)%}
+                <td> 
+                    {{ include('team/_partial_action.html.twig', {taikai: taikai, participatingDojo: participatingDojo, team: team, beforeRegistration: beforeRegistration}) }}
+                </td>
+                {% endif %}
+                {% if firstRow %}
+                    <td rowspan="{{ rowCount }}">
+                        {{ team.participatingDojo }} 
+
+                        {% set teamedCount = participatingDojo.participants|filter(p => p.team is not null)|length %}
+                        {% set unteamedCount = participatingDojo.participants|filter(p => p.team is null)|length %}
+                        {% if unteamedCount > 0 %}
+                            <p class="has-text-danger">
+                                {{ unteamedCount }} / {{ participatingDojo.participants|length }}
+                                {{ 'teaming.unassigned'|trans }}
+                            </p>
+                        {% endif %}
+                        {% if is_granted('TAIKAI_EDIT', taikai) and beforeRegistration %}
+                            {{ include('participating_dojo/_partial_teaming.html.twig', {taikai: taikai, participatingDojo: participatingDojo}) }}
+                        {% endif %}
+                        </td>
+                    {% set firstRow = false %}
+                {% endif %}
+                </tr>
+            {% endfor %}
+
+        {% endif %}
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endif %}
